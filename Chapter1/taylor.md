@@ -16,6 +16,7 @@ This says three things:
 
 Basically this says $|f(x) - f(c)| \rightarrow 0$ as $x \rightarrow c$. 
 
+### 
 A function is continuous on $I = (a,b)$ if it is at each $c$ in $I$.
 
 A function is continuous in $I=[a,b]$ if ....
@@ -32,7 +33,7 @@ $$
 
 The function is differentiable on $I=(a,b)$ provided it has a derivative at each $c$ in $I$.
 
-A function which is differentiable on $I=(a,b)$ it is continuous on $I$. Why???
+A function which is differentiable on $I=(a,b)$ it is continuous on $I$. (Why???)
 
 ### Example
 
@@ -94,6 +95,11 @@ Finding Taylor series by hand is possible. Here we let the computer do some
 
 ```
 using SymPy
+```
+
+### Examples
+
+```
 x = symbols("x")
 
 f(x) = log(1 + x)
@@ -118,8 +124,11 @@ For $f(x) = 1/(1+x)$ we can *approximate* by a Taylor polynomial with $c=0$. If 
 We have $f^{(k)}(x) = k!/(x+1)^{k+1}$, so the error term
 
 $$
-| E_n(\psi) | = |f^{(n+1)}(\psi) / (n+1)! \cdot x^{n+1} | \leq \frac{1}{(1 + \psi)^{n+1}} \cdot x^{n+1} \leq
-1 \cdot (1/2)^{n+1}.
+\begin{algin}
+| E_n(\psi) | &= |f^{(n+1)}(\psi) / (n+1)! \cdot x^{n+1} |\\
+              &\leq \frac{1}{(1 + \psi)^{n+1}} \cdot x^{n+1} \\
+              &\leq 1 \cdot (1/2)^{n+1}.
+\end{align}			  
 $$
 
 We have then $(n+1)\log(1/2) = 8 \log(1/10)$, or $n\approx 26$.
@@ -149,6 +158,9 @@ Rolle's [Theorem](http://tinyurl.com/nkus4e7) is a humble little observation -- 
 
 > if $f(x)$ is continuous on $I=[a,b]$ and differentiable on $(a,b)$. (not quite $C^1$, but $C^1$ functions work), **and** $f(a)=f(b)$, then there exists $\psi$ in $(a,b)$ $f'(\psi) = 0$.
 
+
+### Cauchy Mean Value Theorem
+
 Rolle's Theorem will imply the Cauchy Mean Value [Theorem](http://tinyurl.com/ppt9kd8). Suppose $F$ and $G$ are continous on $I$ and differentiable on its interior, then there exists $\psi$ in $(a,b)$ with $(F(b)-F(a)) \cdot G'(\psi) = (G(b) - G(a)) \cdot F'(\psi)$.
 
 ### Visualize
@@ -164,7 +176,9 @@ plot(layer(x = map(G,ts), y = map(F,ts), Geom.line(preserve_order=true)),
      layer(x = [G(a),G(b)], y=[F(a), F(b)], Geom.line(preserve_order=true),Theme(default_color=color("red"))))
 ```
 
-A solution is found with:
+### a sloution
+
+For fun, a solution is found with:
 
 ```
 ψ = symbols("psi")
@@ -184,8 +198,15 @@ $$
 
 But $G'(\psi) = (n+1) \psi^n$ and
 
+###
+
 $$
-F'(\psi) = f'(x) - \sum_{0}^n \frac{f^{(k)}(0)}{k!} k \psi^{k-1} = f'(x) - \sum_{1}^n \frac{f'^{(k-1)}(0)}{(k-1)!}  \psi^{k-1} = f'(x) - T'_{n-1}(\psi) = E'_n(\gamma) = \frac{f'^{n}(\gamma)}{n!}\psi^{n}.
+\begin{align}
+F'(\psi) &= f'(x) - \sum_{0}^n \frac{f^{(k)}(0)}{k!} k \psi^{k-1}\\
+&= f'(x) - \sum_{1}^n \frac{f'^{(k-1)}(0)}{(k-1)!}  \psi^{k-1} \\
+&= f'(x) - T'_{n-1}(\psi) \\
+&= E'_n(\gamma) = \frac{f'^{n}(\gamma)}{n!}\psi^{n}.
+\end{align}
 $$
 
 By induction. Combining and canceling gives $F(x) = G/G' \cdot F' = f^{n+1}(\gamma)/(n+1)! \cdot x^{n+1}$.
@@ -205,6 +226,8 @@ f(x) = \mathcal{O}(g(x)) \text{ as } x \rightarrow \infty: |f(x)| \leq M |g(x)| 
 $$
 
 Both $f$ and $g$ can be big "O" of each other, in which case $f(x) \approx M g(x)$ as $x$ gets big.
+
+### Little "o"
 
 And little "o" by (for every $\epsilon > 0$ there exists $x_0$ such that...)
 
@@ -230,7 +253,7 @@ The $\mathcal{O}(x^5)$ is as $x \rightarrow c (=0)$. Is it right? we have
 ex = diff(exp(sin(x)), x, 5)
 ```
 
-A continuous function, so on *any* closed interval is bounded. So on $[0,x]$ the $|E_5(x)| \leq M/5! \cdot x^5$ or $\mathcal{O}(x^5)$.
+A continuous function, so on *any* closed interval is bounded [Why?]. So... on $[0,x]$ the $|E_5(x)| \leq M/5! \cdot x^5$ or $\mathcal{O}(x^5)$.
 
 ### Little o can sometimes be the correct answer:
 
@@ -240,7 +263,11 @@ We can see that `SymPy` is not as precise as possible with
 series(exp(sin(x)), x, 0, 3)
 ```
 
-As we could use $\mathcal{o}(x^3)$ in this specific case. Why? The value of $T_3(x) = 1 + x + x^2/2$ (no $x^3$) term, so $|E_4(x)/x^3| \leq M/4! \cdot x \rightarrow 0$.
+As we could use $\mathcal{o}(x^3)$ in this specific case. Why?
+
+###
+
+The value of $T_3(x) = 1 + x + x^2/2$ (no $x^3$) term, so $|E_4(x)/x^3| \leq M/4! \cdot x \rightarrow 0$.
 
 ### Big Oh algebra
 
@@ -346,6 +373,7 @@ for i = 2:10
    m = (f(xn) - f(xn_1)) / (xn - xn_1)
    push!(xs, xn - f(xn)/m)
 end
+ds = xs - sqrt(big(2.0))
 xs
 ```
 

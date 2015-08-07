@@ -507,6 +507,32 @@ op = -
 ( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
 ```
 
+## Associative
+
+Floating point is a [leaky]() abstraction for the real numbers. Certain things aren't true!
+
+* It is not associative
+
+```
+a,b,c = 10^30, -10^30, 1
+a + (b + c),  (a + b) + c # not associative, even with machine numbers
+```
+
+```
+(0.1 + 0.2) + 0.3,  0.1 + (0.2 + 0.3)
+```
+
+## It is not commutative
+
+```
+0.1 + 0.2 + 0.3, 0.3, 0.2, 0.1
+```
+
+(Most accurate to add big numbers first.)
+
+
+Moral: need to be careful when trying to say two things are exactly equal.
+
 ## Addition of numbers and cumulative error
 
 How do errors accumulate?
