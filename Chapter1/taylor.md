@@ -83,10 +83,10 @@ $$
 
 ### Taylor's theorem
 
-Set $E_n(x) = f(x) - T_n(x)$. Then there exists $\psi$ between $c$ and $x$ with
+Set $E_n(x) = f(x) - T_n(x)$. Then there exists $\xi$ between $c$ and $x$ with
 
 $$
-E_n(x) = \frac{f^{n+1}(\psi)}{(n+1)!}(x-c)^{n+1}.
+E_n(x) = \frac{f^{n+1}(\xi)}{(n+1)!}(x-c)^{n+1}.
 $$
 
 ### Examples
@@ -124,9 +124,9 @@ For $f(x) = 1/(1+x)$ we can *approximate* by a Taylor polynomial with $c=0$. If 
 We have $f^{(k)}(x) = k!/(x+1)^{k+1}$, so the error term
 
 $$
-\begin{algin}
-| E_n(\psi) | &= |f^{(n+1)}(\psi) / (n+1)! \cdot x^{n+1} |\\
-              &\leq \frac{1}{(1 + \psi)^{n+1}} \cdot x^{n+1} \\
+\begin{align}
+| E_n(\xi) | &= |f^{(n+1)}(\xi) / (n+1)! \cdot x^{n+1} |\\
+              &\leq \frac{1}{(1 + \xi)^{n+1}} \cdot x^{n+1} \\
               &\leq 1 \cdot (1/2)^{n+1}.
 \end{align}			  
 $$
@@ -139,7 +139,7 @@ In the HW you are asked to show $(f(x+h) - f(x-h))/(2h)$ converges to $f'(x)$ --
 
 $$
 \begin{align}
-f(x + h) &= f(x) + f'(x) h + f''(\psi)/2 \cdot h^2  \\
+f(x + h) &= f(x) + f'(x) h + f''(\xi)/2 \cdot h^2  \\
 f(x - h) &= f(x) - f'(x) h + f''(\gamma)/2 \cdot h^2
 \end{align}
 $$
@@ -147,21 +147,24 @@ $$
 So, subtracting and dividing by $h$ gives:
 
 $$
-(f(x+h) - f(x-h))/(2h) = f'(x) + (f''(\psi) -f''(\gamma))/2 \cdot h \rightarrow f'(x)
+\begin{align}
+(f(x+h) - f(x-h))/(2h) &= f'(x) + (f''(\xi) -f''(\gamma))/2 \cdot h\\
+&\rightarrow f'(x)
+\end{align}
 $$
 
-(How do we know $f''(\psi) - f''(\gamma)$ is bounded when all we know is $x < \psi,\gamma < x +h$?)
+(How do we know $f''(\xi) - f''(\gamma)$ is bounded when all we know is $x < \xi,\gamma < x +h$?)
 
 ## Proving Taylor's theorem
 
 Rolle's [Theorem](http://tinyurl.com/nkus4e7) is a humble little observation -- a "nice" function with a relative maximum or minimum must have a flat tangent line. ("Nice" rules out $|x|$ type functions). One formulation is:
 
-> if $f(x)$ is continuous on $I=[a,b]$ and differentiable on $(a,b)$. (not quite $C^1$, but $C^1$ functions work), **and** $f(a)=f(b)$, then there exists $\psi$ in $(a,b)$ $f'(\psi) = 0$.
+> if $f(x)$ is continuous on $I=[a,b]$ and differentiable on $(a,b)$. (not quite $C^1$, but $C^1$ functions work), **and** $f(a)=f(b)$, then there exists $\xi$ in $(a,b)$ $f'(\xi) = 0$.
 
 
 ### Cauchy Mean Value Theorem
 
-Rolle's Theorem will imply the Cauchy Mean Value [Theorem](http://tinyurl.com/ppt9kd8). Suppose $F$ and $G$ are continous on $I$ and differentiable on its interior, then there exists $\psi$ in $(a,b)$ with $(F(b)-F(a)) \cdot G'(\psi) = (G(b) - G(a)) \cdot F'(\psi)$.
+Rolle's Theorem will imply the Cauchy Mean Value [Theorem](http://tinyurl.com/ppt9kd8). Suppose $F$ and $G$ are continous on $I$ and differentiable on its interior, then there exists $\xi$ in $(a,b)$ with $(F(b)-F(a)) \cdot G'(\xi) = (G(b) - G(a)) \cdot F'(\xi)$.
 
 ### Visualize
 
@@ -189,27 +192,48 @@ nsolve((F(b)-F(a))*Gp - (G(b)-G(a))*Fp, pi/2)
 
 ### Apply to Taylor's theorem.
 
-Using inductions, assume it is true for the case $n-1$. Then 
-Let $F(x) = f(x) - T_n(x) = E_{n+1}(x)$, $G(x) = x^{n+1}$ and $a,b=0,x$. Then $F(0) = G(0) = 0$ and we have:
-
-$$
-F(x) G'(\psi) = G(x) F'(\psi).
-$$
-
-But $G'(\psi) = (n+1) \psi^n$ and
-
-###
+(From [wikipedia](http://tinyurl.com/opmyyog) Fix $x$ and define:
 
 $$
 \begin{align}
-F'(\psi) &= f'(x) - \sum_{0}^n \frac{f^{(k)}(0)}{k!} k \psi^{k-1}\\
-&= f'(x) - \sum_{1}^n \frac{f'^{(k-1)}(0)}{(k-1)!}  \psi^{k-1} \\
-&= f'(x) - T'_{n-1}(\psi) \\
-&= E'_n(\gamma) = \frac{f'^{n}(\gamma)}{n!}\psi^{n}.
+F(t) &= f(t) + f'(t)(x-t) + f''(t)/2! \cdot (x-t)^2 + \cdots + f^{n}(t)/n!\cdot  (x-t)^n,\\
+G(t) &=  (x-t)^{n+1}.
 \end{align}
 $$
 
-By induction. Combining and canceling gives $F(x) = G/G' \cdot F' = f^{n+1}(\gamma)/(n+1)! \cdot x^{n+1}$.
+Then
+
+$F(x) = f(x)$, $G(x) = 0$, and
+
+$$
+\begin{align}
+F'(t) &= f'(t) +f''(t) \cdot (x-t) + f'''(t)/2! \cdot (x-t)^2 + \cdots + f^{n+1}(t)/n! \cdot (x-t)^n +\\
+      & -f'(t) -f''(t)/2! \cdot 2(x-t) - f'''(t)/3! \cdot 3(x-t)^2 - \cdots - f^n(t)/n! \cdot  n (x-t)^{n-1}\\
+      &= 0 + 0 + \cdots + 0 + f^{n+1}(t)/n! (x-t)^n
+\end{align}
+$$
+
+and
+
+$$
+G'(t) = (n+1)(x-t)^n
+$$
+
+Thus,
+
+$$
+\frac{F'(\xi)}{G'(\xi)} = \frac{f^{n+1}(\xi)/n! (x-\xi)^n}{(n+1)(x-\xi)^n} = \frac{f^{n+1}(\xi)}{(n+1)!}.
+$$
+
+But, solving for $F(x)$, we have
+
+$$
+F(x) - F(a) = \frac{F'(\xi)}{G'(\xi)}(G(x) - G(a)) = \frac{f^{n+1}(\xi)}{(n+1)!}(x-a)^{n+1}
+$$
+
+But $F(x) - F(a) = f(x) - \sum_i^{n} \frac{f^i(a)}{i!}(x-a)^u = E_n(x)$
+
+All told, the error term is as advertised
 
 ## Big Oh little Oh ...
 
@@ -269,6 +293,16 @@ As we could use $\mathcal{o}(x^3)$ in this specific case. Why?
 
 The value of $T_3(x) = 1 + x + x^2/2$ (no $x^3$) term, so $|E_4(x)/x^3| \leq M/4! \cdot x \rightarrow 0$.
 
+### Seeing is believing?
+
+We can see that the limit is $0$ with:
+
+```
+f(x) = exp(sin(x))
+Err(x) = f(x) - removeO(series(f(x), x, 0, 3))
+limit(Err(x)/x^3, x, 0)
+```
+
 ### Big Oh algebra
 
 Suppose $f_1$ and $f_2$ are $\mathcal{O}(n)$ and $g_1$ and $g_2$ are $\mathcal{O}(m)$ with $n < m$. What "O" is
@@ -313,9 +347,9 @@ The formal definition of closer is in terms of a limit:
 
 ### Examples
 
-Consider $x_n = (n+1)/n = 1 + 1/n$. It should be clear this converges to $1$. (What is $M$ for a given $\epsilon?)
+Consider $x_n = (n+1)/n = 1 + 1/n$. It should be clear this converges to $1$. (What is $M$ for a given $\epsilon$?)
 
-Less obvious, but well known, is the converge of $x_n = (1 + 1/n)^n$. What does this converge to?
+Less obvious, but well known, is the convergence of $x_n = (1 + 1/n)^n$. What does this converge to?
 
 ```
 ns = [10^i for i in 1:6]
@@ -348,7 +382,7 @@ The difference in convergence between the last two examples is alot! We can quan
 
 ### Empirical evidence if quadratic convergence
 
-The sequence $x_{n+1} = x_n/2 - 1/x_n$ converges quite rapidly to $\sqrt{2}$. Can we see quadratic convergence? To do so we need to work with more precision:
+The sequence $x_{n+1} = x_n/2 + 1/x_n$ converges quite rapidly to $\sqrt{2}$. Can we see quadratic convergence? To do so we need to work with more precision:
 
 ```
 xs = [big(2.0)]
@@ -357,9 +391,17 @@ for i = 2:8
   push!(xs, xn/2 + 1/xn)
 end
 ds = xs - sqrt(big(2.0))
+```
+
+###
+
+We take the ratio to see convergence
+
+```
 [ds[i+1]/ds[i]^2 for i in 1:6]
 ```
 
+(Basically, $e_{n+1} \approx 3.5355339 \cdot e_n^2$.)
 
 ### Empirical evidence of *non* quadratic convergence
 
@@ -391,8 +433,28 @@ But better than linear:
 
 ### Not all sequences converge
 
-Not all sequences converge. Just take $x_n = \sin(n)$. to see. However, some things are known about them. Primarily:
+Not all sequences converge. Just take $x_n = \sin(n)$. to
+see. However, some things are known about them.
 
-> For any non-empty set of real numbers (such as the sequence of $x_n$) with an upper bound, there is a *least* upper bound. That is a smallest number with $x_n \leq M$ for any $M$.
+### Monotonicity
+
+Suppose $x_0 \leq x_1 \leq x_2 \leq \cdots \leq x_n \leq \cdot \leq M$.
+
+> Then it is true that this sequence will have a limit.
+
+### Upper bounds
+
+> For any non-empty set of real numbers (such as the sequence of
+> $x_n$) with an upper bound, there is a *least* upper bound. That is
+> a smallest number with $x_n \leq M$ for any $M$.
+
+### Can't jump over a line...
+
+> Suppose $x_0, x_1, \dots \leq 0$. If $\lim_n x_n = L$, then $L \leq 0$.
+
+
+### Bounded
+
+> Suppose $|a_{n+1}| \leq c |a_n|$. Then if $c < 1$, $\lim a_n = 0$.
 
 

@@ -101,7 +101,58 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Floating point numbers</h1><h2>Decimal numbers</h2><p>In mathematics we have different types of numbers: Integers, Rationals, Reals, ...</p><p>On a calculator there is one: floating point</p><p>On the computer there may be more than one type for each mathematical type: 8, 16, 32, 64, 128 bit integers...</p><p>In mathematics we primarily work with <em>decimal numbers</em></p><p>$$ 12.34 = 1 \cdot 10^2 + 2 \cdot 10^1 + 3\cdot 10^{-1} + 4 \cdot 10^{-2} $$</p><h3>Rounding</h3><p>We are familiar with the task of rounding: a passing grade is 59.5 not a 60!</p><p>We have three types of rounding: round up, round down, mixing based on a rule.</p><p>Rounding to the nearest integer shows this fairly clearly:</p><pre class="sourceCode julia">x = 3.14
+<h1>Floating point numbers</h1><h2>Decimal numbers</h2><p>In mathematics we have different types of numbers: Integers, Rationals, Reals, Complex, ...</p><p>On the computer there may be more than one type for each mathematical type, For example, <code>Julia</code> has 12 built in types for integers (signed and unsigned and different storage sizes.)</p><p>There are infinitely many integers mathematically, but only finitely many representable on the computer.</p><p><code>Int64</code> is typical. <code>Int8</code> has only $256=2^8$ possible values. It uses $-2^7$ to $2^7-1$.</p><p>Internally, the values are kept in binary:</p><pre class="sourceCode julia">convert(Uint8, 5) |> bits</pre>
+<pre class="output">
+"00000101"</pre>
+
+<p>The leading $0$ indicates the sign. </p><h3>Binary numbers</h3><p>Binary numbers use powers of $2$, not $10$. So – as you likely know – $1101$ in binary is just $1\cdot 2^0 + 0\cdot 2^1 + 1 \cdot 2^2 + 1\cdot 2^3 = 13$.</p><p>The largest value in <code>Int8</code> would then be $1 + 2 + 4 + 8 + 16 + 32 + 64 = 127$.</p><p>Negative values are kept as an offset from 128, so can go down to -128:</p><pre class="sourceCode julia">convert(Uint8, -5) |> bits</pre>
+<pre class="output">
+"11111011"</pre>
+
+<p>(That is read as $(1 + 2 + 8 + 16 + 32 + 64) - 128$.)</p><p>(Why store this way?)</p><h3>Math with binary numbers</h3><p>Adding two binary numbers follows the usual algorithm with carrying:</p><pre class="sourceCode julia">  1101
++ 1011
+------
+ 11000  
+</pre><p>$(1 + 4 + 8 + 1 +2 + 8 = 16 + 8)$</p><h3>Multiplication</h3><p>In decimal multiplying or dividing  by 10 is easy – add a $0$ or shift the decimal point. Similarly with binary:</p><pre class="sourceCode julia">   10101
+*     10
+--------
+   00000
+  10101
+--------
+  101010
+</pre><h3>Integer limitations with Julia</h3><p>Integers are stored exactly – as possible. But that has limitations. With 64 bit numbers, the largest integer is $2^{63}-1$.</p><pre class="sourceCode julia">2^63 - 1</pre>
+<pre class="output">
+9223372036854775807</pre>
+
+<p>but not <code>2^64</code>:</p><pre class="sourceCode julia">2^64</pre>
+<pre class="output">
+0</pre>
+
+<p>What happens:</p><pre class="sourceCode julia">bits(2)</pre>
+<pre class="output">
+"0000000000000000000000000000000000000000000000000000000000000010"</pre>
+
+<pre class="sourceCode julia">bits(2*2)</pre>
+<pre class="output">
+"0000000000000000000000000000000000000000000000000000000000000100"</pre>
+
+<p>shifts things left</p><pre class="sourceCode julia">bits(2^62)</pre>
+<pre class="output">
+"0100000000000000000000000000000000000000000000000000000000000000"</pre>
+
+<pre class="sourceCode julia">bits(2^62 + 2^61)</pre>
+<pre class="output">
+"0110000000000000000000000000000000000000000000000000000000000000"</pre>
+
+<pre class="sourceCode julia">bits(2^62 * 2)</pre>
+<pre class="output">
+"1000000000000000000000000000000000000000000000000000000000000000"</pre>
+
+<p>But still this is correct:</p><pre class="sourceCode julia">bits(2^63 - 1)</pre>
+<pre class="output">
+"0111111111111111111111111111111111111111111111111111111111111111"</pre>
+
+<h2>Decimal numbers</h2><p>On a calculator there is one basic number type: floating point. This is primarily the case with computers as well.</p><p>In mathematics we primarily work with <em>decimal numbers</em></p><p>$$ 12.34 = 1 \cdot 10^2 + 2 \cdot 10^1 + 3\cdot 10^{-1} + 4 \cdot 10^{-2} $$</p><h3>Rounding</h3><p>We are familiar with the task of rounding: a passing grade is 59.5 not a 60!</p><p>We have three types of rounding: round up, round down, mixing based on a rule.</p><p>Rounding to the nearest integer shows this fairly clearly:</p><pre class="sourceCode julia">x = 3.14
 ceil(x), floor(x), round(x)</pre>
 <pre class="output">
 (4.0,3.0,3.0)</pre>
@@ -116,11 +167,34 @@ round(x,1), round(x,2), round(x,4)</pre>
 <pre class="output">
 (1.2,1.23,1.2346)</pre>
 
-<h3>Error bound</h3><p>Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?</p><p>We consider the value of the $n+1$st decimal number.</p><p>- If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$</p><p>- If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.</p><p>In either case, it is less –in absolute value – than $5*10^{-(n+1)} = 1/2 \cdot 10^{-n}$.</p><blockquote><p>The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$. </p></blockquote><p>Had we chopped (<code>floor</code>) or always rounded up (<code>ceil</code>) then the error is bounded by $10^{-n}$.</p><h2>Scientific notation</h2><p>We can write a real number in terms of powers of 10. For example:</p><p>$$ 1.234 = 1.234 \cdot 10^0 =  12.34 \cdot 10^{-1} =  .1234 \cdot 10^1 = \cdots $$</p><p>We can use normalized scientific notation to say that we can express $x$ by three quantities:</p><p>$$ x = \pm r \cdot 10^n $$</p><ul><li>$\pm$ is $+1$ or $-1$ records the sign of $x$</li><li>$r$ is a number in $0.1 \leq r < 1.0$</li><li>$n$ is an integer, possible negative, or zero.</li></ul><p>A more useful representation for storing on the computer is to shift things over by $1$ to get</p><ul><li>$r$ is a number in $1 \leq r < 10$</li></ul><h2>Binary numbers</h2><p>Binary numbers are similar, only we use base $2$ – not $10$, as with decimal.</p><p>So</p><p>$$ (10.101)_2 = 1 \cdot 2^1 + 0 \cdot 2^0 + 1 \cdot 2^{-1} + 0 \cdot 2^{-2} + 1 \cdot 2^{-3} $$</p><pre class="sourceCode julia">1*2^1 + 0*2^0 + 1*1/2^1 + 0 * 1/2^2 + 1 * 1/2^3</pre>
+<h3>Error bound</h3><p>Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?</p><p>We consider the value of the $n+1$st decimal number.</p><p>- If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$</p><p>- If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.</p><p>In either case, it is less –in absolute value – than $(10/2) \cdot 10^{-(n+1)} = 1/2 \cdot 10^{-n}$.</p><blockquote><p>The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$. </p></blockquote><p>Had we chopped (<code>floor</code>) or always rounded up (<code>ceil</code>) then the error is bounded by $10^{-n}$.</p><h3>Ulp</h3><p>There is an alternate name for the error. When rounding to a certain number of digits, there is a unit of last precision, and <code>ulp</code>. In the above, the unit of last precision was $10^{-n}$, so the error is less than $1/2$ <code>ulp</code>.</p><p><code>ulp</code>s are easy enough to understand. If we round $3.1415$ to $3.14$ then the error is $0.15$ <code>ulp</code>.</p><h2>Scientific notation</h2><p>We can write a real number in terms of powers of 10. For example:</p><p>$$ 1.234 = 1.234 \cdot 10^0 =  12.34 \cdot 10^{-1} =  .1234 \cdot 10^1 = \cdots $$</p><p>We can use normalized scientific notation to say that we can express $x$ by three quantities:</p><p>$$ x = \pm r \cdot 10^n $$</p><ul><li>$\pm$ is $+1$ or $-1$ records the sign of $x$</li><li>$r$ is a number in $0.1 \leq r < 1.0$</li><li>$n$ is an integer, possible negative, or zero.</li></ul><h3>Binary</h3><p>Binary numbers are similar, only we use base $2$ – not $10$, as with decimal.</p><p>So</p><p>$$ (10.101)_2 = 1 \cdot 2^1 + 0 \cdot 2^0 + 1 \cdot 2^{-1} + 0 \cdot 2^{-2} + 1 \cdot 2^{-3} $$</p><pre class="sourceCode julia">1*2^1 + 0*2^0 + 1*1/2^1 + 0 * 1/2^2 + 1 * 1/2^3</pre>
 <pre class="output">
 2.625</pre>
 
-<h3>Scientific notation with base 2</h3><p>We can use different bases in scientific notation. Any number can be written as</p><p>$$ x = \pm q \cdot 2^m $$</p><p>With</p><ul><li>$\pm$ represents $+1$ or $-1$</li><li>$q$ -- the mantissa -- has $1 \leq q < 2$ (in base 2)</li><li>$m$ -- is an integer (in base 2)</li></ul><p>By writing $q = 1.f$ an extra digit can be gained (the 1) if only a finite number of digits are available, as is the case on the computer.</p><h2>Floating point numbers</h2><p>The above is <em>almost</em> how floating point works. For <em>simplicity</em> let's look at 16-bit floating point where</p><p>- 1 bit is the sign bit <code>0</code> = $+1$, <code>1</code> is $-1$ - $q$ is represented with $10$ bits - $m$ is represented with $5$ bits.</p><p>There is nothing to represent the sign of $m$. The trick is offset the value by subtracting and using  $m -15.</p><p>With this, can we represent some numbers:</p><p>What is $1$? It is $+1 \cdot 1.0 \cdot 10^{15 - 15}$. So we should have</p><p>- sign is <code>0</code> - $q$ is <code>0000000000</code> - $m$ is <code>01111</code></p><p>Checking we have</p><pre class="sourceCode julia">convert(Float16, 1.0) |> bits</pre>
+<h3>Converting decimal to binary</h3><p>We can convert decimal to binary. Here is a simple algorithm. Start with $x$. We want to produce digits $ddd.ddd...$ where $d$ are either $0$ or $1$.</p><p>First, take the log base 2:</p><pre class="sourceCode julia">x = 12.1
+log2(x) |> floor</pre>
+<pre class="output">
+3.0</pre>
+
+<p>This says $2^3 \leq x < 2^4$. Remember $3$, then subtract $2^3$ and repeat:</p><pre class="sourceCode julia">ds = [3]
+x = x - 2.0^ds[end]
+n = log2(x) |> floor</pre>
+<pre class="output">
+2.0</pre>
+
+<p>Remember 2 and then subtract $2^2$ and repeat:</p><pre class="sourceCode julia">push!(ds, n)
+x = x - 2.0^ds[end]
+n = log2(x) |> floor</pre>
+<pre class="output">
+-4.0</pre>
+
+<p>Remember $-4$ and repeat</p><pre class="sourceCode julia">push!(ds, n)
+x = x - 2.0^ds[end]
+n = log2(x) |> floor</pre>
+<pre class="output">
+-5.0</pre>
+
+<p>etc.</p><p>The <code>ds</code> will tell us there is a 1 in position 3,2,-4, -5, 8,9... So <code>1100.000110011...</code></p><p>One thing to note: what numbers terminate in decimal are generally different than what numbers will terminate in binary.</p><h2>scientific notation with different bases</h2><p>We can use different bases in scientific notation. A number would be represented with</p><p>$$ x = \pm q \cdot \beta^m $$</p><p>We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.</p><p>A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.</p><h2>Floating point numbers</h2><p>Floating point is a representation of numbers using scientific notation. Only there are constraints on the sizes:</p><ul><li>The value $q$, the significand, has $p$ digits. (The precision)</li></ul><ul><li>The values of $m$ is between two values, say $e_{min}$ and $e_{max}$.</li></ul><h3>A simple case</h3><p>For example consider base $\beta=10$, $p=3$ and $e_{min}=-1$ and $e_{max}=2$. Then the possible values are limited to $-9.99 \cdot 10^{-1}$ to $9.99 \cdot 10^2$. How many are there?</p><p>$$ 2 \cdot ((\beta-1)\cdot\beta^{p-1}) \cdot (e_{max} - e_{min}) $$</p><h2>Binary floating point</h2><p>For binary floating point, things are similar. For <em>simplicity</em> let's look at 16-bit floating point where</p><p>- 1 bit is the sign bit <code>0</code> = $+1$, <code>1</code> is $-1$ - $q$ is represented with $10$ bits (the <em>precision</em> is 10) - $m$ is represented with $5$ bits.</p><p>There is nothing to represent the <em>sign</em> of $m$. The trick is offset the value by subtracting and using  $m -15.</p><p>With this, can we represent some numbers:</p><p>What is $1$? It is $+1 \cdot 1.0 \cdot 10^{15 - 15}$. So we should have</p><p>- sign is <code>0</code> - $q$ is <code>0000000000</code> - $m$ is <code>01111</code></p><p>Checking we have</p><pre class="sourceCode julia">convert(Float16, 1.0) |> bits</pre>
 <pre class="output">
 "0011110000000000"</pre>
 
@@ -151,7 +225,7 @@ seebits (generic function with 1 method)</pre>
 <pre class="output">
 ('0',"10011","1110100000")</pre>
 
-<p>Numbers get rounded!</p><pre class="sourceCode julia">convert(Float16, 0.1)</pre>
+<h3>Rounding</h3><p>Numbers get rounded!</p><pre class="sourceCode julia">convert(Float16, 0.1)</pre>
 <pre class="output">
 float16(0.099976)</pre>
 
@@ -171,20 +245,20 @@ float16(0.099976)</pre>
 <pre class="output">
 1.6704301324376012</pre>
 
-<p>Notice the number $0.1$ is necessarily approximated.</p><h3>Float16, Float32, Float64, ...</h3><p>16-bit floating point is not typical. What is common is:</p><ul><li>64-bit floating point (in Julia `Float64`)</li><li>32-bit floating point (older hardward and OSes)</li></ul><p>How the bits are arranged in IEEE 754 binary formats for <a href="http://tinyurl.com/76kpk6s">floating point</a> we have this <a href="http://tinyurl.com/76kpk6s">table</a>.</p><p>For example</p><pre class="sourceCode julia">b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
+<p>Notice the number $0.1$ is necessarily approximated.</p><h3>How much off can rounding be?</h3><p>In binary floating point, the unit of last precision is $2^{-p}$, so the error in rounding is at most $(1/2) \cdot 2^{-p}$, or half an <code>ulp</code>.</p><h3>Float16, Float32, Float64, ...</h3><p>16-bit floating point is not typical. What is common is:</p><ul><li>64-bit floating point (in Julia `Float64`)</li><li>32-bit floating point (older hardward and OSes)</li></ul><p>How the bits are arranged in IEEE 754 binary formats for <a href="http://tinyurl.com/76kpk6s">floating point</a> we have this <a href="http://tinyurl.com/76kpk6s">table</a>. See also this post by John <a href="http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/">Cook</a> for the common case.</p><p>For example</p><pre class="sourceCode julia">b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
 b[1], b[2:12], b[13:end]</pre>
 <pre class="output">
 ('0',"10000000001","0110100000000000000000000000000000000000000000000000")</pre>
 
-<p>Here $m = 2^10 + 1 - (2^10 - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.</p><p>## 0, Infinity, NaN</p><p>Some values in floating point are special:</p><ul><li>$0$: how to write $0$ in $1.f \cdot 2^m$? Can't do it. So it is coded:</li></ul><pre class="sourceCode julia">bits(0.0)</pre>
+<p>Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.</p><h2>Zero</h2><p>Wait a minute – if we insist on the significand being $1.dddd...$ we can't represent $0$!</p><p>Some values in floating point are special:</p><ul><li>$0$: how to write $0$ in $1.dddd \cdot 2^m$? Can't do it. So it is coded:</li></ul><pre class="sourceCode julia">bits(0.0)</pre>
 <pre class="output">
 "0000000000000000000000000000000000000000000000000000000000000000"</pre>
 
-<ul><li>$-0$: By flipping the sign bit, we could code $-0$ naturally. Is it done?</li></ul><pre class="sourceCode julia">bits(-0.0)   ## why??</pre>
+<p>(The code uses the <em>smallest</em> possible exponent, and $0$ for the significand)</p><ul><li>$-0$: By flipping the sign bit, we could code $-0$ naturally. Is it done?</li></ul><pre class="sourceCode julia">bits(-0.0)   ## why??</pre>
 <pre class="output">
 "1000000000000000000000000000000000000000000000000000000000000000"</pre>
 
-<ul><li>Infinity. [Why](http://www.cs.berkeley.edu/~wkahan/Infinity.pdf)?</li></ul><p>This value is deemed valuable to have supported at the hardware level. It is coded by reserviing the largest value of $m$:</p><pre class="sourceCode julia">bits(Inf)  # see bits(Inf)[2:12]</pre>
+<h3>"Infinity": Inf</h3><p>Infinity. <a href="http://www.cs.berkeley.edu/~wkahan/Infinity.pdf">Why</a>?</p><p>This value is deemed valuable to have supported at the hardware level. It is coded by reserving the <em>largest</em> possible value of $m$ and $0$ for the significand.</p><pre class="sourceCode julia">bits(Inf)  # see bits(Inf)[2:12]</pre>
 <pre class="output">
 "0111111111110000000000000000000000000000000000000000000000000000"</pre>
 
@@ -192,7 +266,7 @@ b[1], b[2:12], b[13:end]</pre>
 <pre class="output">
 "1111111111110000000000000000000000000000000000000000000000000000"</pre>
 
-<ul><li>NaN. This is a special value reserved for computations where no value is possible. Examples include `0/0` or `0 * Inf`:</li></ul><pre class="sourceCode julia">0/0, 0 * Inf</pre>
+<h3>Not a number: NaN</h3><p>NaN. This is a special value reserved for computations where no value is possible. Examples include <code>0/0</code> or <code>0 * Inf</code>:</p><pre class="sourceCode julia">0/0, 0 * Inf</pre>
 <pre class="output">
 (NaN,NaN)</pre>
 
@@ -208,7 +282,11 @@ b[1], b[2:12], b[13:end]</pre>
 <pre class="output">
 ("1000000000000000000000000000000000000000000000000000","0000000000000000000000000000000000000000000000000000")</pre>
 
-<h3>Range of numbers</h3><p>What is the range of the numbers that can be represented? Let's check with Float16.</p><p>The largest <em>positive</em> value would have $m$ coded with <code>11110</code> or ($2 + 4 + 8 + 16 - 15 = 15$)</p><p>The largest value for $q$ would be <code>1111111111</code>, or</p><pre class="sourceCode julia">sum([1/2^i for i in 0:10])</pre>
+<p><code>NaN</code> semantics are a bit <a href="https://github.com/JuliaLang/julia/issues/7866">controversial</a>.</p><h3>Poison</h3><p>The values of <code>Inf</code> and <code>NaN</code> will "poison" subsequent operations, for example</p><pre class="sourceCode julia">NaN + 1, Inf - 1</pre>
+<pre class="output">
+(NaN,Inf)</pre>
+
+<p>These special values are generated instead of errors being thrown for some common cases:</p><ul><li>overflow (a number bigger than the largest finite floating point number)</li><li>divide by $0$ (either `Inf`, or if `0/0`, `NaN`)</li><li>invalid number (such as `0 * Inf`)</li></ul><p>(Whether something like <code>sqrt(-1.0)</code> is an error or <code>NaN</code> is not specified.)</p><h3>Range of numbers</h3><p>What is the range of the numbers that can be represented? Let's check with Float16.</p><p>The largest <em>positive</em> value would have $m$ coded with <code>11110</code> or ($2 + 4 + 8 + 16 - 15 = 15$) (The value <code>11111</code> is saved for <code>Inf</code> and <code>NaN</code>.)</p><p>The largest value for $q$ would be <code>1111111111</code>, or</p><pre class="sourceCode julia">sum([1/2^i for i in 0:10])</pre>
 <pre class="output">
 1.9990234375</pre>
 
@@ -220,10 +298,9 @@ b[1], b[2:12], b[13:end]</pre>
 <pre class="output">
 float16(65504.0)</pre>
 
-<p>For the smallest <em>positive</em> number, the smallest exponent is code <code>00000</code> or $0 - 15 = -15$. So the value should be:</p><pre class="sourceCode julia">-sum([1/2^i for i in 0:10]) * 2^-15</pre>
+<p>For the smallest <em>positive</em> number, the smallest exponent is code <code>00000</code> or $0 - 15 = -15$. So the value should be:</p><pre class="sourceCode julia">1/2^15</pre>
 <pre class="output">
-DomainError()
-</pre>
+3.0517578125e-5</pre>
 
 <p>But this isn't actually the case:</p><pre class="sourceCode julia">nextfloat(convert(Float16, 0))</pre>
 <pre class="output">
@@ -233,7 +310,7 @@ float16(5.9605e-8)</pre>
 <pre class="output">
 (1.7976931348623157e308,5.0e-324)</pre>
 
-<h2>Machine numbers</h2><p>The numbers that can be represented <strong>exactly</strong> in floating point are called <em>machine number</em>.</p><ul><li>There aren't very many compared to the **infinite** number of floating point values.</li></ul><p>Let's visualize in a <em>hypothetical</em> Float8 mode with 1 sign bit, 3 exponent bits and 4 bits for the mantissa.</p><p>The possible <em>positive</em> values are</p><pre class="sourceCode julia">qs = [1 + i/2 + j/4 + k/8 + l/16 for i in 0:1, j in 0:1, k in 0:1, l in 0:1] |> vec |> sort</pre>
+<h2>Machine numbers</h2><p>The numbers that can be represented <strong>exactly</strong> in floating point are called <em>machine numbers</em>.</p><p><li> There aren't very many compared to the <strong>infinite</strong> number of floating point values.</p><p>Let's visualize in a <em>hypothetical</em> Float8 mode with 1 sign bit, 3 exponent bits and 4 bits for the mantissa.</p><p>The possible <em>positive</em> values are</p><pre class="sourceCode julia">qs = [1 + i/2 + j/4 + k/8 + l/16 for i in 0:1, j in 0:1, k in 0:1, l in 0:1] |> vec |> sort</pre>
 <pre class="output">
 16-element Array{Float64,1}:
  1.0   
@@ -267,13 +344,7 @@ vals = [q * 2.0^m for q in qs, m in ms] |> vec</pre>
   0.179688
   0.1875  
   0.195313
-  0.203125
-  0.210938
-  0.21875 
   ⋮       
- 10.0     
- 10.5     
- 11.0     
  11.5     
  12.0     
  12.5     
@@ -284,7 +355,7 @@ vals = [q * 2.0^m for q in qs, m in ms] |> vec</pre>
  15.0     
  15.5     </pre>
 
-<p>We can plot these points:</p><pre class="sourceCode julia">using Gadfly
+<h3>Plotting the machine numbers</h3><p>We can plot these points:</p><pre class="sourceCode julia">using Gadfly
 plot(x = vals, y = 0*vals, Geom.point)</pre>
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
@@ -297,347 +368,347 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
      stroke-width="0.3"
      font-size="3.88"
 
-     id="fig-3f6890848cbc4cc89ef62b5f3703a896">
-<g class="plotroot xscalable yscalable" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-1">
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-2">
+     id="fig-0c4181b0c2aa4cf094b116deb58388b9">
+<g class="plotroot xscalable yscalable" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-2">
     <text x="75.45" y="88.39" text-anchor="middle" dy="0.6em">x</text>
   </g>
-  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-3">
-    <text x="-130.95" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-25</text>
-    <text x="-101.46" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-20</text>
-    <text x="-71.98" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-15</text>
-    <text x="-42.49" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-10</text>
-    <text x="-13.01" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">-5</text>
-    <text x="16.48" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">0</text>
-    <text x="45.96" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">5</text>
-    <text x="75.45" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">10</text>
-    <text x="104.94" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">15</text>
-    <text x="134.42" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="visible">20</text>
-    <text x="163.91" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">25</text>
-    <text x="193.39" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">30</text>
-    <text x="222.88" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">35</text>
-    <text x="252.36" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">40</text>
-    <text x="281.85" y="84.39" text-anchor="middle" gadfly:scale="1.0" visibility="hidden">45</text>
-    <text x="-101.46" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-20</text>
-    <text x="-95.57" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-19</text>
-    <text x="-89.67" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-18</text>
-    <text x="-83.77" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-17</text>
-    <text x="-77.87" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-16</text>
-    <text x="-71.98" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-15</text>
-    <text x="-66.08" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-14</text>
-    <text x="-60.18" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-13</text>
-    <text x="-54.29" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-12</text>
-    <text x="-48.39" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-11</text>
-    <text x="-42.49" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-10</text>
-    <text x="-36.59" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-9</text>
-    <text x="-30.7" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-8</text>
-    <text x="-24.8" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-7</text>
-    <text x="-18.9" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-6</text>
-    <text x="-13.01" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-5</text>
-    <text x="-7.11" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-4</text>
-    <text x="-1.21" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-3</text>
-    <text x="4.68" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-2</text>
-    <text x="10.58" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">-1</text>
-    <text x="16.48" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">0</text>
-    <text x="22.38" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">1</text>
-    <text x="28.27" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">2</text>
-    <text x="34.17" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">3</text>
-    <text x="40.07" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">4</text>
-    <text x="45.96" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">5</text>
-    <text x="51.86" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">6</text>
-    <text x="57.76" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">7</text>
-    <text x="63.66" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">8</text>
-    <text x="69.55" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">9</text>
-    <text x="75.45" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">10</text>
-    <text x="81.35" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">11</text>
-    <text x="87.24" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">12</text>
-    <text x="93.14" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">13</text>
-    <text x="99.04" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">14</text>
-    <text x="104.94" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">15</text>
-    <text x="110.83" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">16</text>
-    <text x="116.73" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">17</text>
-    <text x="122.63" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">18</text>
-    <text x="128.52" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">19</text>
-    <text x="134.42" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">20</text>
-    <text x="140.32" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">21</text>
-    <text x="146.22" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">22</text>
-    <text x="152.11" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">23</text>
-    <text x="158.01" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">24</text>
-    <text x="163.91" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">25</text>
-    <text x="169.8" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">26</text>
-    <text x="175.7" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">27</text>
-    <text x="181.6" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">28</text>
-    <text x="187.5" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">29</text>
-    <text x="193.39" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">30</text>
-    <text x="199.29" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">31</text>
-    <text x="205.19" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">32</text>
-    <text x="211.08" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">33</text>
-    <text x="216.98" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">34</text>
-    <text x="222.88" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">35</text>
-    <text x="228.78" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">36</text>
-    <text x="234.67" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">37</text>
-    <text x="240.57" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">38</text>
-    <text x="246.47" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">39</text>
-    <text x="252.36" y="84.39" text-anchor="middle" gadfly:scale="10.0" visibility="hidden">40</text>
-    <text x="-101.46" y="84.39" text-anchor="middle" gadfly:scale="0.5" visibility="hidden">-20</text>
-    <text x="16.48" y="84.39" text-anchor="middle" gadfly:scale="0.5" visibility="hidden">0</text>
-    <text x="134.42" y="84.39" text-anchor="middle" gadfly:scale="0.5" visibility="hidden">20</text>
-    <text x="252.36" y="84.39" text-anchor="middle" gadfly:scale="0.5" visibility="hidden">40</text>
-    <text x="-101.46" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-20</text>
-    <text x="-89.67" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-18</text>
-    <text x="-77.87" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-16</text>
-    <text x="-66.08" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-14</text>
-    <text x="-54.29" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-12</text>
-    <text x="-42.49" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-10</text>
-    <text x="-30.7" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-8</text>
-    <text x="-18.9" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-6</text>
-    <text x="-7.11" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-4</text>
-    <text x="4.68" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">-2</text>
-    <text x="16.48" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">0</text>
-    <text x="28.27" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">2</text>
-    <text x="40.07" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">4</text>
-    <text x="51.86" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">6</text>
-    <text x="63.66" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">8</text>
-    <text x="75.45" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">10</text>
-    <text x="87.24" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">12</text>
-    <text x="99.04" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">14</text>
-    <text x="110.83" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">16</text>
-    <text x="122.63" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">18</text>
-    <text x="134.42" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">20</text>
-    <text x="146.22" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">22</text>
-    <text x="158.01" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">24</text>
-    <text x="169.8" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">26</text>
-    <text x="181.6" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">28</text>
-    <text x="193.39" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">30</text>
-    <text x="205.19" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">32</text>
-    <text x="216.98" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">34</text>
-    <text x="228.78" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">36</text>
-    <text x="240.57" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">38</text>
-    <text x="252.36" y="84.39" text-anchor="middle" gadfly:scale="5.0" visibility="hidden">40</text>
+  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-3">
+    <text x="-130.95" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-25</text>
+    <text x="-101.46" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-20</text>
+    <text x="-71.98" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-15</text>
+    <text x="-42.49" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-10</text>
+    <text x="-13.01" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-5</text>
+    <text x="16.48" y="84.39" text-anchor="middle" visibility="visible" gadfly:scale="1.0">0</text>
+    <text x="45.96" y="84.39" text-anchor="middle" visibility="visible" gadfly:scale="1.0">5</text>
+    <text x="75.45" y="84.39" text-anchor="middle" visibility="visible" gadfly:scale="1.0">10</text>
+    <text x="104.94" y="84.39" text-anchor="middle" visibility="visible" gadfly:scale="1.0">15</text>
+    <text x="134.42" y="84.39" text-anchor="middle" visibility="visible" gadfly:scale="1.0">20</text>
+    <text x="163.91" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">25</text>
+    <text x="193.39" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">30</text>
+    <text x="222.88" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">35</text>
+    <text x="252.36" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">40</text>
+    <text x="281.85" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">45</text>
+    <text x="-101.46" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-20</text>
+    <text x="-95.57" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-19</text>
+    <text x="-89.67" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-18</text>
+    <text x="-83.77" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-17</text>
+    <text x="-77.87" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-16</text>
+    <text x="-71.98" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-15</text>
+    <text x="-66.08" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-14</text>
+    <text x="-60.18" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-13</text>
+    <text x="-54.29" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-12</text>
+    <text x="-48.39" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-11</text>
+    <text x="-42.49" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-10</text>
+    <text x="-36.59" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-9</text>
+    <text x="-30.7" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-8</text>
+    <text x="-24.8" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-7</text>
+    <text x="-18.9" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-6</text>
+    <text x="-13.01" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-5</text>
+    <text x="-7.11" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-4</text>
+    <text x="-1.21" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-3</text>
+    <text x="4.68" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-2</text>
+    <text x="10.58" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">-1</text>
+    <text x="16.48" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">0</text>
+    <text x="22.38" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">1</text>
+    <text x="28.27" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">2</text>
+    <text x="34.17" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">3</text>
+    <text x="40.07" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">4</text>
+    <text x="45.96" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">5</text>
+    <text x="51.86" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">6</text>
+    <text x="57.76" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">7</text>
+    <text x="63.66" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">8</text>
+    <text x="69.55" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">9</text>
+    <text x="75.45" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">10</text>
+    <text x="81.35" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">11</text>
+    <text x="87.24" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">12</text>
+    <text x="93.14" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">13</text>
+    <text x="99.04" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">14</text>
+    <text x="104.94" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">15</text>
+    <text x="110.83" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">16</text>
+    <text x="116.73" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">17</text>
+    <text x="122.63" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">18</text>
+    <text x="128.52" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">19</text>
+    <text x="134.42" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">20</text>
+    <text x="140.32" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">21</text>
+    <text x="146.22" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">22</text>
+    <text x="152.11" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">23</text>
+    <text x="158.01" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">24</text>
+    <text x="163.91" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">25</text>
+    <text x="169.8" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">26</text>
+    <text x="175.7" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">27</text>
+    <text x="181.6" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">28</text>
+    <text x="187.5" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">29</text>
+    <text x="193.39" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">30</text>
+    <text x="199.29" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">31</text>
+    <text x="205.19" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">32</text>
+    <text x="211.08" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">33</text>
+    <text x="216.98" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">34</text>
+    <text x="222.88" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">35</text>
+    <text x="228.78" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">36</text>
+    <text x="234.67" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">37</text>
+    <text x="240.57" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">38</text>
+    <text x="246.47" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">39</text>
+    <text x="252.36" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="10.0">40</text>
+    <text x="-101.46" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="0.5">-20</text>
+    <text x="16.48" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="0.5">0</text>
+    <text x="134.42" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="0.5">20</text>
+    <text x="252.36" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="0.5">40</text>
+    <text x="-101.46" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-20</text>
+    <text x="-89.67" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-18</text>
+    <text x="-77.87" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-16</text>
+    <text x="-66.08" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-14</text>
+    <text x="-54.29" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-12</text>
+    <text x="-42.49" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-10</text>
+    <text x="-30.7" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-8</text>
+    <text x="-18.9" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-6</text>
+    <text x="-7.11" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-4</text>
+    <text x="4.68" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">-2</text>
+    <text x="16.48" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">0</text>
+    <text x="28.27" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">2</text>
+    <text x="40.07" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">4</text>
+    <text x="51.86" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">6</text>
+    <text x="63.66" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">8</text>
+    <text x="75.45" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">10</text>
+    <text x="87.24" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">12</text>
+    <text x="99.04" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">14</text>
+    <text x="110.83" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">16</text>
+    <text x="122.63" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">18</text>
+    <text x="134.42" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">20</text>
+    <text x="146.22" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">22</text>
+    <text x="158.01" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">24</text>
+    <text x="169.8" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">26</text>
+    <text x="181.6" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">28</text>
+    <text x="193.39" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">30</text>
+    <text x="205.19" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">32</text>
+    <text x="216.98" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">34</text>
+    <text x="228.78" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">36</text>
+    <text x="240.57" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">38</text>
+    <text x="252.36" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">40</text>
   </g>
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-4">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-4">
     <text x="8.81" y="42.86" text-anchor="end" dy="0.35em">y</text>
   </g>
-  <g clip-path="url(#fig-3f6890848cbc4cc89ef62b5f3703a896-element-6)" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-5">
-    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-7">
+  <g clip-path="url(#fig-0c4181b0c2aa4cf094b116deb58388b9-element-6)" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-5">
+    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-7">
       <rect x="14.48" y="5" width="121.94" height="75.72"/>
     </g>
-    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-8">
-      <path fill="none" d="M14.48,42.86 L 136.42 42.86" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M14.48,150.43 L 136.42 150.43" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,146.84 L 136.42 146.84" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,143.26 L 136.42 143.26" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,139.67 L 136.42 139.67" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,136.09 L 136.42 136.09" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,132.5 L 136.42 132.5" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,128.92 L 136.42 128.92" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,125.33 L 136.42 125.33" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,121.74 L 136.42 121.74" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,118.16 L 136.42 118.16" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,114.57 L 136.42 114.57" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,110.99 L 136.42 110.99" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,107.4 L 136.42 107.4" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,103.82 L 136.42 103.82" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,100.23 L 136.42 100.23" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,96.64 L 136.42 96.64" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,93.06 L 136.42 93.06" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,89.47 L 136.42 89.47" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,85.89 L 136.42 85.89" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,82.3 L 136.42 82.3" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,78.71 L 136.42 78.71" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,75.13 L 136.42 75.13" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,71.54 L 136.42 71.54" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,67.96 L 136.42 67.96" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,64.37 L 136.42 64.37" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,60.79 L 136.42 60.79" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,57.2 L 136.42 57.2" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,53.61 L 136.42 53.61" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,50.03 L 136.42 50.03" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,46.44 L 136.42 46.44" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,42.86 L 136.42 42.86" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,39.27 L 136.42 39.27" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,35.69 L 136.42 35.69" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,32.1 L 136.42 32.1" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,28.51 L 136.42 28.51" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,24.93 L 136.42 24.93" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,21.34 L 136.42 21.34" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,17.76 L 136.42 17.76" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,14.17 L 136.42 14.17" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,10.59 L 136.42 10.59" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,7 L 136.42 7" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,3.41 L 136.42 3.41" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-0.17 L 136.42 -0.17" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-3.76 L 136.42 -3.76" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-7.34 L 136.42 -7.34" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-10.93 L 136.42 -10.93" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-14.51 L 136.42 -14.51" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-18.1 L 136.42 -18.1" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-21.69 L 136.42 -21.69" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-25.27 L 136.42 -25.27" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-28.86 L 136.42 -28.86" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-32.44 L 136.42 -32.44" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-36.03 L 136.42 -36.03" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-39.61 L 136.42 -39.61" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-43.2 L 136.42 -43.2" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-46.79 L 136.42 -46.79" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-50.37 L 136.42 -50.37" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-53.96 L 136.42 -53.96" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-57.54 L 136.42 -57.54" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-61.13 L 136.42 -61.13" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-64.71 L 136.42 -64.71" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,186.29 L 136.42 186.29" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M14.48,114.57 L 136.42 114.57" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M14.48,42.86 L 136.42 42.86" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M14.48,-28.86 L 136.42 -28.86" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M14.48,-100.57 L 136.42 -100.57" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M14.48,150.43 L 136.42 150.43" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,143.26 L 136.42 143.26" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,136.09 L 136.42 136.09" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,128.92 L 136.42 128.92" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,121.74 L 136.42 121.74" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,114.57 L 136.42 114.57" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,107.4 L 136.42 107.4" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,100.23 L 136.42 100.23" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,93.06 L 136.42 93.06" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,85.89 L 136.42 85.89" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,78.71 L 136.42 78.71" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,71.54 L 136.42 71.54" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,64.37 L 136.42 64.37" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,57.2 L 136.42 57.2" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,50.03 L 136.42 50.03" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,42.86 L 136.42 42.86" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,35.69 L 136.42 35.69" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,28.51 L 136.42 28.51" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,21.34 L 136.42 21.34" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,14.17 L 136.42 14.17" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,7 L 136.42 7" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-0.17 L 136.42 -0.17" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-7.34 L 136.42 -7.34" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-14.51 L 136.42 -14.51" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-21.69 L 136.42 -21.69" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-28.86 L 136.42 -28.86" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-36.03 L 136.42 -36.03" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-43.2 L 136.42 -43.2" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-50.37 L 136.42 -50.37" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-57.54 L 136.42 -57.54" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M14.48,-64.71 L 136.42 -64.71" gadfly:scale="5.0" visibility="hidden"/>
+    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-8">
+      <path fill="none" d="M14.48,42.86 L 136.42 42.86" visibility="visible" gadfly:scale="1.0"/>
+      <path fill="none" d="M14.48,150.43 L 136.42 150.43" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,146.84 L 136.42 146.84" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,143.26 L 136.42 143.26" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,139.67 L 136.42 139.67" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,136.09 L 136.42 136.09" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,132.5 L 136.42 132.5" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,128.92 L 136.42 128.92" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,125.33 L 136.42 125.33" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,121.74 L 136.42 121.74" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,118.16 L 136.42 118.16" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,114.57 L 136.42 114.57" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,110.99 L 136.42 110.99" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,107.4 L 136.42 107.4" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,103.82 L 136.42 103.82" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,100.23 L 136.42 100.23" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,96.64 L 136.42 96.64" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,93.06 L 136.42 93.06" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,89.47 L 136.42 89.47" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,85.89 L 136.42 85.89" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,82.3 L 136.42 82.3" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,78.71 L 136.42 78.71" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,75.13 L 136.42 75.13" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,71.54 L 136.42 71.54" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,67.96 L 136.42 67.96" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,64.37 L 136.42 64.37" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,60.79 L 136.42 60.79" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,57.2 L 136.42 57.2" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,53.61 L 136.42 53.61" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,50.03 L 136.42 50.03" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,46.44 L 136.42 46.44" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,42.86 L 136.42 42.86" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,39.27 L 136.42 39.27" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,35.69 L 136.42 35.69" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,32.1 L 136.42 32.1" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,28.51 L 136.42 28.51" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,24.93 L 136.42 24.93" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,21.34 L 136.42 21.34" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,17.76 L 136.42 17.76" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,14.17 L 136.42 14.17" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,10.59 L 136.42 10.59" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,7 L 136.42 7" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,3.41 L 136.42 3.41" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-0.17 L 136.42 -0.17" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-3.76 L 136.42 -3.76" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-7.34 L 136.42 -7.34" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-10.93 L 136.42 -10.93" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-14.51 L 136.42 -14.51" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-18.1 L 136.42 -18.1" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-21.69 L 136.42 -21.69" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-25.27 L 136.42 -25.27" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-28.86 L 136.42 -28.86" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-32.44 L 136.42 -32.44" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-36.03 L 136.42 -36.03" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-39.61 L 136.42 -39.61" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-43.2 L 136.42 -43.2" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-46.79 L 136.42 -46.79" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-50.37 L 136.42 -50.37" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-53.96 L 136.42 -53.96" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-57.54 L 136.42 -57.54" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-61.13 L 136.42 -61.13" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,-64.71 L 136.42 -64.71" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M14.48,186.29 L 136.42 186.29" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M14.48,114.57 L 136.42 114.57" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M14.48,42.86 L 136.42 42.86" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M14.48,-28.86 L 136.42 -28.86" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M14.48,-100.57 L 136.42 -100.57" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M14.48,150.43 L 136.42 150.43" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,143.26 L 136.42 143.26" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,136.09 L 136.42 136.09" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,128.92 L 136.42 128.92" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,121.74 L 136.42 121.74" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,114.57 L 136.42 114.57" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,107.4 L 136.42 107.4" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,100.23 L 136.42 100.23" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,93.06 L 136.42 93.06" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,85.89 L 136.42 85.89" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,78.71 L 136.42 78.71" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,71.54 L 136.42 71.54" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,64.37 L 136.42 64.37" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,57.2 L 136.42 57.2" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,50.03 L 136.42 50.03" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,42.86 L 136.42 42.86" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,35.69 L 136.42 35.69" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,28.51 L 136.42 28.51" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,21.34 L 136.42 21.34" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,14.17 L 136.42 14.17" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,7 L 136.42 7" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-0.17 L 136.42 -0.17" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-7.34 L 136.42 -7.34" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-14.51 L 136.42 -14.51" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-21.69 L 136.42 -21.69" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-28.86 L 136.42 -28.86" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-36.03 L 136.42 -36.03" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-43.2 L 136.42 -43.2" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-50.37 L 136.42 -50.37" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-57.54 L 136.42 -57.54" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M14.48,-64.71 L 136.42 -64.71" visibility="hidden" gadfly:scale="5.0"/>
     </g>
-    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-9">
-      <path fill="none" d="M-130.95,5 L -130.95 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-101.46,5 L -101.46 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-71.98,5 L -71.98 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-42.49,5 L -42.49 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-13.01,5 L -13.01 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M16.48,5 L 16.48 80.72" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M45.96,5 L 45.96 80.72" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M75.45,5 L 75.45 80.72" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M104.94,5 L 104.94 80.72" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M134.42,5 L 134.42 80.72" gadfly:scale="1.0" visibility="visible"/>
-      <path fill="none" d="M163.91,5 L 163.91 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M193.39,5 L 193.39 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M222.88,5 L 222.88 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M252.36,5 L 252.36 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M281.85,5 L 281.85 80.72" gadfly:scale="1.0" visibility="hidden"/>
-      <path fill="none" d="M-101.46,5 L -101.46 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-95.57,5 L -95.57 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-89.67,5 L -89.67 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-83.77,5 L -83.77 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-77.87,5 L -77.87 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-71.98,5 L -71.98 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-66.08,5 L -66.08 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-60.18,5 L -60.18 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-54.29,5 L -54.29 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-48.39,5 L -48.39 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-42.49,5 L -42.49 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-36.59,5 L -36.59 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-30.7,5 L -30.7 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-24.8,5 L -24.8 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-18.9,5 L -18.9 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-13.01,5 L -13.01 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-7.11,5 L -7.11 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-1.21,5 L -1.21 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M4.68,5 L 4.68 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M10.58,5 L 10.58 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M16.48,5 L 16.48 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M22.38,5 L 22.38 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M28.27,5 L 28.27 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M34.17,5 L 34.17 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M40.07,5 L 40.07 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M45.96,5 L 45.96 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M51.86,5 L 51.86 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M57.76,5 L 57.76 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M63.66,5 L 63.66 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M69.55,5 L 69.55 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M75.45,5 L 75.45 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M81.35,5 L 81.35 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M87.24,5 L 87.24 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M93.14,5 L 93.14 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M99.04,5 L 99.04 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M104.94,5 L 104.94 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M110.83,5 L 110.83 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M116.73,5 L 116.73 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M122.63,5 L 122.63 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M128.52,5 L 128.52 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M134.42,5 L 134.42 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M140.32,5 L 140.32 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M146.22,5 L 146.22 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M152.11,5 L 152.11 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M158.01,5 L 158.01 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M163.91,5 L 163.91 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M169.8,5 L 169.8 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M175.7,5 L 175.7 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M181.6,5 L 181.6 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M187.5,5 L 187.5 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M193.39,5 L 193.39 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M199.29,5 L 199.29 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M205.19,5 L 205.19 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M211.08,5 L 211.08 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M216.98,5 L 216.98 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M222.88,5 L 222.88 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M228.78,5 L 228.78 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M234.67,5 L 234.67 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M240.57,5 L 240.57 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M246.47,5 L 246.47 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M252.36,5 L 252.36 80.72" gadfly:scale="10.0" visibility="hidden"/>
-      <path fill="none" d="M-101.46,5 L -101.46 80.72" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M16.48,5 L 16.48 80.72" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M134.42,5 L 134.42 80.72" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M252.36,5 L 252.36 80.72" gadfly:scale="0.5" visibility="hidden"/>
-      <path fill="none" d="M-101.46,5 L -101.46 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-89.67,5 L -89.67 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-77.87,5 L -77.87 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-66.08,5 L -66.08 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-54.29,5 L -54.29 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-42.49,5 L -42.49 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-30.7,5 L -30.7 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-18.9,5 L -18.9 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M-7.11,5 L -7.11 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M4.68,5 L 4.68 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M16.48,5 L 16.48 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M28.27,5 L 28.27 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M40.07,5 L 40.07 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M51.86,5 L 51.86 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M63.66,5 L 63.66 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M75.45,5 L 75.45 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M87.24,5 L 87.24 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M99.04,5 L 99.04 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M110.83,5 L 110.83 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M122.63,5 L 122.63 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M134.42,5 L 134.42 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M146.22,5 L 146.22 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M158.01,5 L 158.01 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M169.8,5 L 169.8 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M181.6,5 L 181.6 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M193.39,5 L 193.39 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M205.19,5 L 205.19 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M216.98,5 L 216.98 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M228.78,5 L 228.78 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M240.57,5 L 240.57 80.72" gadfly:scale="5.0" visibility="hidden"/>
-      <path fill="none" d="M252.36,5 L 252.36 80.72" gadfly:scale="5.0" visibility="hidden"/>
+    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-9">
+      <path fill="none" d="M-130.95,5 L -130.95 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M-101.46,5 L -101.46 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M-71.98,5 L -71.98 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M-42.49,5 L -42.49 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M-13.01,5 L -13.01 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M16.48,5 L 16.48 80.72" visibility="visible" gadfly:scale="1.0"/>
+      <path fill="none" d="M45.96,5 L 45.96 80.72" visibility="visible" gadfly:scale="1.0"/>
+      <path fill="none" d="M75.45,5 L 75.45 80.72" visibility="visible" gadfly:scale="1.0"/>
+      <path fill="none" d="M104.94,5 L 104.94 80.72" visibility="visible" gadfly:scale="1.0"/>
+      <path fill="none" d="M134.42,5 L 134.42 80.72" visibility="visible" gadfly:scale="1.0"/>
+      <path fill="none" d="M163.91,5 L 163.91 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M193.39,5 L 193.39 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M222.88,5 L 222.88 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M252.36,5 L 252.36 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M281.85,5 L 281.85 80.72" visibility="hidden" gadfly:scale="1.0"/>
+      <path fill="none" d="M-101.46,5 L -101.46 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-95.57,5 L -95.57 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-89.67,5 L -89.67 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-83.77,5 L -83.77 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-77.87,5 L -77.87 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-71.98,5 L -71.98 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-66.08,5 L -66.08 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-60.18,5 L -60.18 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-54.29,5 L -54.29 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-48.39,5 L -48.39 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-42.49,5 L -42.49 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-36.59,5 L -36.59 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-30.7,5 L -30.7 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-24.8,5 L -24.8 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-18.9,5 L -18.9 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-13.01,5 L -13.01 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-7.11,5 L -7.11 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-1.21,5 L -1.21 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M4.68,5 L 4.68 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M10.58,5 L 10.58 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M16.48,5 L 16.48 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M22.38,5 L 22.38 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M28.27,5 L 28.27 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M34.17,5 L 34.17 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M40.07,5 L 40.07 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M45.96,5 L 45.96 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M51.86,5 L 51.86 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M57.76,5 L 57.76 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M63.66,5 L 63.66 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M69.55,5 L 69.55 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M75.45,5 L 75.45 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M81.35,5 L 81.35 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M87.24,5 L 87.24 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M93.14,5 L 93.14 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M99.04,5 L 99.04 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M104.94,5 L 104.94 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M110.83,5 L 110.83 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M116.73,5 L 116.73 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M122.63,5 L 122.63 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M128.52,5 L 128.52 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M134.42,5 L 134.42 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M140.32,5 L 140.32 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M146.22,5 L 146.22 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M152.11,5 L 152.11 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M158.01,5 L 158.01 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M163.91,5 L 163.91 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M169.8,5 L 169.8 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M175.7,5 L 175.7 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M181.6,5 L 181.6 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M187.5,5 L 187.5 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M193.39,5 L 193.39 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M199.29,5 L 199.29 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M205.19,5 L 205.19 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M211.08,5 L 211.08 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M216.98,5 L 216.98 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M222.88,5 L 222.88 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M228.78,5 L 228.78 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M234.67,5 L 234.67 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M240.57,5 L 240.57 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M246.47,5 L 246.47 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M252.36,5 L 252.36 80.72" visibility="hidden" gadfly:scale="10.0"/>
+      <path fill="none" d="M-101.46,5 L -101.46 80.72" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M16.48,5 L 16.48 80.72" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M134.42,5 L 134.42 80.72" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M252.36,5 L 252.36 80.72" visibility="hidden" gadfly:scale="0.5"/>
+      <path fill="none" d="M-101.46,5 L -101.46 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-89.67,5 L -89.67 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-77.87,5 L -77.87 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-66.08,5 L -66.08 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-54.29,5 L -54.29 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-42.49,5 L -42.49 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-30.7,5 L -30.7 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-18.9,5 L -18.9 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M-7.11,5 L -7.11 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M4.68,5 L 4.68 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M16.48,5 L 16.48 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M28.27,5 L 28.27 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M40.07,5 L 40.07 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M51.86,5 L 51.86 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M63.66,5 L 63.66 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M75.45,5 L 75.45 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M87.24,5 L 87.24 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M99.04,5 L 99.04 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M110.83,5 L 110.83 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M122.63,5 L 122.63 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M134.42,5 L 134.42 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M146.22,5 L 146.22 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M158.01,5 L 158.01 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M169.8,5 L 169.8 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M181.6,5 L 181.6 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M193.39,5 L 193.39 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M205.19,5 L 205.19 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M216.98,5 L 216.98 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M228.78,5 L 228.78 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M240.57,5 L 240.57 80.72" visibility="hidden" gadfly:scale="5.0"/>
+      <path fill="none" d="M252.36,5 L 252.36 80.72" visibility="hidden" gadfly:scale="5.0"/>
     </g>
-    <g class="plotpanel" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-10">
-      <g class="geometry" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-11">
-        <g class="color_AlphaColorValue{RGB{Float32},Float32}(RGB{Float32}(0.0f0,0.74736935f0,1.0f0),1.0f0)" stroke="#FFFFFF" stroke-width="0.3" fill="#00BFFF" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-12">
+    <g class="plotpanel" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-10">
+      <g class="geometry" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-11">
+        <g class="color_AlphaColorValue{RGB{Float32},Float32}(RGB{Float32}(0.0f0,0.74736935f0,1.0f0),1.0f0)" stroke="#FFFFFF" stroke-width="0.3" fill="#00BFFF" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-12">
           <circle cx="17.22" cy="42.86" r="0.9"/>
           <circle cx="17.26" cy="42.86" r="0.9"/>
           <circle cx="17.31" cy="42.86" r="0.9"/>
@@ -753,130 +824,130 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
         </g>
       </g>
     </g>
-    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-13">
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-14">
+    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-13">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-14">
         <rect x="129.42" y="8" width="4" height="4"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-15">
+        <g class="button_logo" fill="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-15">
           <path d="M130.22,9.6 L 131.02 9.6 131.02 8.8 131.82 8.8 131.82 9.6 132.62 9.6 132.62 10.4 131.82 10.4 131.82 11.2 131.02 11.2 131.02 10.4 130.22 10.4 z"/>
         </g>
       </g>
-      <g fill="#EAEAEA" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-16">
+      <g fill="#EAEAEA" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-16">
         <rect x="109.92" y="8" width="19" height="4"/>
       </g>
-      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-17">
+      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-17">
         <rect x="118.42" y="8" width="2" height="4"/>
       </g>
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-18">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-18">
         <rect x="105.42" y="8" width="4" height="4"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-19">
+        <g class="button_logo" fill="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-19">
           <path d="M106.22,9.6 L 108.62 9.6 108.62 10.4 106.22 10.4 z"/>
         </g>
       </g>
     </g>
   </g>
-  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-20">
-    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" gadfly:scale="1.0" visibility="visible">0</text>
-    <text x="13.48" y="150.43" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-3.0</text>
-    <text x="13.48" y="146.84" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.9</text>
-    <text x="13.48" y="143.26" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.8</text>
-    <text x="13.48" y="139.67" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.7</text>
-    <text x="13.48" y="136.09" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.6</text>
-    <text x="13.48" y="132.5" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.5</text>
-    <text x="13.48" y="128.92" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.4</text>
-    <text x="13.48" y="125.33" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.3</text>
-    <text x="13.48" y="121.74" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.2</text>
-    <text x="13.48" y="118.16" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.1</text>
-    <text x="13.48" y="114.57" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-2.0</text>
-    <text x="13.48" y="110.99" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.9</text>
-    <text x="13.48" y="107.4" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.8</text>
-    <text x="13.48" y="103.82" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.7</text>
-    <text x="13.48" y="100.23" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.6</text>
-    <text x="13.48" y="96.64" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.5</text>
-    <text x="13.48" y="93.06" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.4</text>
-    <text x="13.48" y="89.47" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.3</text>
-    <text x="13.48" y="85.89" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.2</text>
-    <text x="13.48" y="82.3" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.1</text>
-    <text x="13.48" y="78.71" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-1.0</text>
-    <text x="13.48" y="75.13" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.9</text>
-    <text x="13.48" y="71.54" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.8</text>
-    <text x="13.48" y="67.96" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.7</text>
-    <text x="13.48" y="64.37" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.6</text>
-    <text x="13.48" y="60.79" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.5</text>
-    <text x="13.48" y="57.2" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.4</text>
-    <text x="13.48" y="53.61" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.3</text>
-    <text x="13.48" y="50.03" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.2</text>
-    <text x="13.48" y="46.44" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">-0.1</text>
-    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.0</text>
-    <text x="13.48" y="39.27" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.1</text>
-    <text x="13.48" y="35.69" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.2</text>
-    <text x="13.48" y="32.1" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.3</text>
-    <text x="13.48" y="28.51" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.4</text>
-    <text x="13.48" y="24.93" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.5</text>
-    <text x="13.48" y="21.34" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.6</text>
-    <text x="13.48" y="17.76" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.7</text>
-    <text x="13.48" y="14.17" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.8</text>
-    <text x="13.48" y="10.59" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">0.9</text>
-    <text x="13.48" y="7" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.0</text>
-    <text x="13.48" y="3.41" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.1</text>
-    <text x="13.48" y="-0.17" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.2</text>
-    <text x="13.48" y="-3.76" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.3</text>
-    <text x="13.48" y="-7.34" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.4</text>
-    <text x="13.48" y="-10.93" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.5</text>
-    <text x="13.48" y="-14.51" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.6</text>
-    <text x="13.48" y="-18.1" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.7</text>
-    <text x="13.48" y="-21.69" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.8</text>
-    <text x="13.48" y="-25.27" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">1.9</text>
-    <text x="13.48" y="-28.86" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.0</text>
-    <text x="13.48" y="-32.44" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.1</text>
-    <text x="13.48" y="-36.03" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.2</text>
-    <text x="13.48" y="-39.61" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.3</text>
-    <text x="13.48" y="-43.2" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.4</text>
-    <text x="13.48" y="-46.79" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.5</text>
-    <text x="13.48" y="-50.37" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.6</text>
-    <text x="13.48" y="-53.96" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.7</text>
-    <text x="13.48" y="-57.54" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.8</text>
-    <text x="13.48" y="-61.13" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">2.9</text>
-    <text x="13.48" y="-64.71" text-anchor="end" dy="0.35em" gadfly:scale="10.0" visibility="hidden">3.0</text>
-    <text x="13.48" y="186.29" text-anchor="end" dy="0.35em" gadfly:scale="0.5" visibility="hidden">-4</text>
-    <text x="13.48" y="114.57" text-anchor="end" dy="0.35em" gadfly:scale="0.5" visibility="hidden">-2</text>
-    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" gadfly:scale="0.5" visibility="hidden">0</text>
-    <text x="13.48" y="-28.86" text-anchor="end" dy="0.35em" gadfly:scale="0.5" visibility="hidden">2</text>
-    <text x="13.48" y="-100.57" text-anchor="end" dy="0.35em" gadfly:scale="0.5" visibility="hidden">4</text>
-    <text x="13.48" y="150.43" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-3.0</text>
-    <text x="13.48" y="143.26" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-2.8</text>
-    <text x="13.48" y="136.09" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-2.6</text>
-    <text x="13.48" y="128.92" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-2.4</text>
-    <text x="13.48" y="121.74" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-2.2</text>
-    <text x="13.48" y="114.57" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-2.0</text>
-    <text x="13.48" y="107.4" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-1.8</text>
-    <text x="13.48" y="100.23" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-1.6</text>
-    <text x="13.48" y="93.06" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-1.4</text>
-    <text x="13.48" y="85.89" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-1.2</text>
-    <text x="13.48" y="78.71" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-1.0</text>
-    <text x="13.48" y="71.54" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-0.8</text>
-    <text x="13.48" y="64.37" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-0.6</text>
-    <text x="13.48" y="57.2" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-0.4</text>
-    <text x="13.48" y="50.03" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">-0.2</text>
-    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">0.0</text>
-    <text x="13.48" y="35.69" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">0.2</text>
-    <text x="13.48" y="28.51" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">0.4</text>
-    <text x="13.48" y="21.34" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">0.6</text>
-    <text x="13.48" y="14.17" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">0.8</text>
-    <text x="13.48" y="7" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">1.0</text>
-    <text x="13.48" y="-0.17" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">1.2</text>
-    <text x="13.48" y="-7.34" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">1.4</text>
-    <text x="13.48" y="-14.51" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">1.6</text>
-    <text x="13.48" y="-21.69" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">1.8</text>
-    <text x="13.48" y="-28.86" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">2.0</text>
-    <text x="13.48" y="-36.03" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">2.2</text>
-    <text x="13.48" y="-43.2" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">2.4</text>
-    <text x="13.48" y="-50.37" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">2.6</text>
-    <text x="13.48" y="-57.54" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">2.8</text>
-    <text x="13.48" y="-64.71" text-anchor="end" dy="0.35em" gadfly:scale="5.0" visibility="hidden">3.0</text>
+  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-20">
+    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" visibility="visible" gadfly:scale="1.0">0</text>
+    <text x="13.48" y="150.43" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-3.0</text>
+    <text x="13.48" y="146.84" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.9</text>
+    <text x="13.48" y="143.26" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.8</text>
+    <text x="13.48" y="139.67" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.7</text>
+    <text x="13.48" y="136.09" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.6</text>
+    <text x="13.48" y="132.5" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.5</text>
+    <text x="13.48" y="128.92" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.4</text>
+    <text x="13.48" y="125.33" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.3</text>
+    <text x="13.48" y="121.74" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.2</text>
+    <text x="13.48" y="118.16" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.1</text>
+    <text x="13.48" y="114.57" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.0</text>
+    <text x="13.48" y="110.99" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.9</text>
+    <text x="13.48" y="107.4" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.8</text>
+    <text x="13.48" y="103.82" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.7</text>
+    <text x="13.48" y="100.23" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.6</text>
+    <text x="13.48" y="96.64" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.5</text>
+    <text x="13.48" y="93.06" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.4</text>
+    <text x="13.48" y="89.47" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.3</text>
+    <text x="13.48" y="85.89" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.2</text>
+    <text x="13.48" y="82.3" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.1</text>
+    <text x="13.48" y="78.71" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-1.0</text>
+    <text x="13.48" y="75.13" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.9</text>
+    <text x="13.48" y="71.54" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.8</text>
+    <text x="13.48" y="67.96" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.7</text>
+    <text x="13.48" y="64.37" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.6</text>
+    <text x="13.48" y="60.79" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.5</text>
+    <text x="13.48" y="57.2" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.4</text>
+    <text x="13.48" y="53.61" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.3</text>
+    <text x="13.48" y="50.03" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.2</text>
+    <text x="13.48" y="46.44" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-0.1</text>
+    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.0</text>
+    <text x="13.48" y="39.27" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.1</text>
+    <text x="13.48" y="35.69" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.2</text>
+    <text x="13.48" y="32.1" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.3</text>
+    <text x="13.48" y="28.51" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.4</text>
+    <text x="13.48" y="24.93" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.5</text>
+    <text x="13.48" y="21.34" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.6</text>
+    <text x="13.48" y="17.76" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.7</text>
+    <text x="13.48" y="14.17" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.8</text>
+    <text x="13.48" y="10.59" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">0.9</text>
+    <text x="13.48" y="7" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.0</text>
+    <text x="13.48" y="3.41" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.1</text>
+    <text x="13.48" y="-0.17" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.2</text>
+    <text x="13.48" y="-3.76" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.3</text>
+    <text x="13.48" y="-7.34" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.4</text>
+    <text x="13.48" y="-10.93" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.5</text>
+    <text x="13.48" y="-14.51" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.6</text>
+    <text x="13.48" y="-18.1" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.7</text>
+    <text x="13.48" y="-21.69" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.8</text>
+    <text x="13.48" y="-25.27" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">1.9</text>
+    <text x="13.48" y="-28.86" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.0</text>
+    <text x="13.48" y="-32.44" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.1</text>
+    <text x="13.48" y="-36.03" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.2</text>
+    <text x="13.48" y="-39.61" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.3</text>
+    <text x="13.48" y="-43.2" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.4</text>
+    <text x="13.48" y="-46.79" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.5</text>
+    <text x="13.48" y="-50.37" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.6</text>
+    <text x="13.48" y="-53.96" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.7</text>
+    <text x="13.48" y="-57.54" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.8</text>
+    <text x="13.48" y="-61.13" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">2.9</text>
+    <text x="13.48" y="-64.71" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">3.0</text>
+    <text x="13.48" y="186.29" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="0.5">-4</text>
+    <text x="13.48" y="114.57" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="0.5">-2</text>
+    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="0.5">0</text>
+    <text x="13.48" y="-28.86" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="0.5">2</text>
+    <text x="13.48" y="-100.57" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="0.5">4</text>
+    <text x="13.48" y="150.43" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-3.0</text>
+    <text x="13.48" y="143.26" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-2.8</text>
+    <text x="13.48" y="136.09" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-2.6</text>
+    <text x="13.48" y="128.92" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-2.4</text>
+    <text x="13.48" y="121.74" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-2.2</text>
+    <text x="13.48" y="114.57" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-2.0</text>
+    <text x="13.48" y="107.4" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-1.8</text>
+    <text x="13.48" y="100.23" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-1.6</text>
+    <text x="13.48" y="93.06" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-1.4</text>
+    <text x="13.48" y="85.89" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-1.2</text>
+    <text x="13.48" y="78.71" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-1.0</text>
+    <text x="13.48" y="71.54" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-0.8</text>
+    <text x="13.48" y="64.37" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-0.6</text>
+    <text x="13.48" y="57.2" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-0.4</text>
+    <text x="13.48" y="50.03" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">-0.2</text>
+    <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">0.0</text>
+    <text x="13.48" y="35.69" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">0.2</text>
+    <text x="13.48" y="28.51" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">0.4</text>
+    <text x="13.48" y="21.34" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">0.6</text>
+    <text x="13.48" y="14.17" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">0.8</text>
+    <text x="13.48" y="7" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">1.0</text>
+    <text x="13.48" y="-0.17" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">1.2</text>
+    <text x="13.48" y="-7.34" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">1.4</text>
+    <text x="13.48" y="-14.51" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">1.6</text>
+    <text x="13.48" y="-21.69" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">1.8</text>
+    <text x="13.48" y="-28.86" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">2.0</text>
+    <text x="13.48" y="-36.03" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">2.2</text>
+    <text x="13.48" y="-43.2" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">2.4</text>
+    <text x="13.48" y="-50.37" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">2.6</text>
+    <text x="13.48" y="-57.54" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">2.8</text>
+    <text x="13.48" y="-64.71" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="5.0">3.0</text>
   </g>
 </g>
 <defs>
-<clipPath id="fig-3f6890848cbc4cc89ef62b5f3703a896-element-6">
+<clipPath id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-6">
   <path d="M14.48,5 L 136.42 5 136.42 80.72 14.48 80.72" />
 </clipPath
 ></defs>
@@ -1813,8 +1884,8 @@ return Gadfly;
           factory(glob.Snap, glob.Gadfly);
       }
 })(window, function (Snap, Gadfly) {
-    var fig = Snap("#fig-3f6890848cbc4cc89ef62b5f3703a896");
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-5")
+    var fig = Snap("#fig-0c4181b0c2aa4cf094b116deb58388b9");
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-5")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -1822,63 +1893,63 @@ fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-5")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-8")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-8")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-8")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-8")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-9")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-9")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-9")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-9")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-14")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-14")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-14")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-14")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-14")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-14")
    .click(Gadfly.zoomslider_zoomin_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-16")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-16")
    .data("max_pos", 120.42)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-16")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-16")
    .data("min_pos", 103.42)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-16")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-16")
    .click(Gadfly.zoomslider_track_click);
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-17")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
    .data("max_pos", 120.42)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-17")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
    .data("min_pos", 103.42)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-17")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-17")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-17")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
    .drag(Gadfly.zoomslider_thumb_dragmove,
      Gadfly.zoomslider_thumb_dragstart,
      Gadfly.zoomslider_thumb_dragend)
 .mousedown(Gadfly.zoomslider_thumb_mousedown)
 .mouseup(Gadfly.zoomslider_thumb_mouseup)
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-18")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-18")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-18")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-18")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-18")
+fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-18")
    .click(Gadfly.zoomslider_zoomout_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
@@ -1886,7 +1957,19 @@ fig.select("#fig-3f6890848cbc4cc89ef62b5f3703a896-element-18")
     });
 ]]> </script>
 </svg>
-<p>We notice:</p><ul><li>they are definitely finite</li><li>there are definitely gaps</li><li>they are not evenly spaced out</li><li>there is a "hole" near 0</li></ul><h2>Error analysis of arithmetic operations</h2><h2>Addition of numbers and cumulative error</h2><h3>Other adding methods</h3>
+<p>We notice:</p><ul><li>they are definitely finite</li><li>there are definitely gaps</li><li>they are not evenly spaced out</li><li>there is a "hole" near 0</li></ul><h3>Machine precision</h3><p>Of special note is the size of the gap between values around 1:</p><pre class="sourceCode julia">nextfloat(1.0), nextfloat(1.0) - 1.0</pre>
+<pre class="output">
+(1.0000000000000002,2.220446049250313e-16)</pre>
+
+<p>This is sometimes called <em>machine precision</em> and in <code>Julia</code> is returned by <code>eps()</code>:</p><pre class="sourceCode julia">eps()</pre>
+<pre class="output">
+2.220446049250313e-16</pre>
+
+<pre class="sourceCode julia">eps(Float16)</pre>
+<pre class="output">
+float16(0.00097656)</pre>
+
+
   </div>
 </div>  
 

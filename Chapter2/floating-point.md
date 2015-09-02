@@ -1,12 +1,123 @@
 # Floating point numbers
 
+
 ## Decimal numbers
 
-In mathematics we have different types of numbers: Integers, Rationals, Reals, ...
+In mathematics we have different types of numbers: Integers, Rationals, Reals, Complex, ...
 
-On a calculator there is one: floating point
 
-On the computer there may be more than one type for each mathematical type: 8, 16, 32, 64, 128 bit integers...
+On the computer there may be more than one type for each mathematical type, For example, `Julia` has 12 built in types for integers (signed and unsigned and different storage sizes.)
+
+There are infinitely many integers mathematically, but only finitely many representable on the computer.
+
+`Int64` is typical. `Int8` has only $256=2^8$ possible values. It uses $-2^7$ to $2^7-1$.
+
+Internally, the values are kept in binary:
+
+```
+convert(Uint8, 5) |> bits
+```
+
+The leading $0$ indicates the sign. 
+
+### Binary numbers
+
+Binary numbers use powers of $2$, not $10$. So -- as you likely know -- $1101$ in binary is just $1\cdot 2^0 + 0\cdot 2^1 + 1 \cdot 2^2 + 1\cdot 2^3 = 13$.
+
+The largest value in `Int8` would then be $1 + 2 + 4 + 8 + 16 + 32 + 64 = 127$.
+
+
+Negative values are kept as an offset from 128, so can go down to -128:
+
+```
+convert(Uint8, -5) |> bits
+```
+
+(That is read as $(1 + 2 + 8 + 16 + 32 + 64) - 128$.)
+
+
+(Why store this way?)
+
+### Math with binary numbers
+
+Adding two binary numbers follows the usual algorithm with carrying:
+
+```
+Verbatim("""
+  1101
++ 1011
+------
+ 11000  
+""")
+```
+
+$(1 + 4 + 8 + 1 +2 + 8 = 16 + 8)$
+
+### Multiplication
+
+In decimal multiplying or dividing  by 10 is easy -- add a $0$ or shift the decimal point. Similarly with binary:
+
+```
+Verbatim("""
+   10101
+*     10
+--------
+   00000
+  10101
+--------
+  101010
+""")
+```
+
+
+### Integer limitations with Julia
+
+Integers are stored exactly -- as possible. But that has limitations. With 64 bit numbers, the largest integer is $2^{63}-1$.
+
+```
+2^63 - 1
+```
+
+but not `2^64`:
+
+```
+2^64
+```
+
+What happens:
+
+```
+bits(2)
+```
+
+```
+bits(2*2)
+```
+
+shifts things left
+
+```
+bits(2^62)
+```
+
+```
+bits(2^62 + 2^61)
+```
+
+```
+bits(2^62 * 2)
+```
+
+But still this is correct:
+
+```
+bits(2^63 - 1)
+```
+
+
+## Decimal numbers
+
+On a calculator there is one basic number type: floating point. This is primarily the case with computers as well.
 
 In mathematics we primarily work with *decimal numbers*
 
@@ -53,11 +164,21 @@ We consider the value of the $n+1$st decimal number.
 
 - If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.
 
-In either case, it is less --in absolute value -- than $5*10^{-(n+1)} = 1/2 \cdot 10^{-n}$.
+In either case, it is less --in absolute value -- than $(10/2) \cdot 10^{-(n+1)} = 1/2 \cdot 10^{-n}$.
 
 > The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$.
 
 Had we chopped (`floor`) or always rounded up (`ceil`) then the error is bounded by $10^{-n}$.
+
+### Ulp
+
+There is an alternate name for the error. When rounding to a certain
+number of digits, there is a unit of last precision, and `ulp`. In the
+above, the unit of last precision was $10^{-n}$, so the error is less
+than $1/2$ `ulp`.
+
+`ulp`s are easy enough to understand. If we round $3.1415$ to $3.14$
+then the error is $0.15$ `ulp`.
 
 ## Scientific notation
 
@@ -77,11 +198,7 @@ $$
 * $r$ is a number in $0.1 \leq r < 1.0$
 * $n$ is an integer, possible negative, or zero.
 
-A more useful representation for storing on the computer is to shift things over by $1$ to get
-
-* $r$ is a number in $1 \leq r < 10$
-
-## Binary numbers
+### Binary
 
 Binary numbers are similar, only we use base $2$ -- not $10$, as with decimal.
 
@@ -95,30 +212,76 @@ $$
 1*2^1 + 0*2^0 + 1*1/2^1 + 0 * 1/2^2 + 1 * 1/2^3
 ```
 
-### Scientific notation with base 2
+### Converting decimal to binary
 
-We can use different bases in scientific notation. Any number can be written as
+We can convert decimal to binary. Here is a simple algorithm. Start with $x$. We want to produce digits $ddd.ddd...$ where $d$ are either $0$ or $1$.
+
+First, take the log base 2:
+
+```
+x = 12.1
+log2(x) |> floor
+```
+
+This says $2^3 \leq x < 2^4$. Remember $3$, then subtract $2^3$ and repeat:
+
+```
+ds = [3]
+x = x - 2.0^ds[end]
+n = log2(x) |> floor
+```
+
+Remember 2 and then subtract $2^2$ and repeat:
+
+```
+push!(ds, n)
+x = x - 2.0^ds[end]
+n = log2(x) |> floor
+```
+
+Remember $-4$ and repeat
+
+```
+push!(ds, n)
+x = x - 2.0^ds[end]
+n = log2(x) |> floor
+```
+
+etc.
+
+
+The `ds` will tell us there is a 1 in position 3,2,-4, -5, 8,9... So `1100.000110011...`
+
+One thing to note: what numbers terminate in decimal are generally different than what numbers will terminate in binary.
+
+## scientific notation with different bases
+
+We can use different bases in scientific notation. A number would be represented with
 
 $$
-x = \pm q \cdot 2^m
+x = \pm q \cdot \beta^m
 $$
 
-With
+We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.
 
-* $\pm$ represents $+1$ or $-1$
-* $q$ -- the significand -- has $1 \leq q < 2$ (in base 2)
-* $m$ -- is an integer (in base 2)
-
-By writing $q = 1.f$ an extra digit can be gained (the 1) if only a finite number of digits are available, as is the case on the computer.
-
-(In general, with a base $\beta$, we can write $x=\pm q \cdot \beta^m$ where $q$ is written in base $\beta$.)
+A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.
 
 ## Floating point numbers
 
-Floating point is a representation of numbers using scientific notation, as above, except there are only finitely many digits that can be used for $q$ and $m$. For example, we might restrict $q$ to hold just $p$ digits ($p$ is the *precision*), and $m$ will have another restriction on the size of its digits.
+Floating point is a representation of numbers using scientific notation. Only there are constraints on the sizes:
 
-For example, let's consider numbers of the type $d.dd \cdot 10^m$ -- that is $p=3$ where $m$ is in $\{-1,0,1,2\}$. Then some numbers are: `1.23e3` , `-1.2oe-1`, `1.99e0`, ... In each case, $q$ has 3 digits and is in $[1,10)$.
+* The value $q$, the significand, has $p$ digits. (The precision)
 
+* The values of $m$ is between two values, say $e_{min}$ and $e_{max}$.
+
+### A simple case
+
+For example consider base $\beta=10$, $p=3$ and $e_{min}=-1$ and $e_{max}=2$. Then the possible values are limited to
+$-9.99 \cdot 10^{-1}$ to $9.99 \cdot 10^2$. How many are there?
+
+$$
+2 \cdot ((\beta-1)\cdot\beta^{p-1}) \cdot (e_{max} - e_{min})
+$$
 
 ## Binary floating point
 
@@ -144,6 +307,7 @@ Checking we have
 convert(Float16, 1.0) |> bits
 ```
 
+###
 
 Kinda hard to see: Let's wrap this in a function:
 
@@ -158,6 +322,8 @@ end
 seebits(1)
 ```
 
+###
+
 We have $2 = 1.0 \cdot 2^1$. Se we expect $q$ to represent $0$ and $m$ to represent $16$, as $16-15 = 1$:
 
 ```
@@ -170,6 +336,8 @@ What about the sign bit?
 seebits(-2)
 ```
 
+###
+
 What about other numbers
 
 ```
@@ -179,6 +347,8 @@ seebits(1 + 1/2 + 1/4 + 1/8 + 0/16 + 1/32)
 ```
 seebits(2^4*(1 + 1/2 + 1/4 + 1/8 + 0/16 + 1/32)) ## 19 - (1 + 1*2 + 1*16) = 0
 ```
+
+### Rounding
 
 Numbers get rounded!
 
@@ -196,6 +366,8 @@ seebits(0.1)
 q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )
 ```
 
+###
+
 And `01011` for $m$ becomes
 
 ```
@@ -207,6 +379,11 @@ m = 2.0^(1 + 2 + 8 - 15)
 ```
 
 Notice the number $0.1$ is necessarily approximated.
+
+### How much off can rounding be?
+
+In binary floating point, the unit of last precision is $2^{-p}$, so
+the error in rounding is at most $(1/2) \cdot 2^{-p}$, or half an `ulp`.
 
 ### Float16, Float32, Float64, ...
 
@@ -224,18 +401,22 @@ b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
 b[1], b[2:12], b[13:end]
 ```
 
-Here $m = 2^10 + 1 - (2^10 - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.
+Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.
+
+## Zero
 
 
-## 0, Infinity, NaN
+Wait a minute -- if we insist on the significand being $1.dddd...$ we can't represent $0$!
 
 Some values in floating point are special:
 
-* $0$: how to write $0$ in $1.f \cdot 2^m$? Can't do it. So it is coded:
+* $0$: how to write $0$ in $1.dddd \cdot 2^m$? Can't do it. So it is coded:
 
 ```
 bits(0.0)
 ```
+
+(The code uses the *smallest* possible exponent, and $0$ for the significand)
 
 * $-0$: By flipping the sign bit, we could code $-0$ naturally. Is it done?
 
@@ -244,9 +425,11 @@ bits(0.0)
 bits(-0.0)   ## why??
 ```
 
-* Infinity. [Why](http://www.cs.berkeley.edu/~wkahan/Infinity.pdf)?
+### "Infinity": Inf
 
-This value is deemed valuable to have supported at the hardware level. It is coded by reserviing the largest value of $m$:
+Infinity. [Why](http://www.cs.berkeley.edu/~wkahan/Infinity.pdf)?
+
+This value is deemed valuable to have supported at the hardware level. It is coded by reserving the *largest* possible value of $m$ and $0$ for the significand.
 
 ```
 bits(Inf)  # see bits(Inf)[2:12]
@@ -258,7 +441,9 @@ There is room for $-\infty$ and it too is defined:
 bits(-Inf)
 ```
 
-* NaN. This is a special value reserved for computations where no value is possible. Examples include `0/0` or `0 * Inf`:
+### Not a number: NaN
+
+NaN. This is a special value reserved for computations where no value is possible. Examples include `0/0` or `0 * Inf`:
 
 ```
 0/0, 0 * Inf
@@ -282,14 +467,34 @@ This is *very* similar to `Inf`, but the value of $q$ is non-zero!
 bits(NaN)[13:end], bits(Inf)[13:end]
 ```
 
+`NaN` semantics are a bit [controversial](https://github.com/JuliaLang/julia/issues/7866).
+
+
+
+### Poison
+
+The values of `Inf` and `NaN` will "poison" subsequent operations, for example
+
+```
+NaN + 1, Inf - 1
+```
+
+These special values are generated instead of errors being thrown for some common cases:
+
+* overflow (a number bigger than the largest finite floating point number)
+* divide by $0$ (either `Inf`, or if `0/0`, `NaN`)
+* invalid number (such as `0 * Inf`)
+
+(Whether something like `sqrt(-1.0)` is an error or `NaN` is not specified.)
+
 ### Range of numbers
 
 What is the range of the numbers that can be represented? Let's check with Float16.
 
-The largest *positive* value would have $m$ coded with `11110` or ($2 + 4 + 8 + 16 - 15 = 15$)
+The largest *positive* value would have $m$ coded with `11110` or ($2 + 4 + 8 + 16 - 15 = 15$) (The value `11111` is saved for `Inf` and `NaN`.)
 
 The largest value for $q$ would be `1111111111`, or
-
+ 
 ```
 sum([1/2^i for i in 0:10])
 ```
@@ -310,7 +515,7 @@ For the smallest *positive* number, the smallest exponent is code `00000` or $0 
 
 
 ```
--sum([1/2^i for i in 0:10]) * 1/2^15
+1/2^15
 ```
 
 But this isn't actually the case:
@@ -330,9 +535,9 @@ prevfloat(Inf), nextfloat(0.0)
 
 ## Machine numbers
 
-The numbers that can be represented **exactly** in floating point are called *machine number*.
+The numbers that can be represented **exactly** in floating point are called *machine numbers*.
 
-* There aren't very many compared to the **infinite** number of floating point values.
+<li> There aren't very many compared to the **infinite** number of floating point values.
 
 Let's visualize in a *hypothetical* Float8 mode with 1 sign bit, 3 exponent bits and 4 bits for the mantissa.
 
@@ -359,7 +564,6 @@ using Gadfly
 plot(x = vals, y = 0*vals, Geom.point)
 ```
 
-
 We notice:
 
 * they are definitely finite
@@ -372,7 +576,7 @@ We notice:
 Of special note is the size of the gap between values around 1:
 
 ```
-nextfloat(1.0)
+nextfloat(1.0), nextfloat(1.0) - 1.0
 ```
 
 This is sometimes called *machine precision* and in `Julia` is returned by `eps()`:
@@ -384,261 +588,3 @@ eps()
 ```
 eps(Float16)
 ```
-
-### Rounding
-
-As not every number is a machine number, numbers are rounded to machine numbers. There are variants of rounding methods. Some are:
-
-* round to nearest: find the closest machine number. If a tie round to the even number.
-* round to $0$: round down if positive, up if negative
-* round to $\infty$ (or $-\infty$): always round up (or down)
-
-How big can the error be in rounding one number? Let $p$ be the precision and $\beta=2$, for simplicity we take $p=3$. We can write
-
-$$
-x=1.a_1 a_2 a_3 a_4 \dots 2^m = 1.a_1 a_2 a_3 2^m + e
-$$
-
-where
-
-$$
-e=.000a_4 a_5 \dots 2^m = 0.a_4a_5\dots 2^{-p} 2^m.
-$$
-
-If we round down, we take $e=0$.
-
-If we round up, we take $e = 1\cdot 2^{-p} 2^m$.
-
-At most the error is $1/2 2^{-p} 2^m$.
-
-The *relative error* is at most
-
-$$
-|\frac{x - fl(x)}{x}| = |\frac{e}{x} = \frac{1/2 2^{-p} 2^m}{q 2^m} \leq 1/2 2^{-p}
-$$
-
-(With just chopping there would be no $1/2$.)
-
-The book writes $fl(x)$ for the floating point value of $x$. If $\delta$ is the relative error, then we have $fl(x) = x (1 + \delta)$ and $|\delta| \leq 1/2 2^{-p}$.
-
-### next closest number
-
-Suppose $x = 1.a_1a_2 \cdot a_p \cdot 2^m$ is a machine number with precision $p$. What is the relative size of the next largest number? This would be
-
-$$
-x' = (1.a_1a_2 \cdot a_p + 2^{-p}) \cdot  2^m
-$$
-
-The absolute difference being $2^{m-p}$. So if $m$ is larger, the difference is larger -- bigger gaps. The *relative difference* is basically a constant: $2^{-p}2^m/(q 2^m) \leq 2^{-p}$. 
-
-## Error analysis of arithmetic operations
-
-Rounding can mess with our "inituitive" ideas of how numbers work: Consider the familiar decimal case with $p=3$.
-
-What is $10.1 - 9.93$?
-
-In regular subtraction we align the decimal points
-
-```
-Verbatim("""
-10.10
-09.93
------
-00.17
-""")
-```
-
-On the computer though values are shifted to align the decimal points. Hence $9.93$ could become $0.99 \cdot 10^{1}$, if chopped. So that subtraction becomes
-
-```
-Verbatim("""
-10 *  1.01
-      0.99
-      ----- 
-10 *  0.02
-""")
-```
-
-The difference between $.20$ and $.17$ is 3 units in the off in the last digit of precision. So rounding can have an adverse effect.
-
-
-### How far off can subtraction with shifting and truncation be?
-
-Suppose we have  precision $p$ and binary ($\beta=2$). Then the *relative* error can be as large as 1 = $\beta-1$!
-
-Consider a small case: $1.00 \cdot 2^0$ and $1.11 \cdot 2^{-1}$. (These are adjacent). Then mathematically the difference is $0.001$, but if $1.11 2^{-1}$ is shifted (and chopped) to $0.11 \cdot 2^0$ to match, then the difference is $0.01$. We have $|(0.001 - 0.01)/(0.001)| =  1$.
-
-To work around this loss, *guard bits* are used in practice.
-
-## Analysis of floating point operations
-
-Consider more generally the basic operations of addition, subtraction, multiplication, and division.
-
-Let's assume (contrary to above) that the operations on floating point are correctly done and *then* rounded to a machine number. (This can be arranged by using more bits for intermediate computations).
-
-If $\odot$ is any of the above operations, what is $fl(x \odot y)$?
-
-We know for $x$ that $fl(x) = x(1 + \delta)$ where $\delta$ is small ($\leq 2^{-p}$) and depends on $x$. So,
-
-$$
-fl(x \odot y) = fl(fl(x) \odot fl(y)) = [(x(1+\delta_x) \odot (y(1 + \delta_y))](1 + \delta)
-$$
-
-Each $\delta is small.
-
-Well, how much off are we?
-
-```
-using SymPy
-x,y,d1,d2,d3 = symbols("x,y,d1,d2,d3", real=true)
-op = *
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
-```
-
-```
-op = /
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
-```
-
-But...
-
-```
-op = -
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
-```
-
-## Associative
-
-Floating point is a [leaky]() abstraction for the real numbers. Certain things aren't true!
-
-* It is not associative
-
-```
-a,b,c = 10^30, -10^30, 1
-a + (b + c),  (a + b) + c # not associative, even with machine numbers
-```
-
-```
-(0.1 + 0.2) + 0.3,  0.1 + (0.2 + 0.3)
-```
-
-## It is not commutative
-
-```
-0.1 + 0.2 + 0.3, 0.3, 0.2, 0.1
-```
-
-(Most accurate to add big numbers first.)
-
-
-Moral: need to be careful when trying to say two things are exactly equal.
-
-## Addition of numbers and cumulative error
-
-How do errors accumulate?
-
-> Theorem 1 (p49) relative error in $\sum_0^n x_i$ is $(1_\epsilon)^n-1 \approx n\epsilon$.
-
-
-Let $S_{k+1} = x_{k+1} + S_k$ be the partial sum and $S^*_{k+1} = fl(x_{k+1} + S*_k) = (x_{k+1}+S^*_k)(1+\delta_{k+1}$ be the floating point partial sum. What is the relative difference?
-
-$$
-\frac{S_{k+1} - S^*_{k+1}}{S_{k+1}} =
-\frac{S_{k+1}(1+\delta) - S^*_{k+1}(1+\delta) - S_{k+1}\delta}{S_{k+1}
-= (1 + \delta)\frac{S_k - S^*_k}{S_k}\frac{S_k}{S_{k+1}} - \delta
-$$
-
-Let $\rho_k$ be the absolute value. Then
-$\rho_{k+1} \leq \rho_k(1+\epsilon) + \espilon$ with $\rho_0 = 0$. This can be solved to yield: $\rho_n \leq (1 + \epsilon)^n - $.
-
-### Other bounds
-
-The maximal possible error for accumulating sums grows *linearly* with the number of sums. There are other algorithms to cut this down. In Julia, [pairwise](https://en.wikipedia.org/wiki/Pairwise_summation) summation is used. This has relative error given by $\epsilon \log_2(n)$.
-
-
-## Loss of significance
-
-
-Return to
-
-
-```
-op = -
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
-```
-
-
-The presence of the difference in the denominator can be a problem.
-
-
-In the book, we have Thm 1 of section 2.2
-
-> If $x$ and $y$ are binary floating point numbers with $x > y > 0$ with
-$$
-2^{-q} \leq 1 - y/x \leq 2^{-p}
-$$
-Then at most $q$ and *at least* $p$ significant binary bits are lost in the substraction $x-y$.
-
-The lower bound:
-
-Say $x = r \cdot 2^n$ and $y=s\cdot 2^m$ with $m \leq n$ and here $1/2 \leq r, s < 1$. Then to "line up the decimal points" we may write $y = s \cdot 2^(m-n) \cdot 2^n$.
-
-$$
-x - y = (r - s\cdot 2^{m-n}) \cdot 2^n
-$$
-
-The significand then satisfies:
-
-$$
-r - s \cdot 2^{m-n} = r(1 - \frac{s\cdot 2^m}{r \cdot 2^n}) = r(1 - y/x) < 2^{-p}
-$$
-
-To put into normalized floating point, the significand must be shifted (there are leading $0$s) and the (at least) $p$ terms added are spurious, so accuracy is lost.
-
-### Example
-
-Consider $\sin(x) \approx x$. So $\sin(x) - x$ will cause issues.
-
-```
-x = 1/2^5
-X = big(1/2^5)   # more precision
-sin(x) - x
-```
-
-```
-sin(X) - X
-```
-
-Only accurate to the 10th digit -- not the 16th. There is a loss of accuracy
-
-Compare this to
-
-```
-sin(x) + x
-```
-
-and
-
-```
-sin(X) - X
-```
-
-
-The moral of the story -- try to avoid these.
-
-## Accuracy of functions
-
-In `Julia` there are many "redundant" functions:
-
-* `sinpi` for computing $\sin(\pi x)$, `cospi`, ...
-* `expm` to compute $e^x - 1$ for $x$ near 0
-* `log1p` to compute $\log(1+x)$ near 0
-
-The reason for `expm` seems clear. $e^x \approx 1 + x + x^2/2! + \cdot$, so $e^x-1$ for small $x$ is a subtraction of like-sized values.
-
-For `log1p` [Cook](http://www.johndcook.com/blog/2010/06/07/math-library-functions-that-seem-unnecessary/) if $x$ is really small, say $x=10^{-17}$ (`x < eps()`), then what happens to $1 + x$? In floating point it is 1. But $\log(1+x) \approx x$ by Taylor, so the absolute error is $x$ and the relative error $1$. Quite large. There are more floating point values closer to $0$ than $1$, so smaller values of $x$ can be used in `log1p`. 
-
-What about `sinpi`?
-
-The first step in 
-
