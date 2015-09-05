@@ -101,15 +101,54 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Floating point numbers</h1><h2>Decimal numbers</h2><p>In mathematics we have different types of numbers: Integers, Rationals, Reals, Complex, ...</p><p>On the computer there may be more than one type for each mathematical type, For example, <code>Julia</code> has 12 built in types for integers (signed and unsigned and different storage sizes.)</p><p>There are infinitely many integers mathematically, but only finitely many representable on the computer.</p><p><code>Int64</code> is typical. <code>Int8</code> has only $256=2^8$ possible values. It uses $-2^7$ to $2^7-1$.</p><p>Internally, the values are kept in binary:</p><pre class="sourceCode julia">convert(Uint8, 5) |> bits</pre>
+<h1>Floating point numbers</h1><h2>Decimal numbers</h2><p>In mathematics we have different types of numbers: Integers, Rationals, Reals, Complex, ...</p><p>For a minute, lets focus on integers.</p><p>There are infinitely many integers mathematically, but only finitely many representable on the computer.</p><p>On the computer there may be more than one storage type for each mathematical type, For example, <code>Julia</code> has <a href="http://julia.readthedocs.org/en/latest/manual/integers-and-floating-point-numbers/">12</a> built in types for integers (signed and unsigned and different storage sizes.)</p><p><code>Int64</code> is typical. <code>Int8</code> has only $256=2^8$ possible values. It uses $-2^7$ to $2^7-1$.</p><p>Internally, the values are kept in binary:</p><pre class="sourceCode julia">convert(Int8, 5) |> bits</pre>
 <pre class="output">
 "00000101"</pre>
 
-<p>The leading $0$ indicates the sign. </p><h3>Binary numbers</h3><p>Binary numbers use powers of $2$, not $10$. So – as you likely know – $1101$ in binary is just $1\cdot 2^0 + 0\cdot 2^1 + 1 \cdot 2^2 + 1\cdot 2^3 = 13$.</p><p>The largest value in <code>Int8</code> would then be $1 + 2 + 4 + 8 + 16 + 32 + 64 = 127$.</p><p>Negative values are kept as an offset from 128, so can go down to -128:</p><pre class="sourceCode julia">convert(Uint8, -5) |> bits</pre>
+<p>The leading $0$ indicates the sign. </p><h3>Binary numbers</h3><p>Binary numbers use powers of $2$, not $10$. So – as you likely know – $1101$ in binary is just $1\cdot 2^0 + 0\cdot 2^1 + 1 \cdot 2^2 + 1\cdot 2^3 = 13$.</p><p>The largest value in <code>Int8</code> would then be $1 + 2 + 4 + 8 + 16 + 32 + 64 = 127$.</p><h3>Converting binary to decimal</h3><p>It is easy to convert binary to decimal: we just mentally use powers of 2 instead of 10.</p><p>Here is some code:</p><pre class="sourceCode julia">x = "1101101100"
+out = [ parseint(x[length(x) - i])* 2^i for i in 0:(length(x) - 1)]</pre>
 <pre class="output">
-"11111011"</pre>
+10-element Array{Any,1}:
+   0
+   0
+   4
+   8
+   0
+  32
+  64
+   0
+ 256
+ 512</pre>
 
-<p>(That is read as $(1 + 2 + 8 + 16 + 32 + 64) - 128$.)</p><p>(Why store this way?)</p><h3>Math with binary numbers</h3><p>Adding two binary numbers follows the usual algorithm with carrying:</p><pre class="sourceCode julia">  1101
+<p>and we just add</p><pre class="sourceCode julia">sum(out)</pre>
+<pre class="output">
+876</pre>
+
+<h3>Converting decimal in integer to binary</h3><p>Start with an integer $n$. we generate the value of <code>x</code> from left to right. Suppose $n\geq 2$.</p><p>First find $p$ with $2^p \leq n < 2^(p+1)$. The number will have $p+1$ digits, and the left most one will be $1$.</p><p>Then consider $n = n - 2^p$. Apply the same to this. Repeat.</p><pre class="sourceCode julia">n = 27
+log2(n) # 4. So x = 1XXXX</pre>
+<pre class="output">
+4.754887502163468</pre>
+
+<pre class="sourceCode julia">n = n - 2^4
+log2(n) # 3. So x = 11XXX</pre>
+<pre class="output">
+3.4594316186372973</pre>
+
+<pre class="sourceCode julia">n = n - 2^3
+log2(n) # 1 So x = 1101X</pre>
+<pre class="output">
+1.584962500721156</pre>
+
+<pre class="sourceCode julia">n = n - 2^1 ## smaller than 2, so clearly x = 11011</pre>
+<pre class="output">
+1</pre>
+
+<p>and check:</p><pre class="sourceCode julia">x = "11011"
+sum([parseint(x[length(x) - i])* 2^i for i in 0:(length(x) - 1)])</pre>
+<pre class="output">
+27</pre>
+
+<h3>Math with binary numbers</h3><p>Adding two binary numbers follows the usual algorithm with carrying:</p><pre class="sourceCode julia">  1101
 + 1011
 ------
  11000  
@@ -120,7 +159,49 @@ $( document ).ready(function() {
   10101
 --------
   101010
-</pre><h3>Integer limitations with Julia</h3><p>Integers are stored exactly – as possible. But that has limitations. With 64 bit numbers, the largest integer is $2^{63}-1$.</p><pre class="sourceCode julia">2^63 - 1</pre>
+</pre><h3>Negative numbers</h3><p>How are negative numbers stored?</p><pre class="sourceCode julia">bits(convert(Uint8, 5)),  bits(convert(Uint8, -5))</pre>
+<pre class="output">
+("00000101","11111011")</pre>
+
+<p>They are quite different!</p><h3>two's complement</h3><p>The storage uses <a href="http://tinyurl.com/855yrz2">two's</a> complements. Basically $-x$ is stored as $2^n-x$.</p><p>We have $n$ bits ($n=8$ in our example, $64$ is typical, though $32$ may be for older machines). Positive numbers use the first $n-1$ which is why there the largest number is $2^{n-1} + 2^{n-2} + \cdots 2 + 1 = 2^n-1$.</p><p>It could be that the last bit could just be a sign bit, but instead of that, the values for negative numbers are stored in a different format. $-x$ ($x>0$) is stored as $2^n-x$.</p><pre class="sourceCode julia">bits(convert(Uint8, 5)),  bits(convert(Uint8, -5))</pre>
+<pre class="output">
+("00000101","11111011")</pre>
+
+<pre class="sourceCode julia">11111111    (Carry)
+ 00000101   (5=1*1 + 0*2 + 1*4)
+ 11111011   (2^8-5 = 251 = 1 + 2 + 8 + 16+32 + 64 +128
+---------
+100000000
+</pre><h3>Why</h3><p>This makes addition easy, as illustrated above. Or here with 15 + (-5)</p><pre class="sourceCode julia">11111111    (Carry)
+ 00001111   (15=1*1 + 1*2 + 1*4+1*8)
+ 11111011   (2^8-5 = 251 = 1 + 2 + 8 + 16+32 + 64 +128
+---------
+100001010
+</pre><p>And <code>00001010</code> $ = 2 + 8 = 10$.</p><h3>multiplying and shifting</h3><p>Let's see what happens with powers of 2:</p><pre class="sourceCode julia">bits(2)</pre>
+<pre class="output">
+"0000000000000000000000000000000000000000000000000000000000000010"</pre>
+
+<pre class="sourceCode julia">bits(2 * 2)</pre>
+<pre class="output">
+"0000000000000000000000000000000000000000000000000000000000000100"</pre>
+
+<pre class="sourceCode julia">bits(2 * 2^2)</pre>
+<pre class="output">
+"0000000000000000000000000000000000000000000000000000000000001000"</pre>
+
+<p>and ...</p><pre class="sourceCode julia">bits(2^62)</pre>
+<pre class="output">
+"0100000000000000000000000000000000000000000000000000000000000000"</pre>
+
+<p>and we go over the edge...</p><pre class="sourceCode julia">bits(2 * 2^62)</pre>
+<pre class="output">
+"1000000000000000000000000000000000000000000000000000000000000000"</pre>
+
+<p>The largest value is</p><pre class="sourceCode julia">bits(typemax(Int64))</pre>
+<pre class="output">
+"0111111111111111111111111111111111111111111111111111111111111111"</pre>
+
+<p>Which is $2^{63} - 1$.</p><p>Integers are stored exactly – as possible. But that has limitations. With 64 bit numbers, the largest integer is $2^{63}-1$.</p><pre class="sourceCode julia">2^63 - 1</pre>
 <pre class="output">
 9223372036854775807</pre>
 
@@ -152,26 +233,7 @@ $( document ).ready(function() {
 <pre class="output">
 "0111111111111111111111111111111111111111111111111111111111111111"</pre>
 
-<h2>Decimal numbers</h2><p>On a calculator there is one basic number type: floating point. This is primarily the case with computers as well.</p><p>In mathematics we primarily work with <em>decimal numbers</em></p><p>$$ 12.34 = 1 \cdot 10^2 + 2 \cdot 10^1 + 3\cdot 10^{-1} + 4 \cdot 10^{-2} $$</p><h3>Rounding</h3><p>We are familiar with the task of rounding: a passing grade is 59.5 not a 60!</p><p>We have three types of rounding: round up, round down, mixing based on a rule.</p><p>Rounding to the nearest integer shows this fairly clearly:</p><pre class="sourceCode julia">x = 3.14
-ceil(x), floor(x), round(x)</pre>
-<pre class="output">
-(4.0,3.0,3.0)</pre>
-
-<p>The same would be true of $3.1$, as that is all that is looked at here.</p><p>What becomes of $1.5$? The default is to round up.</p><pre class="sourceCode julia">x = 1.5
-ceil(x), floor(x), round(x)</pre>
-<pre class="output">
-(2.0,1.0,2.0)</pre>
-
-<p>Rounding can be done for real numbers too to some specified number of digits:</p><pre class="sourceCode julia">x = 1.23456
-round(x,1), round(x,2), round(x,4)</pre>
-<pre class="output">
-(1.2,1.23,1.2346)</pre>
-
-<h3>Error bound</h3><p>Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?</p><p>We consider the value of the $n+1$st decimal number.</p><p>- If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$</p><p>- If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.</p><p>In either case, it is less –in absolute value – than $(10/2) \cdot 10^{-(n+1)} = 1/2 \cdot 10^{-n}$.</p><blockquote><p>The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$. </p></blockquote><p>Had we chopped (<code>floor</code>) or always rounded up (<code>ceil</code>) then the error is bounded by $10^{-n}$.</p><h3>Ulp</h3><p>There is an alternate name for the error. When rounding to a certain number of digits, there is a unit of last precision, and <code>ulp</code>. In the above, the unit of last precision was $10^{-n}$, so the error is less than $1/2$ <code>ulp</code>.</p><p><code>ulp</code>s are easy enough to understand. If we round $3.1415$ to $3.14$ then the error is $0.15$ <code>ulp</code>.</p><h2>Scientific notation</h2><p>We can write a real number in terms of powers of 10. For example:</p><p>$$ 1.234 = 1.234 \cdot 10^0 =  12.34 \cdot 10^{-1} =  .1234 \cdot 10^1 = \cdots $$</p><p>We can use normalized scientific notation to say that we can express $x$ by three quantities:</p><p>$$ x = \pm r \cdot 10^n $$</p><ul><li>$\pm$ is $+1$ or $-1$ records the sign of $x$</li><li>$r$ is a number in $0.1 \leq r < 1.0$</li><li>$n$ is an integer, possible negative, or zero.</li></ul><h3>Binary</h3><p>Binary numbers are similar, only we use base $2$ – not $10$, as with decimal.</p><p>So</p><p>$$ (10.101)_2 = 1 \cdot 2^1 + 0 \cdot 2^0 + 1 \cdot 2^{-1} + 0 \cdot 2^{-2} + 1 \cdot 2^{-3} $$</p><pre class="sourceCode julia">1*2^1 + 0*2^0 + 1*1/2^1 + 0 * 1/2^2 + 1 * 1/2^3</pre>
-<pre class="output">
-2.625</pre>
-
-<h3>Converting decimal to binary</h3><p>We can convert decimal to binary. Here is a simple algorithm. Start with $x$. We want to produce digits $ddd.ddd...$ where $d$ are either $0$ or $1$.</p><p>First, take the log base 2:</p><pre class="sourceCode julia">x = 12.1
+<h2>Decimal numbers</h2><p>On a calculator there is one basic number type: floating point. This is primarily the case with computers as well.</p><p>In mathematics we primarily work with <em>decimal numbers</em></p><p>$$ 12.34 = 1 \cdot 10^2 + 2 \cdot 10^1 + 3\cdot 10^{-1} + 4 \cdot 10^{-2} $$</p><h3>Scientific notation</h3><p>We can write a real number in terms of powers of 10. For example:</p><p>$$ 1.234 = 1.234 \cdot 10^0 =  12.34 \cdot 10^{-1} =  .1234 \cdot 10^1 = \cdots $$</p><p>We can use normalized scientific notation to say that we can express $x$ by three quantities:</p><p>$$ x = \pm r \cdot 10^n $$</p><ul><li>$\pm$ is $+1$ or $-1$ records the sign of $x$</li><li>$r$ is a number in $0.1 \leq r < 1.0$</li><li>$n$ is an integer, possible negative, or zero.</li></ul><h2>scientific notation with different bases</h2><p>We can use different bases in scientific notation. A number would be represented with</p><p>$$ x = \pm q \cdot \beta^m $$</p><p>We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.</p><p>A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.</p><h3>Converting decimal to binary</h3><p>We can convert decimal numbers to binary. The same simple algorithm for integers works with some modification. Start with $x$. We want to produce digits $ddd.ddd...$ where $d$ are either $0$ or $1$.</p><p>First, take the log base 2:</p><pre class="sourceCode julia">x = 12.1
 log2(x) |> floor</pre>
 <pre class="output">
 3.0</pre>
@@ -194,7 +256,7 @@ n = log2(x) |> floor</pre>
 <pre class="output">
 -5.0</pre>
 
-<p>etc.</p><p>The <code>ds</code> will tell us there is a 1 in position 3,2,-4, -5, 8,9... So <code>1100.000110011...</code></p><p>One thing to note: what numbers terminate in decimal are generally different than what numbers will terminate in binary.</p><h2>scientific notation with different bases</h2><p>We can use different bases in scientific notation. A number would be represented with</p><p>$$ x = \pm q \cdot \beta^m $$</p><p>We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.</p><p>A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.</p><h2>Floating point numbers</h2><p>Floating point is a representation of numbers using scientific notation. Only there are constraints on the sizes:</p><ul><li>The value $q$, the significand, has $p$ digits. (The precision)</li></ul><ul><li>The values of $m$ is between two values, say $e_{min}$ and $e_{max}$.</li></ul><h3>A simple case</h3><p>For example consider base $\beta=10$, $p=3$ and $e_{min}=-1$ and $e_{max}=2$. Then the possible values are limited to $-9.99 \cdot 10^{-1}$ to $9.99 \cdot 10^2$. How many are there?</p><p>$$ 2 \cdot ((\beta-1)\cdot\beta^{p-1}) \cdot (e_{max} - e_{min}) $$</p><h2>Binary floating point</h2><p>For binary floating point, things are similar. For <em>simplicity</em> let's look at 16-bit floating point where</p><p>- 1 bit is the sign bit <code>0</code> = $+1$, <code>1</code> is $-1$ - $q$ is represented with $10$ bits (the <em>precision</em> is 10) - $m$ is represented with $5$ bits.</p><p>There is nothing to represent the <em>sign</em> of $m$. The trick is offset the value by subtracting and using  $m -15.</p><p>With this, can we represent some numbers:</p><p>What is $1$? It is $+1 \cdot 1.0 \cdot 10^{15 - 15}$. So we should have</p><p>- sign is <code>0</code> - $q$ is <code>0000000000</code> - $m$ is <code>01111</code></p><p>Checking we have</p><pre class="sourceCode julia">convert(Float16, 1.0) |> bits</pre>
+<p>etc.</p><p>The <code>ds</code> will tell us there is a 1 in position 3,2,-4, -5, 8,9... So <code>1100.000110011...</code></p><p>One thing to note: what numbers terminate in decimal are generally different than what numbers will terminate in binary.</p><h2>Floating point numbers</h2><p>Floating point is a representation of numbers using scientific notation. Only there are constraints on the sizes:</p><ul><li>The value $q$, the significand, has $p$ digits. (The precision)</li></ul><ul><li>The values of $m$ is between two values, say $e_{min}$ and $e_{max}$.</li></ul><h3>A simple case</h3><p>For example consider base $\beta=10$, $p=3$ and $e_{min}=-1$ and $e_{max}=2$. Then the possible values are limited to $-9.99 \cdot 10^{-1}$ to $9.99 \cdot 10^2$. How many are there?</p><p>$$ 2 \cdot ((\beta-1)\cdot\beta^{p-1}) \cdot (e_{max} - e_{min}) $$</p><h2>Binary floating point</h2><p>For binary floating point, things are similar. For <em>simplicity</em> let's look at 16-bit floating point where</p><p>- 1 bit is the sign bit <code>0</code> = $+1$, <code>1</code> is $-1$ - $q$ is represented with $10$ bits (the <em>precision</em> is 10) - $m$ is represented with $5$ bits.</p><p>There is nothing to represent the <em>sign</em> of $m$. The trick is offset the value by subtracting and using  $m -15$.</p><p>With this, can we represent some numbers:</p><p>What is $1$? It is $+1 \cdot 1.0 \cdot 10^{15 - 15}$. So we should have</p><p>- sign is <code>0</code> - $q$ is <code>0000000000</code> - $m$ is <code>01111</code></p><p>Checking we have</p><pre class="sourceCode julia">convert(Float16, 1.0) |> bits</pre>
 <pre class="output">
 "0011110000000000"</pre>
 
@@ -225,32 +287,7 @@ seebits (generic function with 1 method)</pre>
 <pre class="output">
 ('0',"10011","1110100000")</pre>
 
-<h3>Rounding</h3><p>Numbers get rounded!</p><pre class="sourceCode julia">convert(Float16, 0.1)</pre>
-<pre class="output">
-float16(0.099976)</pre>
-
-<pre class="sourceCode julia">seebits(0.1)</pre>
-<pre class="output">
-('0',"01011","1001100110")</pre>
-
-<p>"1001100110" becomes:</p><pre class="sourceCode julia">q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )</pre>
-<pre class="output">
-1.599609375</pre>
-
-<p>And <code>01011</code> for $m$ becomes</p><pre class="sourceCode julia">m = 2.0^(1 + 2 + 8 - 15)</pre>
-<pre class="output">
-0.0625</pre>
-
-<pre class="sourceCode julia">1 * q * 2^m</pre>
-<pre class="output">
-1.6704301324376012</pre>
-
-<p>Notice the number $0.1$ is necessarily approximated.</p><h3>How much off can rounding be?</h3><p>In binary floating point, the unit of last precision is $2^{-p}$, so the error in rounding is at most $(1/2) \cdot 2^{-p}$, or half an <code>ulp</code>.</p><h3>Float16, Float32, Float64, ...</h3><p>16-bit floating point is not typical. What is common is:</p><ul><li>64-bit floating point (in Julia `Float64`)</li><li>32-bit floating point (older hardward and OSes)</li></ul><p>How the bits are arranged in IEEE 754 binary formats for <a href="http://tinyurl.com/76kpk6s">floating point</a> we have this <a href="http://tinyurl.com/76kpk6s">table</a>. See also this post by John <a href="http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/">Cook</a> for the common case.</p><p>For example</p><pre class="sourceCode julia">b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
-b[1], b[2:12], b[13:end]</pre>
-<pre class="output">
-('0',"10000000001","0110100000000000000000000000000000000000000000000000")</pre>
-
-<p>Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.</p><h2>Zero</h2><p>Wait a minute – if we insist on the significand being $1.dddd...$ we can't represent $0$!</p><p>Some values in floating point are special:</p><ul><li>$0$: how to write $0$ in $1.dddd \cdot 2^m$? Can't do it. So it is coded:</li></ul><pre class="sourceCode julia">bits(0.0)</pre>
+<h2>Zero and other "special" numbers</h2><p>Wait a minute – if we insist on the significand being $1.dddd...$ we can't represent $0$!</p><p>Some values in floating point are special:</p><ul><li>$0$: how to write $0$ in $1.dddd \cdot 2^m$? Can't do it. So it is coded:</li></ul><pre class="sourceCode julia">bits(0.0)</pre>
 <pre class="output">
 "0000000000000000000000000000000000000000000000000000000000000000"</pre>
 
@@ -310,7 +347,47 @@ float16(5.9605e-8)</pre>
 <pre class="output">
 (1.7976931348623157e308,5.0e-324)</pre>
 
-<h2>Machine numbers</h2><p>The numbers that can be represented <strong>exactly</strong> in floating point are called <em>machine numbers</em>.</p><p><li> There aren't very many compared to the <strong>infinite</strong> number of floating point values.</p><p>Let's visualize in a <em>hypothetical</em> Float8 mode with 1 sign bit, 3 exponent bits and 4 bits for the mantissa.</p><p>The possible <em>positive</em> values are</p><pre class="sourceCode julia">qs = [1 + i/2 + j/4 + k/8 + l/16 for i in 0:1, j in 0:1, k in 0:1, l in 0:1] |> vec |> sort</pre>
+<h2>Rounding</h2><p>We are familiar with the task of rounding: a passing grade is 59.5 not a 60!</p><p>We have three types of rounding: round up, round down, mixing based on a rule.</p><p>Rounding to the nearest integer shows this fairly clearly:</p><pre class="sourceCode julia">x = 3.14
+ceil(x), floor(x), round(x)</pre>
+<pre class="output">
+(4.0,3.0,3.0)</pre>
+
+<p>The same would be true of $3.1$, as that is all that is looked at here.</p><p>What becomes of $1.5$? The default is to round up.</p><pre class="sourceCode julia">x = 1.5
+ceil(x), floor(x), round(x)</pre>
+<pre class="output">
+(2.0,1.0,2.0)</pre>
+
+<p>Rounding can be done for real numbers too to some specified number of digits:</p><pre class="sourceCode julia">x = 1.23456
+round(x,1), round(x,2), round(x,4)</pre>
+<pre class="output">
+(1.2,1.23,1.2346)</pre>
+
+<h3>Rounding in floating point</h3><p>When converting from decimal to floating point, even simple decimal numbers get rounded!</p><pre class="sourceCode julia">convert(Float16, 0.1)</pre>
+<pre class="output">
+float16(0.099976)</pre>
+
+<pre class="sourceCode julia">seebits(0.1)</pre>
+<pre class="output">
+('0',"01011","1001100110")</pre>
+
+<p>"1001100110" becomes:</p><pre class="sourceCode julia">q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )</pre>
+<pre class="output">
+1.599609375</pre>
+
+<p>And <code>01011</code> for $m$ becomes</p><pre class="sourceCode julia">m = 2.0^(1 + 2 + 8 - 15)</pre>
+<pre class="output">
+0.0625</pre>
+
+<pre class="sourceCode julia">1 * q * 2^m</pre>
+<pre class="output">
+1.6704301324376012</pre>
+
+<p>Notice the number $0.1$ is necessarily approximated.</p><h3>Error bound</h3><p>Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?</p><p>We consider the value of the $n+1$st decimal number.</p><p>- If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$</p><p>- If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.</p><p>In either case, it is less –in absolute value – than $(10/2) \cdot 10^{-(n+1)} = 1/2 \cdot 10^{-n}$.</p><blockquote><p>The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$. </p></blockquote><p>Had we chopped (<code>floor</code>) or always rounded up (<code>ceil</code>) then the error is bounded by $10^{-n}$.</p><h3>Ulp</h3><p>There is an alternate name for the error. When rounding to a certain number of digits, there is a unit of last precision, and <code>ulp</code>. In the above, the unit of last precision was $10^{-n}$, so the error is less than $1/2$ <code>ulp</code>.</p><p><code>ulp</code>s are easy enough to understand. If we round $3.1415$ to $3.14$ then the error is $0.15$ <code>ulp</code>.</p><h3>How much off can rounding be?</h3><p>In binary floating point, the unit of last precision is $2^{-p}$, so the error in rounding is at most $(1/2) \cdot 2^{-p}$, or half an <code>ulp</code>.</p><h3>Float16, Float32, Float64, ...</h3><p>16-bit floating point is not typical. What is common is:</p><ul><li>64-bit floating point (in Julia `Float64`)</li><li>32-bit floating point (older hardward and OSes)</li></ul><p>How the bits are arranged in IEEE 754 binary formats for <a href="http://tinyurl.com/76kpk6s">floating point</a> we have this <a href="http://tinyurl.com/76kpk6s">table</a>. See also this post by John <a href="http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/">Cook</a> for the common case.</p><p>For example</p><pre class="sourceCode julia">b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
+b[1], b[2:12], b[13:end]</pre>
+<pre class="output">
+('0',"10000000001","0110100000000000000000000000000000000000000000000000")</pre>
+
+<p>Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.</p><h2>Machine numbers</h2><p>The numbers that can be represented <strong>exactly</strong> in floating point are called <em>machine numbers</em>.</p><p><li> There aren't very many compared to the <strong>infinite</strong> number of floating point values.</p><p>Let's visualize in a <em>hypothetical</em> Float8 mode with 1 sign bit, 3 exponent bits and 4 bits for the mantissa.</p><p>The possible <em>positive</em> values are</p><pre class="sourceCode julia">qs = [1 + i/2 + j/4 + k/8 + l/16 for i in 0:1, j in 0:1, k in 0:1, l in 0:1] |> vec |> sort</pre>
 <pre class="output">
 16-element Array{Float64,1}:
  1.0   
@@ -344,7 +421,13 @@ vals = [q * 2.0^m for q in qs, m in ms] |> vec</pre>
   0.179688
   0.1875  
   0.195313
+  0.203125
+  0.210938
+  0.21875 
   ⋮       
+ 10.0     
+ 10.5     
+ 11.0     
  11.5     
  12.0     
  12.5     
@@ -368,12 +451,12 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
      stroke-width="0.3"
      font-size="3.88"
 
-     id="fig-0c4181b0c2aa4cf094b116deb58388b9">
-<g class="plotroot xscalable yscalable" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-1">
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-2">
+     id="fig-f351dd3bfed7440bafb357cc3855abea">
+<g class="plotroot xscalable yscalable" id="fig-f351dd3bfed7440bafb357cc3855abea-element-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-f351dd3bfed7440bafb357cc3855abea-element-2">
     <text x="75.45" y="88.39" text-anchor="middle" dy="0.6em">x</text>
   </g>
-  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-3">
+  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-f351dd3bfed7440bafb357cc3855abea-element-3">
     <text x="-130.95" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-25</text>
     <text x="-101.46" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-20</text>
     <text x="-71.98" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="1.0">-15</text>
@@ -486,14 +569,14 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
     <text x="240.57" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">38</text>
     <text x="252.36" y="84.39" text-anchor="middle" visibility="hidden" gadfly:scale="5.0">40</text>
   </g>
-  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-4">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="fig-f351dd3bfed7440bafb357cc3855abea-element-4">
     <text x="8.81" y="42.86" text-anchor="end" dy="0.35em">y</text>
   </g>
-  <g clip-path="url(#fig-0c4181b0c2aa4cf094b116deb58388b9-element-6)" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-5">
-    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-7">
+  <g clip-path="url(#fig-f351dd3bfed7440bafb357cc3855abea-element-6)" id="fig-f351dd3bfed7440bafb357cc3855abea-element-5">
+    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="fig-f351dd3bfed7440bafb357cc3855abea-element-7">
       <rect x="14.48" y="5" width="121.94" height="75.72"/>
     </g>
-    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-8">
+    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-f351dd3bfed7440bafb357cc3855abea-element-8">
       <path fill="none" d="M14.48,42.86 L 136.42 42.86" visibility="visible" gadfly:scale="1.0"/>
       <path fill="none" d="M14.48,150.43 L 136.42 150.43" visibility="hidden" gadfly:scale="10.0"/>
       <path fill="none" d="M14.48,146.84 L 136.42 146.84" visibility="hidden" gadfly:scale="10.0"/>
@@ -593,7 +676,7 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
       <path fill="none" d="M14.48,-57.54 L 136.42 -57.54" visibility="hidden" gadfly:scale="5.0"/>
       <path fill="none" d="M14.48,-64.71 L 136.42 -64.71" visibility="hidden" gadfly:scale="5.0"/>
     </g>
-    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-9">
+    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="fig-f351dd3bfed7440bafb357cc3855abea-element-9">
       <path fill="none" d="M-130.95,5 L -130.95 80.72" visibility="hidden" gadfly:scale="1.0"/>
       <path fill="none" d="M-101.46,5 L -101.46 80.72" visibility="hidden" gadfly:scale="1.0"/>
       <path fill="none" d="M-71.98,5 L -71.98 80.72" visibility="hidden" gadfly:scale="1.0"/>
@@ -706,9 +789,9 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
       <path fill="none" d="M240.57,5 L 240.57 80.72" visibility="hidden" gadfly:scale="5.0"/>
       <path fill="none" d="M252.36,5 L 252.36 80.72" visibility="hidden" gadfly:scale="5.0"/>
     </g>
-    <g class="plotpanel" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-10">
-      <g class="geometry" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-11">
-        <g class="color_AlphaColorValue{RGB{Float32},Float32}(RGB{Float32}(0.0f0,0.74736935f0,1.0f0),1.0f0)" stroke="#FFFFFF" stroke-width="0.3" fill="#00BFFF" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-12">
+    <g class="plotpanel" id="fig-f351dd3bfed7440bafb357cc3855abea-element-10">
+      <g class="geometry" id="fig-f351dd3bfed7440bafb357cc3855abea-element-11">
+        <g class="color_AlphaColorValue{RGB{Float32},Float32}(RGB{Float32}(0.0f0,0.74736935f0,1.0f0),1.0f0)" stroke="#FFFFFF" stroke-width="0.3" fill="#00BFFF" id="fig-f351dd3bfed7440bafb357cc3855abea-element-12">
           <circle cx="17.22" cy="42.86" r="0.9"/>
           <circle cx="17.26" cy="42.86" r="0.9"/>
           <circle cx="17.31" cy="42.86" r="0.9"/>
@@ -824,28 +907,28 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
         </g>
       </g>
     </g>
-    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-13">
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-14">
+    <g opacity="0" class="guide zoomslider" stroke="#000000" stroke-opacity="0.000" id="fig-f351dd3bfed7440bafb357cc3855abea-element-13">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-f351dd3bfed7440bafb357cc3855abea-element-14">
         <rect x="129.42" y="8" width="4" height="4"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-15">
+        <g class="button_logo" fill="#6A6A6A" id="fig-f351dd3bfed7440bafb357cc3855abea-element-15">
           <path d="M130.22,9.6 L 131.02 9.6 131.02 8.8 131.82 8.8 131.82 9.6 132.62 9.6 132.62 10.4 131.82 10.4 131.82 11.2 131.02 11.2 131.02 10.4 130.22 10.4 z"/>
         </g>
       </g>
-      <g fill="#EAEAEA" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-16">
+      <g fill="#EAEAEA" id="fig-f351dd3bfed7440bafb357cc3855abea-element-16">
         <rect x="109.92" y="8" width="19" height="4"/>
       </g>
-      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-17">
+      <g class="zoomslider_thumb" fill="#6A6A6A" id="fig-f351dd3bfed7440bafb357cc3855abea-element-17">
         <rect x="118.42" y="8" width="2" height="4"/>
       </g>
-      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-18">
+      <g fill="#EAEAEA" stroke-width="0.3" stroke-opacity="0" stroke="#6A6A6A" id="fig-f351dd3bfed7440bafb357cc3855abea-element-18">
         <rect x="105.42" y="8" width="4" height="4"/>
-        <g class="button_logo" fill="#6A6A6A" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-19">
+        <g class="button_logo" fill="#6A6A6A" id="fig-f351dd3bfed7440bafb357cc3855abea-element-19">
           <path d="M106.22,9.6 L 108.62 9.6 108.62 10.4 106.22 10.4 z"/>
         </g>
       </g>
     </g>
   </g>
-  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-20">
+  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="fig-f351dd3bfed7440bafb357cc3855abea-element-20">
     <text x="13.48" y="42.86" text-anchor="end" dy="0.35em" visibility="visible" gadfly:scale="1.0">0</text>
     <text x="13.48" y="150.43" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-3.0</text>
     <text x="13.48" y="146.84" text-anchor="end" dy="0.35em" visibility="hidden" gadfly:scale="10.0">-2.9</text>
@@ -947,7 +1030,7 @@ plot(x = vals, y = 0*vals, Geom.point)</pre>
   </g>
 </g>
 <defs>
-<clipPath id="fig-0c4181b0c2aa4cf094b116deb58388b9-element-6">
+<clipPath id="fig-f351dd3bfed7440bafb357cc3855abea-element-6">
   <path d="M14.48,5 L 136.42 5 136.42 80.72 14.48 80.72" />
 </clipPath
 ></defs>
@@ -1884,8 +1967,8 @@ return Gadfly;
           factory(glob.Snap, glob.Gadfly);
       }
 })(window, function (Snap, Gadfly) {
-    var fig = Snap("#fig-0c4181b0c2aa4cf094b116deb58388b9");
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-5")
+    var fig = Snap("#fig-f351dd3bfed7440bafb357cc3855abea");
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-5")
    .mouseenter(Gadfly.plot_mouseover)
 .mouseleave(Gadfly.plot_mouseout)
 .mousewheel(Gadfly.guide_background_scroll)
@@ -1893,63 +1976,63 @@ fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-5")
       Gadfly.guide_background_drag_onstart,
       Gadfly.guide_background_drag_onend)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-8")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-8")
    .plotroot().data("unfocused_ygrid_color", "#D0D0E0")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-8")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-8")
    .plotroot().data("focused_ygrid_color", "#A0A0A0")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-9")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-9")
    .plotroot().data("unfocused_xgrid_color", "#D0D0E0")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-9")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-9")
    .plotroot().data("focused_xgrid_color", "#A0A0A0")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-14")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-14")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-14")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-14")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-14")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-14")
    .click(Gadfly.zoomslider_zoomin_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-16")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-16")
    .data("max_pos", 120.42)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-16")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-16")
    .data("min_pos", 103.42)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-16")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-16")
    .click(Gadfly.zoomslider_track_click);
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-17")
    .data("max_pos", 120.42)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-17")
    .data("min_pos", 103.42)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-17")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-17")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-17")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-17")
    .drag(Gadfly.zoomslider_thumb_dragmove,
      Gadfly.zoomslider_thumb_dragstart,
      Gadfly.zoomslider_thumb_dragend)
 .mousedown(Gadfly.zoomslider_thumb_mousedown)
 .mouseup(Gadfly.zoomslider_thumb_mouseup)
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-18")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-18")
    .data("mouseover_color", "#cd5c5c")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-18")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-18")
    .data("mouseout_color", "#6a6a6a")
 ;
-fig.select("#fig-0c4181b0c2aa4cf094b116deb58388b9-element-18")
+fig.select("#fig-f351dd3bfed7440bafb357cc3855abea-element-18")
    .click(Gadfly.zoomslider_zoomout_click)
 .mouseenter(Gadfly.zoomslider_button_mouseover)
 .mouseleave(Gadfly.zoomslider_button_mouseout)

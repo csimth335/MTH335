@@ -5,17 +5,25 @@
 
 In mathematics we have different types of numbers: Integers, Rationals, Reals, Complex, ...
 
-
-On the computer there may be more than one type for each mathematical type, For example, `Julia` has 12 built in types for integers (signed and unsigned and different storage sizes.)
+For a minute, lets focus on integers.
 
 There are infinitely many integers mathematically, but only finitely many representable on the computer.
+
+
+On the computer there may be more than one storage type for each
+mathematical type, For example, `Julia` has
+[12](http://julia.readthedocs.org/en/latest/manual/integers-and-floating-point-numbers/)
+built in types for integers (signed and unsigned and different storage
+sizes.)
+
+###
 
 `Int64` is typical. `Int8` has only $256=2^8$ possible values. It uses $-2^7$ to $2^7-1$.
 
 Internally, the values are kept in binary:
 
 ```
-convert(Uint8, 5) |> bits
+convert(Int8, 5) |> bits
 ```
 
 The leading $0$ indicates the sign. 
@@ -26,17 +34,58 @@ Binary numbers use powers of $2$, not $10$. So -- as you likely know -- $1101$ i
 
 The largest value in `Int8` would then be $1 + 2 + 4 + 8 + 16 + 32 + 64 = 127$.
 
+### Converting binary to decimal
 
-Negative values are kept as an offset from 128, so can go down to -128:
+It is easy to convert binary to decimal: we just mentally use powers of 2 instead of 10.
+
+Here is some code:
 
 ```
-convert(Uint8, -5) |> bits
+x = "1101101100"
+out = [ parseint(x[length(x) - i])* 2^i for i in 0:(length(x) - 1)]
 ```
 
-(That is read as $(1 + 2 + 8 + 16 + 32 + 64) - 128$.)
+and we just add
+
+```
+sum(out)
+```
+
+### Converting decimal in integer to binary
+
+Start with an integer $n$. we generate the value of `x` from left to right. Suppose $n\geq 2$.
+
+First find $p$ with $2^p \leq n < 2^(p+1)$. The number will have $p+1$ digits, and the left most one will be $1$.
+
+Then consider $n = n - 2^p$. Apply the same to this. Repeat.
 
 
-(Why store this way?)
+```
+n = 27
+log2(n) # 4. So x = 1XXXX
+```
+
+```
+n = n - 2^4
+log2(n) # 3. So x = 11XXX
+```
+
+```
+n = n - 2^3
+log2(n) # 1 So x = 1101X
+```
+
+```
+n = n - 2^1 ## smaller than 2, so clearly x = 11011
+```
+
+and check:
+
+```
+x = "11011"
+sum([parseint(x[length(x) - i])* 2^i for i in 0:(length(x) - 1)])
+```
+
 
 ### Math with binary numbers
 
@@ -69,8 +118,95 @@ Verbatim("""
 """)
 ```
 
+### Negative numbers
 
-### Integer limitations with Julia
+How are negative numbers stored?
+
+```
+bits(convert(Uint8, 5)),  bits(convert(Uint8, -5))
+```
+
+They are quite different!
+
+### two's complement
+
+The storage uses [two's](http://tinyurl.com/855yrz2) complements. Basically $-x$ is stored as $2^n-x$.
+
+We have $n$ bits ($n=8$ in our example, $64$ is typical, though $32$ may be for older machines). Positive numbers use the first $n-1$ which is why there the largest number is $2^{n-1} + 2^{n-2} + \cdots 2 + 1 = 2^n-1$.
+
+It could be that the last bit could just be a sign bit, but instead of that, the values for negative numbers are stored in a different format. $-x$ ($x>0$) is stored as $2^n-x$.
+
+###
+
+
+```
+bits(convert(Uint8, 5)),  bits(convert(Uint8, -5))
+```
+
+
+```
+Verbatim("""
+11111111    (Carry)
+ 00000101   (5=1*1 + 0*2 + 1*4)
+ 11111011   (2^8-5 = 251 = 1 + 2 + 8 + 16+32 + 64 +128
+---------
+100000000
+""")
+```
+
+### Why
+
+This makes addition easy, as illustrated above. Or here with 15 + (-5)
+
+```
+Verbatim("""
+11111111    (Carry)
+ 00001111   (15=1*1 + 1*2 + 1*4+1*8)
+ 11111011   (2^8-5 = 251 = 1 + 2 + 8 + 16+32 + 64 +128
+---------
+100001010
+""")
+```
+
+And `00001010` $ = 2 + 8 = 10$.
+
+### multiplying and shifting
+
+Let's see what happens with powers of 2:
+
+```
+bits(2)
+```
+
+```
+bits(2 * 2)
+```
+
+```
+bits(2 * 2^2)
+```
+
+and ...
+
+```
+bits(2^62)
+```
+
+and we go over the edge...
+
+```
+bits(2 * 2^62)
+```
+
+
+The largest value is
+
+```
+bits(typemax(Int64))
+```
+
+Which is $2^{63} - 1$.
+
 
 Integers are stored exactly -- as possible. But that has limitations. With 64 bit numbers, the largest integer is $2^{63}-1$.
 
@@ -125,62 +261,7 @@ $$
 12.34 = 1 \cdot 10^2 + 2 \cdot 10^1 + 3\cdot 10^{-1} + 4 \cdot 10^{-2}
 $$
 
-### Rounding
-
-We are familiar with the task of rounding: a passing grade is 59.5 not a 60!
-
-We have three types of rounding: round up, round down, mixing based on a rule.
-
-Rounding to the nearest integer shows this fairly clearly:
-
-```
-x = 3.14
-ceil(x), floor(x), round(x)
-```
-
-The same would be true of $3.1$, as that is all that is looked at here.
-
-What becomes of $1.5$? The default is to round up.
-
-```
-x = 1.5
-ceil(x), floor(x), round(x)
-```
-
-Rounding can be done for real numbers too to some specified number of digits:
-
-```
-x = 1.23456
-round(x,1), round(x,2), round(x,4)
-```
-
-### Error bound
-
-Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?
-
-We consider the value of the $n+1$st decimal number.
-
-- If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$
-
-- If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.
-
-In either case, it is less --in absolute value -- than $(10/2) \cdot 10^{-(n+1)} = 1/2 \cdot 10^{-n}$.
-
-> The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$.
-
-Had we chopped (`floor`) or always rounded up (`ceil`) then the error is bounded by $10^{-n}$.
-
-### Ulp
-
-There is an alternate name for the error. When rounding to a certain
-number of digits, there is a unit of last precision, and `ulp`. In the
-above, the unit of last precision was $10^{-n}$, so the error is less
-than $1/2$ `ulp`.
-
-`ulp`s are easy enough to understand. If we round $3.1415$ to $3.14$
-then the error is $0.15$ `ulp`.
-
-## Scientific notation
+### Scientific notation
 
 We can write a real number in terms of powers of 10. For example:
 
@@ -198,23 +279,26 @@ $$
 * $r$ is a number in $0.1 \leq r < 1.0$
 * $n$ is an integer, possible negative, or zero.
 
-### Binary
 
-Binary numbers are similar, only we use base $2$ -- not $10$, as with decimal.
 
-So
+
+## scientific notation with different bases
+
+We can use different bases in scientific notation. A number would be represented with
 
 $$
-(10.101)_2 = 1 \cdot 2^1 + 0 \cdot 2^0 + 1 \cdot 2^{-1} + 0 \cdot 2^{-2} + 1 \cdot 2^{-3}
+x = \pm q \cdot \beta^m
 $$
 
-```
-1*2^1 + 0*2^0 + 1*1/2^1 + 0 * 1/2^2 + 1 * 1/2^3
-```
+We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.
+
+A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.
 
 ### Converting decimal to binary
 
-We can convert decimal to binary. Here is a simple algorithm. Start with $x$. We want to produce digits $ddd.ddd...$ where $d$ are either $0$ or $1$.
+We can convert decimal numbers to binary. The same simple
+algorithm for integers works with some modification. Start with $x$. We want to produce digits $ddd.ddd...$
+where $d$ are either $0$ or $1$.
 
 First, take the log base 2:
 
@@ -254,18 +338,6 @@ The `ds` will tell us there is a 1 in position 3,2,-4, -5, 8,9... So `1100.00011
 
 One thing to note: what numbers terminate in decimal are generally different than what numbers will terminate in binary.
 
-## scientific notation with different bases
-
-We can use different bases in scientific notation. A number would be represented with
-
-$$
-x = \pm q \cdot \beta^m
-$$
-
-We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.
-
-A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.
-
 ## Floating point numbers
 
 Floating point is a representation of numbers using scientific notation. Only there are constraints on the sizes:
@@ -291,7 +363,7 @@ For binary floating point, things are similar. For *simplicity* let's look at 16
 - $q$ is represented with $10$ bits (the *precision* is 10)
 - $m$ is represented with $5$ bits.
 
-There is nothing to represent the *sign* of $m$. The trick is offset the value by subtracting and using  $m -15.
+There is nothing to represent the *sign* of $m$. The trick is offset the value by subtracting and using  $m -15$.
 
 With this, can we represent some numbers:
 
@@ -348,62 +420,7 @@ seebits(1 + 1/2 + 1/4 + 1/8 + 0/16 + 1/32)
 seebits(2^4*(1 + 1/2 + 1/4 + 1/8 + 0/16 + 1/32)) ## 19 - (1 + 1*2 + 1*16) = 0
 ```
 
-### Rounding
-
-Numbers get rounded!
-
-```
-convert(Float16, 0.1)
-```
-
-```
-seebits(0.1)
-```
-
-"1001100110" becomes:
-
-```
-q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )
-```
-
-###
-
-And `01011` for $m$ becomes
-
-```
-m = 2.0^(1 + 2 + 8 - 15)
-```
-
-```
-1 * q * 2^m
-```
-
-Notice the number $0.1$ is necessarily approximated.
-
-### How much off can rounding be?
-
-In binary floating point, the unit of last precision is $2^{-p}$, so
-the error in rounding is at most $(1/2) \cdot 2^{-p}$, or half an `ulp`.
-
-### Float16, Float32, Float64, ...
-
-16-bit floating point is not typical. What is common is:
-
-* 64-bit floating point (in Julia `Float64`)
-* 32-bit floating point (older hardward and OSes)
-
-How the bits are arranged in IEEE 754 binary formats for [floating point](http://tinyurl.com/76kpk6s) we have this [table](http://tinyurl.com/76kpk6s). See also this post by John [Cook](http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/) for the common case.
-
-For example
-
-```
-b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
-b[1], b[2:12], b[13:end]
-```
-
-Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.
-
-## Zero
+## Zero and other "special" numbers
 
 
 Wait a minute -- if we insist on the significand being $1.dddd...$ we can't represent $0$!
@@ -469,8 +486,6 @@ bits(NaN)[13:end], bits(Inf)[13:end]
 
 `NaN` semantics are a bit [controversial](https://github.com/JuliaLang/julia/issues/7866).
 
-
-
 ### Poison
 
 The values of `Inf` and `NaN` will "poison" subsequent operations, for example
@@ -533,6 +548,117 @@ For double precision numbers (Float64) the values are given by:
 prevfloat(Inf), nextfloat(0.0)
 ```
 
+## Rounding
+
+We are familiar with the task of rounding: a passing grade is 59.5 not a 60!
+
+We have three types of rounding: round up, round down, mixing based on a rule.
+
+Rounding to the nearest integer shows this fairly clearly:
+
+```
+x = 3.14
+ceil(x), floor(x), round(x)
+```
+
+The same would be true of $3.1$, as that is all that is looked at here.
+
+What becomes of $1.5$? The default is to round up.
+
+```
+x = 1.5
+ceil(x), floor(x), round(x)
+```
+
+Rounding can be done for real numbers too to some specified number of digits:
+
+```
+x = 1.23456
+round(x,1), round(x,2), round(x,4)
+```
+
+
+### Rounding in floating point
+
+When converting from decimal to floating point, even simple decimal numbers get rounded!
+
+```
+convert(Float16, 0.1)
+```
+
+```
+seebits(0.1)
+```
+
+"1001100110" becomes:
+
+```
+q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )
+```
+
+###
+
+And `01011` for $m$ becomes
+
+```
+m = 2.0^(1 + 2 + 8 - 15)
+```
+
+```
+1 * q * 2^m
+```
+
+Notice the number $0.1$ is necessarily approximated.
+
+### Error bound
+
+Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?
+
+We consider the value of the $n+1$st decimal number.
+
+- If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$
+
+- If it is in 5,6,7,8,9 then we round up, and the error is $10-i \cdot 10^{-(n+1)}$.
+
+In either case, it is less --in absolute value -- than $(10/2) \cdot 10^{-(n+1)} = 1/2 \cdot 10^{-n}$.
+
+> The error in rounding to $n$ decimal points is bounded by: $|x - \tilde{x}| < 1/2 \cdot 10^{-n}$.
+
+Had we chopped (`floor`) or always rounded up (`ceil`) then the error is bounded by $10^{-n}$.
+
+### Ulp
+
+There is an alternate name for the error. When rounding to a certain
+number of digits, there is a unit of last precision, and `ulp`. In the
+above, the unit of last precision was $10^{-n}$, so the error is less
+than $1/2$ `ulp`.
+
+`ulp`s are easy enough to understand. If we round $3.1415$ to $3.14$
+then the error is $0.15$ `ulp`.
+
+### How much off can rounding be?
+
+In binary floating point, the unit of last precision is $2^{-p}$, so
+the error in rounding is at most $(1/2) \cdot 2^{-p}$, or half an `ulp`.
+
+### Float16, Float32, Float64, ...
+
+16-bit floating point is not typical. What is common is:
+
+* 64-bit floating point (in Julia `Float64`)
+* 32-bit floating point (older hardward and OSes)
+
+How the bits are arranged in IEEE 754 binary formats for [floating point](http://tinyurl.com/76kpk6s) we have this [table](http://tinyurl.com/76kpk6s). See also this post by John [Cook](http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/) for the common case.
+
+For example
+
+```
+b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
+b[1], b[2:12], b[13:end]
+```
+
+Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.
+
 ## Machine numbers
 
 The numbers that can be represented **exactly** in floating point are called *machine numbers*.
@@ -553,7 +679,6 @@ The values for the exponents are $-3, -2, -1, 0, 1, 2, 3$. So all our values are
 ms = (-3):3
 vals = [q * 2.0^m for q in qs, m in ms] |> vec
 ```
-
 
 ### Plotting the machine numbers
 
