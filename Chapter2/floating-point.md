@@ -55,7 +55,7 @@ sum(out)
 
 Start with an integer $n$. we generate the value of `x` from left to right. Suppose $n\geq 2$.
 
-First find $p$ with $2^p \leq n < 2^(p+1)$. The number will have $p+1$ digits, and the left most one will be $1$.
+First find $p$ with $2^p \leq n < 2^{p+1}$. The number will have $p+1$ digits, and the left most one will be $1$.
 
 Then consider $n = n - 2^p$. Apply the same to this. Repeat.
 
@@ -134,9 +134,11 @@ The storage uses [two's](http://tinyurl.com/855yrz2) complements. Basically $-x$
 
 We have $n$ bits ($n=8$ in our example, $64$ is typical, though $32$ may be for older machines). Positive numbers use the first $n-1$ which is why there the largest number is $2^{n-1} + 2^{n-2} + \cdots 2 + 1 = 2^n-1$.
 
-It could be that the last bit could just be a sign bit, but instead of that, the values for negative numbers are stored in a different format. $-x$ ($x>0$) is stored as $2^n-x$.
+It could be that the last bit could just be a sign bit, but instead of
+that, the values for negative numbers are stored in a different
+format. $-x$ ($x>0$) is stored as $2^n-x$.
 
-###
+### Carry
 
 
 ```
@@ -162,7 +164,7 @@ This makes addition easy, as illustrated above. Or here with 15 + (-5)
 Verbatim("""
 11111111    (Carry)
  00001111   (15=1*1 + 1*2 + 1*4+1*8)
- 11111011   (2^8-5 = 251 = 1 + 2 + 8 + 16+32 + 64 +128
+ 11111011   (2^8-5 = 251 = 1 + 2 +...+ 64 +128
 ---------
 100001010
 """)

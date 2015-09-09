@@ -412,7 +412,7 @@ Verbatim("""
 """)
 ```
 
-Notice, in the above the numbers are not large in any sense unliek $16 - 32 + 24 -8 + 3$.
+Notice, in the above the numbers are not large in any sense unlike $16 - 32 + 24 -8 + 3$.
 
 ###
 
@@ -725,7 +725,6 @@ Any error in $x_n$ is multiplied by $13/3$. So in particular, any error in $x_1$
 
 The same happens with 64 bits, just slower as the bounds on $\delta$ are smaller.
 
-
 ### What about different starting values?
 
 Had the problem been started differently, say $x_0=1$, $x_1=4$. Then the error in $x_1$ is still propagated, but the relative error stays small, as the sequence grows as $4^n$ and does not decay like $(1/3)^n$:
@@ -782,10 +781,11 @@ integrate(x^n *exp(-x), (x, 0, 1)) |> N
 
 The limit is ...
 
-
 ### What happens
 
-From the expression $n I_{n-1}$, any error is multiplied by $n$. So If $I_1$ is off by $\epsilon$, then $I_2$ is off by $2\epsilon$$, so $I_3$ is off by $3\cdot 2 \epsilon$, ... and $I_50$ is off by $50! \epsilon$. which is `3e64`.
+From the expression $n I_{n-1}$,
+any error is multiplied by $n$. So If $I_1$ is off by $\epsilon$, then $I_2$ is off by $2\epsilon$,
+so $I_3$ is off by $3\cdot 2 \epsilon$, ... and $I_50$ is off by $50! \epsilon$. which is `3e64`.
 
 Working backwards isn't the same issue as we have $1/n \cdot I_n$ so errors are multiplied by $1/n$ not $n$. So we would just need a starting point:
 
