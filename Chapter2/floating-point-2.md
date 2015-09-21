@@ -140,7 +140,7 @@ The difference between $.20$ and $.17$ is 3 units in the off in the last digit o
 
 Suppose we have  precision $p$ and binary ($\beta=2$). Then the *relative* error can be as large as 1 = $\beta-1$!
 
-Consider a small case: $1.00 \cdot 2^0$ and $1.11 \cdot 2^{-1}$. (These are adjacent). Then mathematically the difference is $0.001$, but if $1.11 2^{-1}$ is shifted (and chopped) to $0.11 \cdot 2^0$ to match, then the difference is $0.01$. We have $|(0.001 - 0.01)/(0.001)| =  1$.
+Consider a small case: $1.00 \cdot 2^0$ and $1.11 \cdot 2^{-1}$. (These are adjacent). Then mathematically the difference is $0.001$, but if $1.11 \cdot 2^{-1}$ is shifted (and chopped) to $0.11 \cdot 2^0$ to match, then the difference is $0.01$. We have $|(0.001 - 0.01)/(0.001)| =  1$.
 
 **Historically** this led to engineering using guard digits (mentioned in
 the book). The IEEE 754 standard is different -- the values should be
@@ -167,6 +167,7 @@ Each $\delta$ is small and possibly different.
 Well, how much off are we? Let's quickly check:
 
 ```
+ENV["PYTHONHOME"] = "/Users/verzani/anaconda/"
 using SymPy
 ```
 
@@ -283,7 +284,7 @@ The moral of the story -- try to avoid subtraction when the values are of the sa
 ### floating point is not always associative
 
 ```
-a,b,c = 10^30, -10^30, 1
+a,b,c = 10.0^30, -10.0^30, 1
 a + (b + c),  (a + b) + c # not associative, even with machine numbers
 ```
 
@@ -511,7 +512,7 @@ Better algorithms are possible. Kahan summation is $\mathcal{O}(n\epsilon^2)$, s
 
 In Julia, [pairwise](https://en.wikipedia.org/wiki/Pairwise_summation)
 summation is used. This has relative error given by $\epsilon
-\log_2(n)$. For $n=10^7$, this is about $23 \epsilon$, so around $5e-15$.
+\log_2(n)$. For $n=10^7$, this is about $23 \epsilon$, so around `5e-15`.
 
 ## Accuracy of functions
 
@@ -524,7 +525,7 @@ $$
 The relative error divides this difference by $f(x)$ to get:
 
 $$
-|\frac{f(x) - f(\bar{x})}{f(x)}| = |x|\frac{f'(\xi)}{f(x)} \cdot \frac{x - \bar{x}}{x}
+|\frac{f(x) - f(\bar{x})}{f(x)}| = |x|\frac{f'(\xi)}{f(x)} \cdot |\frac{x - \bar{x}}{x}|.
 $$
 
 (Written to emphasize a factor times the relative error in the approximation to the number $x$.
@@ -562,7 +563,7 @@ n = 10^8
 sin(pi*n), sinpi(n)
 ```
 
-Why? The definition of sine involves a reduction to the range $[0,2pi]$. Let's just see:
+Why? The definition of sine involves a reduction to the range $[0,2\pi]$. Let's just see:
 
 ```
 divrem(pi * 10, 2pi)
@@ -717,7 +718,7 @@ end
 
 ### What happens?
 
-Any error in $x_n$ is multiplied by $13/3$. So in particular, any error in $x_1$ is propagated to $x_n$ with a possible error of $(13/3)^n \delta$. So even is $\delta$ is small the possible error is big (and relative error even bigger):
+Any error in $x_n$ is multiplied by $13/3$. So in particular, any error in $x_1$ is propagated to $x_n$ with a possible error of $(13/3)^n \delta$. So even if $\delta$ is small the possible error is big (and relative error even bigger):
 
 ```
 (13/3)^15 * eps(Float32)
