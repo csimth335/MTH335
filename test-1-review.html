@@ -1,0 +1,109 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Test 1 Review</h1><h2>Chapter 1</h2><p>Chapter 1 covered mathematical theorems from calculus and some definitions:</p><p><li> The fundamental notions of a <em>limit</em>, <em>continuity</em>, and <em>differentiability</em>.</p><p><li>A new hierarchy of functions was discussed, these being $C^k$, where this stands for functions which have $k$ continuous derivatives.</p><p>A an example of a $C^1$ function is $F(x) = \int_a^x f(u) du$ when $f$ is continuous. This example can be re-integrated to get examples of $C^k$ functions.</p><p><li>The basic theorems of continuous and differentiable functions:</p><p>- The intermediate value theorem</p><p>- the extreme value theorem</p><p>- the mean value theorem. (We formulated this in an extended sense due to Cauchy.)</p><p><li>The all important theorem of Taylor, written here in a slightly less powerful means:</p><blockquote><p>Let $f$ be a $C^{k+1}$ function on $[a,b]$. Let $a < c < b$ and $x$ be in $(a,b)$. Then there exists an $\xi$ between $c$ and $x$ satisfying: </p></blockquote><p>$$ f(x) = T_k(x) + \frac{f^{(k+1)}(\xi)}{(k+1)!} (x - c)^{k+1}, $$</p><p>where $T_k(x) = f(c) + f'(c)(x-c) + \cdots + f^{(k)}(c)/k! \cdot (x-c)^k$.</p><p>$T_k$ is the Taylor polynomial of degree $k$ for $f$ about $c$.</p><p>There are other ways to write the remainder term, and somewhat relaxed assumptions on $f$ that are possible, but this is the easiest to remember.</p><p>A less precise, but still true, form of the above is:</p><p>$$ f(x) = T_k(x) + \mathcal{O}((x-c)^{k+1}). $$</p><h3>Typical questions</h3><p><li>Suppose $f(x)$ is continuous on $[a,b]$ and $f(a) = -1$ while $f(b) = 3$. Which is guaranteed true and why?</p><p>- There exists a $\xi$ in $[a,b]$ with $f(\xi) = 0$.</p><p>- There exists a $\xi$ in $[a,b]$ with $f'(\xi) = 0$.</p><p>- There exists a $\xi$ in $[a,b]$ with $f'(\xi) \cdot (b-a) = f(b) - f(c)$.</p><p><li>Prove that</p><p>$$ \lim_{h \rightarrow 0} \frac{f(x+h) - f(x-h)}{2h} = f'(x). $$</p><p>What are the assumptions on $f$ used in your proof?</p><p><li>Suppose $f(x)$ is $C^1$ on $[a,b]$. Why do you know that for any $\xi$ in $[a,b]$ you must have $|f(\xi)| \leq M$ for some $M$ that does not depend on $\xi$?</p><p><li>The tangent line approximation for a function is just the function $T_1(x)$. Compute the tangent line approximation for the functions:</p><p>- $\sin(x)$ at $c=0$</p><p>- $\log(1+x)$ at $c=0$</p><p>- $1 / (1 + x)$ at $c=0$</p><p>- $\arctan(x)$ at $c=0$</p><p><li>Find $T_5(x)$ for $c=0$ for each of</p><p>- $\sin(x)$</p><p>- $e^x$</p><p><li>Use the above to find $T_5(x)$ for $e^{\sin(x)}$.</p><p><li>In class we saw for $f(x) = \log(1+x)$ and $c=$ that to find $k$ such that if $0 \leq \xi \leq 1$ that</p><p>$$ \frac{f^{(k+1)}(\xi)}{(k+1)!} (x-0)^{k+1} \leq 2^{-53} $$</p><p>We needed a <em>very large</em> value of $k$. What if we tried this over a smaller interval, say $0 \leq \xi \leq 1/2$, instead? How big would $k$ need to be then.</p><p>We used $f^{(k)}(x) = \pm 1 / (k (1+x)^k)$.</p><h2>Chapter 2</h2><p>Chapter 2 deals with floating point representation of real numbers. Some basic things we saw along the way:</p><p><li>integers can be exactly represented in binary.</p><p>- We saw how the non-negative integers $0, \dots, 2^n-1$ can fit in $n$ bits in a simple manner.</p><p>- We saw how the integers $-2^{n-1}, \dots, 0, \dots, 2^{n-1}-1$ can fit in $n$ bits using two's complements for the negative numbers. The advantage with this storage is fast addition and subtraction.</p><p><li>We mentioned that in Julia, rational numbers can also be exactly represented, as integers can be.</p><p><li>For real numbers, we mentioned that they are stored in floating point. The exact format depends on the amount of size dedicated to storage, with 64 bits being the typical  size now, though 32 was when the book was written.</p><p>The basic storage uses</p><p>- a sign bit</p><p>- $p$ bits to store the significand which is <em>normalized</em> to be $1.ddd\cdots d$.</p><p>- some bits to store the exponent, $e_{min} \leq m \leq e_{max}$.</p><p>and all this is put together to create the floating point numbers of the form</p><p>$$ \pm 1.ddddd\cdots d \cdot 2^m. $$</p><p><li>The floating point numbers are discrete. They are more spaced out as they get bigger, and more concentrated near $0$.</p><p><li>There are some conventions:</p><p>- the sign bit comes first and uses <code>1</code> for minus, and <code>0</code> for plus.</p><p>- the exponent is stored as an unsigned integer ($0, \cdots 2^k - 1$) and there is an implicit bias to be subtracted. The value $000\cdots 0$ is special and used for $0.0$ (or $-0.0$) and subnormal numbers. The value $111\cdots 1$ is used for <code>Inf</code>, <code>-Inf</code> and various types of <code>NaN</code>.</p><p>- the significand has an implicit $1$ in front, except for the special numbers <code>0</code>, <code>Inf</code>, and <code>NaN</code>.</p><p><li>We use $fl(x)$ to be the floating point number that $x$ rounds to. A key formula is</p><p>$$ fl(x) = x(1 + \delta) $$</p><p>What is $\delta$? Some number between $-\epsilon$ and $\epsilon$. What is $\epsilon$? Good question.</p><p><li>we define $\epsilon$ or <code>eps</code> through $\epsilon = 1^+ - 1$, where $1^+$ is the next largest floating than $1$. We saw $\epsilon = 2^{-p}$.</p><p><li>The basic math operations with floating point numbers satisfy: $fl(x \odot y) = (x \odot y)(1 + \delta)$.</p><p><li>The basic math operations do <em>not</em> satisfy some common properties: associativity and commutativity.</p><p><li><em>However</em>, relative errors can be a problem when rounding is involved.</p><p>- We saw that if $x$ and $y$ are real numbers, that the relative error of the floating point result of $x-y$ can be large if $x$ is close to $y$</p><p>- We saw a theorem that says even if there is no rounding error, the subtraction of $y$ from $x$ can introduce a loss of precision. Basically, if $x$ and $y$ agree to $p$ binary digits, then a shift is necessary of $p$ units. More concretely: if $x > y > 0$ and $1 - y/x \leq 2^{-p}$ then at least $p$ significant binary bits are lost in forming $x-y$.</p><p>- We saw that if possible we should avoid big numbers, as the errors are then possibly  bigger. (Why the book suggests finding $(a+b)/2$ as $a + (b-a)/2$.)</p><p>- We saw that when possible we should cut down on the operations used. (One reason why Horner's method for polynomial evaluations is preferred.)</p><p>- We saw that errors can accumulate. In particular we discussed this theorem:</p><blockquote><p>If $x_i$ are positive, the relative error in a nieve summation of $\sum x_i$ is $\mathcal{O}(n\epsilon)$. </p></blockquote><p><li>We saw that there are times where trivial functions mathematically speaking are necessary.</p><p><li>We saw that errors can propagate quickly. The book has the example of $x_{n+1} = 13/3 x_n - 4/3 x_{n-1}$ which numerically diverges from the true quickly with 32 bit usage.</p><p><li>We saw that some problems lend themselves to a condition number. There were two examples</p><p>- evaluation of function when the input is uncertain. That is we evaluate $f(x+h)$ when we want to find $f(x)$. (It could be $x + h = x(1+\delta)$, say. For this we have</p><p>$$ \frac{f(x+h) - f(x)}{f(x)} \approx \frac{x f'(x)}{f(x)} \cdot \frac{h}{x}, $$</p><p>Or the relative error in the image is the relative error in the domain times a factor $xf'(x)/f(x)$.</p><p>- evaluation of a perturbed function (which can happen with polynomials that have rounded coefficients). For this, we have $F(x) = f(x) + \epsilon g(x)$. The example we had is if $r$ is a root of $f$ and $r+h$ is a root of $F$. What can we say about $h$? We can see that</p><p>$$ h \approx -\epsilon g(r)/f'(r) $$</p><p>Which can be big. The example in the book uses the Wilkinson polynomial and $r=20$. (The Wilkinson polynomial actually is exactly this case, as there is necessary rounding to get its coefficients into floating point.</p><h3>Some sample problems</h3><p><li>Suppose our decimal floating point system had numbers of the form $\pm d.dd \cdot 10^m$.</p><p>- If $1 = 1.00 \cdot 10^2$. What is $\epsilon$?</p><p>- What is $3.14 \cdot 10^0 - 3.15 \cdot 10^0$?</p><p>- What is $4.00 \cdot 10^0$ times $3.00 \cdot 10^1$?</p><p>- What is $\delta$ (where $fl(x \cdot y) = (x\cdot y)\cdot (1 \cdot \delta)$) when computing $1.23 \cdot 10^4$ times $4.32 \cdot 10^1$?</p><p><li>Suppose our binary floating point system has numbers of the form $\pm 1.pp \cdot 2^m$ where $-2 \leq m \leq 1$.</p><p>- How many total numbers are representable in this form ($0$ is not)?</p><p>- What is $\epsilon$?</p><p>- what is $1.11 \cdot 2^1 - 1.00 \cdot 2^0$?</p><p>- Convert the number $-1.01 \cdot 2^{-2}$ to decimal.</p><p>- Let $x=1.11 \cdot 2^0$ and $y=1.11 \cdot 2^1$. Find $\delta$ in $fl(x \cdot y) = (x \cdot y)(1 + \delta)$.</p><p><li> The answer to a famous question is coded in <code>0101000101000000</code>. The first bit, <code>0</code> is the sign bit, the exponent <code>10100</code> and significant <code>0101000000</code>). Can you find the number? Remember the exponent is encoded and you'll need to subtract <code>01111</code> then convert.</p><p><li>Use Horner's method (or synthetic division) to compute $p(x) = x^3 + 2x^2 + 3x^3 + 1$ at $x=2$.</p><p><li>The direct definition of $\sinh(x) = (e^x - e^{-x})/2$ is not how it is actually computed. In particular, for $0 \leq x \leq 22$, the following is used where <code>E = expm1(x)</code> is the more precise version of $e^x - 1$:</p><p>$$ (1/2) \cdot E +  E/(E+1) $$</p><p>Can you think of why the direct approach might cause issues for some values of $x$ in that range?</p><p><li>Express the following in a different manner mathematically so that the issue of loss of precision is avoided:</p><p>- $\log(x) - \log(y)$</p><p>- $x^{-3} (\sin(x) - x)$</p><p>- $\sin(x) - \tan(x)$.</p><p><li>The computation $y = \sqrt{x^2 + 1} -1$ is to be computed. For what values of $x$ are you guaranteed that no more than 2 bits of precision will be lost? (Why is solving $\sqrt{x^2+1}/1 = 2^{-2}$ of any interest?)</p><p><li>The for $\xi$ between $0$ and $x$ we have $x - \sin(x) = x^3/3! - x^5/5! + x^7/7! + \cdot + (-1)^k x^{2k-1}/(2k-1)! + (-1)^{k+1}(\xi)^{2k+1}/(2k+1)!$</p><p>What value of $k$ will ensure that the error over $[0, 1/4]$ is no more than $10^{-3}$?</p><p><li>If $fl(xy) = xy\cdot(1 + \delta)$, where $\delta$ depends on the value of $x$ and $y$, show that</p><p>$$ fl(fl(xy)\cdot z) \neq fl(x \cdot fl(yz)) $$</p><p>That is, floating point multiplication is not associative. You can verify by testing <code>(0.1 * 0.2)*0.3</code> and <code>0.1 * (0.2 * 0.3)</code>.</p><p><li>Show that $fl(x^3) = x^3(1 + \delta)^2$ where $|\delta| \leq \epsilon$.</p><p><li>True of false? For a fixed $x$, a floating point number. We expect the following to converge to $f'(x)$?</p><p>$$ \lim_{n\rightarrow\infty} \frac{fl(f(x+10^{-n})) + fl(f(x))}{10^{-n}} $$</p><p>That is, if you computed the difference quotient, $(f(x+h)-f(x))/h$ in floating would you expect smaller and smaller values of $h$ would converge. Why?</p><p><li>True of false. Suppose $p > q > 0$ are floating point numbers with $1/2 \leq p/q \leq 2$. Then $p-q$ is a floating point number also (unless it is too small).</p><p><li>Show with a <em>rough</em> proof that the error in $\log(y(x))$ is about the <em>relative error</em> of $y(x)$, that is</p><p>$$ \log(y(x+h)) - \log(y(x)) \approx \frac{y(x+h) - y(x)}{y(x)}. $$</p><h2>Chapter 3 -- solving f(x) = 0</h2>
+  </div>
+</div>  
+
+</body>
+</html>

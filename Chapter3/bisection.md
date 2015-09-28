@@ -53,7 +53,7 @@ The above is true mathematically, but can it be true in floating point?
 
 - The $c_i$ in any algorithm are necessarily finite in number, so they can't take on any value, just machine numbers. Since machine numbers are rational numbers in binary, numbers like $\sqrt{2}$ can not be represented exactly, so the value of $c$ is not guaranteed!
 
-- Even the simple statement $c = (a+b)/2$ has problems! $x+y$ can overflow, It isn't even guaranteed that $fl((x+y)/2)$ is in $[x,y]$ with some rounding modes!
+- Even the simple statement $c = (a+b)/2$ has problems! $x+y$ can overflow, It isn't even guaranteed that $fl((x+y)/2)$ is in $[x,y]$ with some rounding modes! 
 
 ### What to do
 
@@ -130,7 +130,7 @@ ceil(log2(1e-15) - 1)
 Mathematically, we can always subdivide $[a,b]$ via $c=(a+b)/2$. Not so with the computer.
 
 We said that using
-`c = (a+b)/2` has issues (overflow, loss of low bits...)
+`c = (a+b)/2` has issues (overflow, loss of low bits, magnified errors...)
 
 We avoid some of that with `c = a + (b-a)/2`
 
@@ -231,6 +231,10 @@ f(x) = sin(x)
 c = fzero(f, [3,4])
 c, f(c), sign(f(prevfloat(c))) * sign(f(nextfloat(c)))
 ```
+
+###
+
+What about $f(x) = 1/x$? It has no zero, but it does have a zero crossing at $0$ which will get picked up:
 
 ```
 f(x) = 1/x

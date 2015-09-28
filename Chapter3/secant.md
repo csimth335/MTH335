@@ -10,7 +10,7 @@ $$
 x_{n+1} = x_n - \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \cdot f(x_n)
 $$
 
-Basically use the slope of the tangent line instead of $f'(x_n)$. Hence the advantage, each step only requires one function evaluation $f(x_n)$, not two (the other being $f'(x_n)$).
+Basically use the slope of a secant line instead of $f'(x_n)$, the slope of the tangent. Hence the advantage, each step only requires one function evaluation $f(x_n)$, not  (the other being $f'(x_n)$).
 
 ### Example
 

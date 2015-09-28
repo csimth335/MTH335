@@ -22,7 +22,10 @@ See this [algorithm](http://calculuswithjulia.github.io/derivatives/newtons_meth
 
 Basic idea: approximate function by tangent line and find that intersection.
 
-More formally, Let $r$ be a zero of $f(x)$. Suppose $x$ is an approximation to $r$. That is, suppose $r = x + h$ for some small $h$, then using Taylor's theorem about $x$, we have:
+More formally, Let $r$ be a zero of $f(x)$.
+Further, suppose $r$ is a *simple* zero where $f'(r) \neq 0$.
+
+Suppose $x$ is an approximation to $r$. That is, suppose $r = x + h$ for some small $h$, then using Taylor's theorem about $x$, we have:
 
 $$
 0 = f(r) = f(x+h) = f(x) + f'(x) \cdot h + \mathcal{O}(h^2)
@@ -88,9 +91,19 @@ x = x - f(x) / fp(x)
 
 When do we stop?
 
-- the method stabilizes to 16 *or so* digits
+- We stopped when the method stabilized to 16 *or so* digits
 
-- the method doesn't stabilize after many iterations
+- There is no guarantee it will stabilize though, so we should guard against that
+
+- The goal is to solve $f(r) = 0$, so finding values where $f(r)$ is close to $0$ should also be a good criteria
+
+### Let's implement it...
+
+```
+function nm(f, fp, x)
+  ## Fill me in...
+end
+```  
 
 ### Programming a stopping value
 
@@ -116,8 +129,8 @@ Answer: it depends on $x$!
 ###
 
 We have in general $f(fl(x)) = f(x\cdot(1 + \delta)) \approx f(x) +
-f'(x) x \delta$. This vlaue depends on $x$! So, it is not unusual to
-have a third tolerance depending on $x$. For example, this comes from `quadgk`:
+f'(x) x \delta$. This value depends on $x$! So, it is not unusual to
+have a third tolerance depending on $x$. For example, this check on convergence comes from `quadgk`:
 
 
 >    `while E > abstol && E > reltol * nrm(I) && numevals < maxevals`
@@ -233,9 +246,9 @@ Wilkinson proposed this function $f(x) = x^{20} - 1$ to test Newton's method for
 
 Notice $f''(x) = 20 \cdot 19 \cdot x^{18}$ is large if $x > 1$ ($f''(1.1) = 2112.\dots$)
 
-But $f'(x) = 20 x^{19}$ is *small* f $x < 1$!. $f'(0.5) = 1.9\cdot 10^{-6}$.
+But $f'(x) = 20 x^{19}$ is *small* when $x < 1$!. $f'(0.5) = 1.9\cdot 10^{-6}$.
 
-So newton will have trouble
+So the Newton algorithm will have trouble
 
 ```
 using Roots
