@@ -36,7 +36,7 @@ In the latter case, what to do?
 
 ###
 
-Let $c = \lim_i c_i$. Then:
+Let $c = \lim_i c_i$. This exists as the sequence is clearly Cauchy ($|x_n - x_{n+m}| \leq C2^{-n}$). Then:
 
 - $c$ exists!
 - $f(c) = 0$.
