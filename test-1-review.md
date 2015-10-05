@@ -68,13 +68,13 @@ What are the assumptions on $f$ used in your proof?
 
 - $\arctan(x)$ at $c=0$
 
-<li>Find $T_5(x)$ for $c=0$ for each of
+<li>Find $T_3(x)$ for $c=0$ for each of
 
 - $\sin(x)$
 
 - $e^x$
 
-<li>Use the above to find $T_5(x)$ for $e^{\sin(x)}$.
+<li>Use the above to find $T_3(x)$ for $e^{\sin(x)}$.
 
 <li>In class we saw for $f(x) = \log(1+x)$ and $c=$ that to find $k$ such that if $0 \leq \xi \leq 1$ that
 
@@ -255,4 +255,53 @@ $$
 
 ## Chapter 3 -- solving f(x) = 0
 
-TBA
+This chapter is about solving for zeros of a real-valued, scalar function $f(x)$.
+
+We only managed to cover the first section on the bisection method. This is related to the
+
+> Intermediate value theorem. If $f(x)$ is continuous on $[a,b]$, then for any $y$ in the interval between $f(a)$ and $f(b)$, there exists $c$ such that $f(c) = y$.
+
+The special case is when $f(a) \cdot f(b) < 0$ ($[a,b]$ is a bracket), then there is a $c$ where $f(c) = 0$.
+
+A proof follows by subsequently bisecting the interval. If we number $a_0, b_0=a,b$, and set $c_0$ equal to $(a_0 + b_0)/2$. Then either $f(c_0)$ is positive, negative or $0$. If $0$, we can stop. If not, then either $[a_0,c_0]$ or $[c_0,b_0]$ will be a bracket. Call this $[a_1,b_1]$ and define $c_1$ as a new midpoint. We repeat and get a sequence $c_0, c_1, \dots$. If this terminates, we are done. Otherwise, since it can be shown $|c_n - c_{n+k}| \leq 2^{-n}|b_0 - a_0|$, that $c_i$ has a limt $c$. This limit will be the zero. It can't have $f(c)> 0$. The values of $c_i$ where $f(c_i)<0$ will also have limit of $c$ and by continuity $f(c) \leq 0$. (This is provided there is an infinite sequences of $c_i$s with $f(c_i) <0$, which requires proof. Similarly, it can't be $f(c) < 0$. So it must be $0$.
+
+The point of the proof is that there is a bound on the error:
+
+$$
+|c_n - c| \leq \frac{1}{2} |b_n - a_n| \leq \frac{1}{2^{(n+1)}} |b_0 - a_0|.
+$$
+
+### Some sample problems
+
+* Let $f(x) = x^2 - 2$. Starting with $a_0, b_0 = 1, 2$, find $a_4, b_4$.
+
+* Let $e_n$ be $c_n - c$. The order of convergence of $c_n$ is  $q$ provided
+
+$$
+\lim_n \frac{e_{n+1}}{e_n^q} = A
+$$
+
+Using the bound above, what is the obvious guess for the order of convergence?
+
+* Explain why the bisection method is no help in finding the zeros of $f(x) = (x-1)^2 \cdot e^x$.
+
+* In floating point, the computation of the midpoint via $(a+b)/2$ is discouraged and using $a + (b-a)/2$ is suggested. Why?
+
+* Mathematically if $a < b$, it always the case that there exists a $c = (a+b)/2$ and $a < c < b$. Is this also *always* the case in floating point? Can you think of an example of when it wouldn't be?
+
+* To compute $\pi$ as a solution to $\sin(x) = 0$, one might use the bisection method with $a_0, b_0 = 3,4$. Were you to do so, how many steps would it take to find an error of no more than $10^{-16}$?
+
+* A simple zero for a function $f(x)$ is one where $f'(x) \neq 0$. Some algorithms have different convergence properties for functions with only simple zeros as compared to those with non-simple zeros. Would the bisection algorithm have a difference?
+
+* If you answered yes above, you could still be right, even though
+  you'd be wrong mathematically (Why? look at the bound on the error
+  and the assumptions on $f$.). This is because for functions with non
+  simple zeros, you can have a lot of numeric issues creep in. The
+  book gives an example of the function lie $f(x) = (x-1)^5$. Explain what
+  is going on with this graph near $x=1$:
+
+```
+using Gadfly
+f(x) = x^5 - 5x^4 +10x^3 -10x^2 + 5x -1
+plot(f, 0.999, 1.001)
+```

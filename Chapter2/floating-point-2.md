@@ -201,7 +201,6 @@ Here are some "gotchas"
 
 <li> there is no guarantee of *associativity* ($a+(b+c) = (a+b) + c$.
 
-<li> there is no guarantee of *commutivity* ($a+b = b + a$)
 
 ### Subtraction
 
@@ -294,13 +293,16 @@ And:
 (0.1 + 0.2) + 0.3,  0.1 + (0.2 + 0.3)
 ```
 
-### Floating point is not always commutative
+### Floating point is not always "commutative"
 
 ```
 0.1 + 0.2 + 0.3, 0.3 +  0.2 +  0.1
 ```
 
-Moral: need to be careful when trying to say two things are exactly equal.
+This is not quite correct mathematically. It is the case that $fl(x) + fl(y) = fl(y) + fl(x)$. However, the above shows that we can't arbitrarily move around sums. This is due to the lack of associativity. On the left `0.1 + 0.2` is performed first, on the right `0.3 + 0.2` is.
+
+
+Moral: need to be careful when trying to say two things are exactly equal: Not only is there rounding, but algebraic reductions done different ways can lead as well to different answers.
 
 ### Proof not associative
 
