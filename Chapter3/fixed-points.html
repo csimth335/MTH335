@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Iteration as fixed points</h1><h2>General Framework</h2><p>A general framework for Newton&#39;s method is</p>$$~
+x_{n+1} = F(x_n), \quad (n\geq 0)
+~$$<p>Where &#36;F&#40;u&#41; &#61; u - f&#40;u&#41;/f&#39;&#40;u&#41;&#36;.</p><p>What conditions on &#36;F&#36; ensure that this sequence will converge? For the specific case of Newton&#39;s method, the following can work:</p><p>Suppose &#36;f&#40;z&#41; &#61; 0&#36; and &#36;f&#36; is twice differentiable around &#36;z&#36;.  If there is some &#36;\delta &gt; 0&#36; such that &#36;|f&#39;&#39;&#40;y&#41;/f&#39;&#40;x&#41;| &lt; 2/\delta&#36; whenever &#36;|x-z|, |y-z| &lt; \delta&#36;, then the algorithm will converge to &#36;z&#36;.</p><h2>A fixed point</h2><p>Suppose &#36;x_n \rightarrow s&#36;. Then if &#36;F&#36; is continuous we have</p>$$~
+s = \lim x_{n+1} = \lim F(x_n) = F(s)
+~$$<p>That is &#36;s &#61; F&#40;s&#41;&#36;, so &#36;s&#36; is a <strong>fixed point</strong> of &#36;F&#36;.</p><h3>What general assumptions on &#36;F&#36; will ensure a fixed point exists?</h3><blockquote>
+<p>Theorem: Contractive Mapping Theorem</p>
+</blockquote><p>Suppose &#36;C \subset R&#36;, and &#36;F&#36; is a <em>contractive mapping</em>, that is there exists &#36;\lambda &lt; 1&#36; with</p>$$~
+| F(x) - F(y) | \leq \lambda |x - y|
+~$$<p>The &#36;F&#36; has a unique fixed point, &#36;s&#36;. Furthermore, for any &#36;x_0 &#36; in &#36;C&#36;, the sequence &#36;x_&#123;n&#43;1&#125; &#61; F&#40;x_n&#41;&#36; will converge to &#36;s&#36;.</p><h3>Example</h3><p>Let &#36;f&#40;x&#41; &#61; x^2 - s&#36; and &#36;C&#36; is a ball around &#36;\sqrt&#123;s&#125;&#36;. Then Newton&#39;s method has &#36;F&#40;x&#41; &#61; x - f&#40;x&#41;/f&#39;&#40;x&#41;&#36;, so we have:</p><p>Then &#36;F&#40;x&#41; &#61; x - &#40;x^2 - s&#41;/&#40;2x&#41; &#61; x/2 - s/&#40;2x&#41;&#36;. So</p>$$~
+F(x) - F(y) = \frac{x-y}{2} - \frac{s}{2}[\frac{1}{x} - \frac{1}{y}] = (x-y) \cdot \frac{1}{2}[1 + \frac{s}{xy}].
+~$$<p>Thus,</p>$$~
+\frac{|F(x) - F(y)|}{|x-y|} \leq \frac{1}{2}[1 + \frac{s}{xy}].
+~$$<p>For a specific case with &#36;s&#61;2&#36; we can use &#36;C&#61;&#40;\sqrt&#123;2&#125;-\delta, \sqrt&#123;2&#125;&#43;\delta&#41;&#36; where &#36;\delta &#61; 1/10&#36;, say.</p><pre class="sourceCode julia">s, delta = sqrt(2), 1/10
+1/2 * (1 + s/( (s-delta)*(s-delta)))</pre>
+<pre class="output">
+0.9094049721433702</pre>
+
+<h2>Proof of contractive mapping theorem</h2><p>We have</p>$$~
+|x_n - x_{n-1}| = |F(x_{n-1}) - F(x_{n-2})| \leq \lambda |x_{n-1} - x_{n-2}|.
+~$$<p>So, by repeating, we get</p>$$~
+|x_n - x_{n-1}| \leq \lambda^{n-1} |x_1 - x_0|.
+~$$<p>This implies the sequence &#36;x_n&#36;will converge:</p><p>We write</p>$$~
+x_n = (x_n - x_{n-1}) + (x_{n-1} - x_{n-2}) + \cdots + (x_1 - x_0) + x_0
+~$$<p>So the sequence of &#36;x_n&#36; will converge only if the series &#36;\sum_&#123;i&#61;0&#125;^n &#40;x_i -x_&#123;i-1&#125;&#41;&#36; converges. In this case it is easy to see, as</p>$$~
+\sum_{i=0}^n (x_i -x_{i-1}) \leq \sum \lambda^{i-1} |x_1 - x_0| = |x_1 - x_0| \cdot \sum \lambda^{i-1}  \rightarrow \frac{1}{1 - \lambda} |x_1 - x_0|.
+~$$<p>Let &#36;s &#61; \lim x_n&#36;. Then &#36;F&#40;s&#41; &#61; s&#36; by continuity &#40;why is &#36;F&#36; continuous&#41;.</p><p>Is this fixed point unique? Suppose &#36;s&#36; and &#36;t&#36; are fixed points in &#36;C&#36;. Then</p>$$~
+|s - t|  = |F(s) - F(t)| \leq \lambda |s-t| < |s -t|
+~$$<p>A contradiction.</p><h3>Cauchy</h3><p>A Cauchy sequence is one where for any &#36;\epsilon &gt; 0&#36;, there is an &#36;N&#36; for which if &#36;n,m \geq N&#36;, then &#36;|x_n - x_m| &lt; \epsilon&#36;. Cauchy sequences on the real line converge. Another way to prove the convergence would be to prove that the sequence is cauchy. The book shows &#40;p103&#41;, that this could be found:</p>$$~
+|x_n - x_m| \leq \lambda^N |x_1 - x_0| (1 - \lambda)^{-1}.
+~$$<p>Since both &#36;|x_1 - x_0|&#36; and &#36;&#40;1 - \lambda&#41;^&#123;-1&#125;&#36; are bounded, some &#36;N&#36; can be chosen to make this as small as desired.</p><h3>Example</h3><p>Let &#36;F&#40;x&#41; &#61; 4 &#43; 1/3 \cdot \sin&#40;2x&#41;&#36;. The book shows that this is a contractive mapping with &#36;\lambda&#61;2/3&#36;:</p>$$~
+F(x) - F(y) = \frac{1}{3}(\sin(2x) - \sin(2y)) = \frac{1}{3}(2\cos(2\xi))( x- y) = \cos(2\xi) \cdot \frac{2}{3} \cdot (x-y).
+~$$<h3></h3><p>So we have a contractive map. It will converge for <em>any</em> starting point, as &#36;C&#36; did not need specifying. Let&#39;s see.</p><pre class="sourceCode julia">function iterate(f, x)
+  xn, xn_1 = x, Inf
+  while abs(xn - xn_1) > 100 * eps()
+    xn, xn_1 = f(xn), xn
+  end
+  xn
+end</pre>
+<pre class="output">
+iterate (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">f(x) = 2 + 1/3 * sin(2x)
+iterate(f,4), iterate(f, 40)</pre>
+<pre class="output">
+(1.833063392382903,1.833063392382903)</pre>
+
+<h2>Error analysis</h2><p>Suppose &#36;F&#36; is a contractive map over &#36;C&#36; and iteration converges to &#36;s&#36;. How fast? Supppose further that &#36;F&#36; is &#36;C^k&#36;.</p><p>Let &#36;e_n &#61; x_n - s&#36;, as before. Then the mean value theorem gives us:</p>$$~
+e_{n+1} = x_{n+1} - s = F(x_n) - F(s) = F'(\xi_n) (x_n - s) = F'(\xi_n) e_n.
+~$$<p>Since &#36;|F&#39;&#40;\xi_m&#41;| &lt; 1&#36;, we must have the sequence &#36;|e_n|&#36; decreasing. As &#36;F&#39;&#40;\xi_n&#41; \approx F&#39;&#40;s&#41;&#36;, if the latter is small converge should be rapid. If it is &#36;0&#36; even more so.</p><p>The book defines &#36;q&#36; to be the first positive integer with &#36;F^&#123;&#40;k&#41;&#125;&#40;s&#41; \neq 0&#36;. With this, the Taylor series for &#36;F&#36; about &#36;s&#36; becomes:</p>$$~
+\begin{align}
+F(x_n) - F(s) &= x_{n+1} - s = e_{n+1}\\\\
+&= F(s + e_n) - F(s)\\\\
+&= [F(s) + F'(s) \cdot e_n + 1/2 F''(s) e_n^2 + \cdots] - F(s)\\\\
+&= F'(s) e_n + (1/2) F''(s) e_n + \cdot (1/(q-1)!) F^{(q-1)}(s) e_n^{q-1}(s) + \frac{1}{q!}F^{(q)}(\xi_n) e_n^q \\\\
+&= \frac{F^{(q)}(\xi_n)}{q!} e_n^q.
+\end{align}
+~$$<p>So that</p>$$~
+\lim_n \frac{|e_{n+1}|}{|e_n|^q} = \lim \frac{1}{q!}F^{(q)}(\xi_n) \rightarrow \frac{1}{q!}F^{(q)}(s).
+~$$<p>So the <em>order of convergence</em> is atleast &#36;q&#36;.</p><h3>Newton, order of convergence at least &#36;2&#36;</h3><p>For Newton&#39;s method, &#36;F&#40;u&#41; &#61; u - f&#40;u&#41;/f&#39;&#40;u&#41;&#36;. We have</p>$$~
+F'(u) = 1 - \frac{f'(u)^2 - f(u) f''(u)}{f'(u)^2} = \frac{f(u)f''(u)}{f'(u)^2}.
+~$$<p>If &#36;s&#36; is a fixed point, &#36;f&#40;s&#41; &#61; 0&#36;, so &#36;F&#39;&#40;s&#41;&#61;0&#36;. That is &#36;q \geq 2&#36;.</p>
+  </div>
+</div>  
+
+</body>
+</html>
