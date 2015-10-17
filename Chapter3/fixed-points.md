@@ -176,3 +176,38 @@ F'(u) = 1 - \frac{f'(u)^2 - f(u) f''(u)}{f'(u)^2} = \frac{f(u)f''(u)}{f'(u)^2}.
 ~$$
 
 If $s$ is a fixed point, $f(s) = 0$, so $F'(s)=0$. That is $q \geq 2$.
+
+
+### visualize
+
+If we graph $F(x)$ and layer on the line $y=x$, we can see cobwebbing converges to a fixed point.
+
+
+```
+using Plots
+backend(:gadfly)
+
+F(x) = x - sin(x)/cos(x)
+a,b = 2.0, 4.3
+x0 = 2.0
+
+
+plot(F, a, b)
+plot!( x ->x, a, b)
+
+xs = [x0]
+ys = map(F, xs)
+
+
+for i = 0:3
+  annotate!([(x0, F(x0), "(x$i, F(x$i))")])
+  x0 = F(x0)
+end
+
+for i in 1:5
+  append!(xs, [ys[end], ys[end]])
+  append!(ys, [ys[end], F(ys[end])])
+end
+plot!(xs, ys)
+
+```
