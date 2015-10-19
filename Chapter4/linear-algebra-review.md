@@ -64,13 +64,13 @@ $$~
 Ax = b.
 ~$$
 
-Here are three main problems in linear algebra that repeat themselves all the time:
+Here are two main problems in linear algebra that repeat themselves all the time:
 
-* Solve for $x$ in $Ax = b$
+* Solve for $x$ in $Ax = b$. Also, somewhat related, if $Ax = b$ has no solutions, can we find "best" solutions?
 
 * Solve for the $\lambda$ for which $Ax = \lambda x$ has non zero solutions
 
-* If $Ax = b$ has no solutions, can we find "best" solutions satisfying $A^TAx = A^Tb$?
+
 
 
 ## Example:
@@ -276,3 +276,161 @@ We could see visually, or confirm as follows
 B' - B
 ```
 
+## positive definite
+
+A matrix $A$ is *positive definite* if for every nonzero vector $x$, $x^T A x > 0$.
+
+The example in the book is
+
+```
+A = [2 1; 1 2]
+```
+
+For which $x^T A x = (x_1 + x_2)^2 + x_1^2 + x_2^2 > 0$ (if $x \neq 0$).
+
+
+## Inverses
+
+Let $I$ be an $n \times n$ *identify matrix*,  that is $I$ is all $0$s with $1$s on the diagonal:
+
+Then$AI = A$ and  $IA = A$, if defined. For example:
+
+$$~
+(AI)_{ij}
+= a_{i1} I_{1j} + \cdots+ a_{ij} I_{jj} + \cdots + a_{in} I_{nj}
+= a_{i1} 0+ \cdots+ a_{ij} 1+ \cdots + a_{in} 0
+= a_{ij}
+~$$
+
+
+Let $A$ be given (and $m \times n$) Then $B$ is a *right inverse* if $AB = I$.
+
+> Thm: A *square* matrix, $A$, can possess at most one right inverse.
+
+Proof: a linear algebra proof that rests on a fact: a linear combination of a *basis* producing $x$ is unique.
+
+Suppose $B$ is an inverse. We aim to show $B$ is unique. The product
+
+$$
+(AB)_{\cdot k} = \sum_l a_{\cdot l} b_{lk}
+$$
+
+So if we look at the $k$th column vector of a matrix and write this as $A_{:k}$, then:
+
+$$
+I_{:k} = \sum_l b_{lk}A_{:l}
+$$
+
+So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.
+
+> Theorem: If $A$ and $B$ are square matrices, then a right inverse is a left inverse.
+
+Suppose $B$ is a right inverse ($AB=I$). Then set $C = BA - I + B$ and note: $AC = ABA - AI + AB = A(BA) - A + I = I$, so $C=B$ and consequently $BA = I$ as well.
+
+So, if a square matrix $A$ has a $n\times n$ right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written $A^{-1}$.
+
+### How to find an inverse?
+
+We return to system of equations. There we know a few basic facts:
+
+* we could interchange the order in how we define our equations and we would have the same answers
+* we could replace one equation by its multiple by a **non**-zero constant and would still have the same answers
+* we could replace one equation by adding another to it and not effect the solutions.
+
+The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?
+
+Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, for $E'_j = -E_j$ and add this to $E'_i$ to get $E''_i = E'_i + E'_j = E_i + E_j - E_j = E_i$ and so the original set of equations will have the same solutions if we replace $E_i$ as specified.
+
+### Matrix equivalence
+
+We have systems of linear equations lend them selves to matrices, so elementary operations lend themselves to matrix operations.
+
+To illustrate:
+
+```
+A = [1 2 3; 4 5 6; 7 8 9]
+```
+
+We can switch rows 2 and 3 via let multiplication of the identity matrix with rows $2$ and $3$ swapped
+
+```
+[1 0 0; 0 0 1; 0 1 0] * A
+```
+
+We can multiply row 2 as follows:
+
+```
+[1 0 0; 0 pi 0; 0 0 1] * A
+```
+
+We can replace row $2$ with row $2$ plus row $3$ via:
+
+```
+[1 0 0; 0 1 0; 0 1 1] * A
+```
+
+If we think of these elementary operations in terms of left multiplication by an elementary matrix, we can write the transformed matrix as $E_m E_{m-1} \cdots E_2 E_1 A$.
+
+> Thm: If $A$ is invertible, we can find $A^{-1}$ from a sequence of elementary row operations.
+
+Idea: If we can find a sequence such that $E_m E_{m-1} \cdots E_2 E_1 A = I$, the $E_m E_{m-1} \cdots E_2 E_1 \cdot I = A^{-1}$. Why?
+
+$$~
+A^{-1}A = (E_m E_{m-1} \cdots E_2 E_1 \cdot I) A
+= E_m E_{m-1} \cdots E_2 E_1 (I \cdot A)
+= E_m E_{m-1} \cdots E_2 E_1 \cdot A
+= I.
+~$$
+
+
+### Nonsingular matrix properties
+
+For an $n \times n$ matrix $A$, all of these are equivalent:
+
+* $A$ is nonsingular
+* the *determinant* of $A$ is non-zero
+* The rows of $A$ for a basis for $R^n$
+* The columns of $A$ for a basis for $R^n$
+* The equation $Ax=0$ is only satisfied by $x=0$.
+* The equation $Ax=b$ has only one solution, $x$.
+* A is a product of elementary matrices
+* $0$ is not an eigenvalue of $A$.
+
+## Block multiplication
+
+Matrices can be partitioned into blocks. So for example:
+
+```
+B = [1 2; 3 4]
+C = [5 6; 6 5]
+O = [0 0; 0 0]
+I = [1 0; 0 1]
+A = [B C; O I]
+```
+
+Problem 7 has one show that $A^k$ is also a block matrix with Blocks $B^k$ and $(B^k-I)(B-I)^{-1}C$ to go with O and I. Let's see with k = 2:
+
+We need $B-I$ to have an inverse. We check:
+
+```
+det(B-I)
+```
+
+Now let $k=3$, we have
+
+```
+k = 3
+out = A^k
+```
+
+And now check the pieces:
+
+```
+out[1:2, 1:2] ==B^k
+```
+
+and
+
+```
+(B^k - I)* inv(B-I) * C == out[1:2, 3:4]
+```

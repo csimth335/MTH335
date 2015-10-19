@@ -136,12 +136,10 @@ b_n
 \right)
 ~$$<h3>Why?</h3><p>This is because matrices have their own, nearly familar, algebra that allows us to represent the system of equations in terms of an equation:</p>$$~
 Ax = b.
-~$$<p>Here are three main problems in linear algebra that repeat themselves all the time:</p><ul>
-<li>Solve for &#36;x&#36; in &#36;Ax &#61; b&#36;</li>
+~$$<p>Here are two main problems in linear algebra that repeat themselves all the time:</p><ul>
+<li>Solve for &#36;x&#36; in &#36;Ax &#61; b&#36;. Also, somewhat related, if &#36;Ax &#61; b&#36; has no solutions, can we find &quot;best&quot; solutions?</li>
 </ul><ul>
 <li>Solve for the &#36;\lambda&#36; for which &#36;Ax &#61; \lambda x&#36; has non zero solutions</li>
-</ul><ul>
-<li>If &#36;Ax &#61; b&#36; has no solutions, can we find &quot;best&quot; solutions satisfying &#36;A^TAx &#61; A^Tb&#36;?</li>
 </ul><h2>Example:</h2><p>Consider the system of equations is</p>$$~
 \begin{align}
 1x_{11} + 2x_{12} + 3x_{13} &= 4\\
@@ -331,6 +329,130 @@ A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
  0  0  0
  0  0  0
  0  0  0</pre>
+
+<h2>positive definite</h2><p>A matrix &#36;A&#36; is <em>positive definite</em> if for every nonzero vector &#36;x&#36;, &#36;x^T A x &gt; 0&#36;.</p><p>The example in the book is</p><pre class="sourceCode julia">A = [2 1; 1 2]</pre>
+<pre class="output">
+2x2 Array{Int64,2}:
+ 2  1
+ 1  2</pre>
+
+<p>For which &#36;x^T A x &#61; &#40;x_1 &#43; x_2&#41;^2 &#43; x_1^2 &#43; x_2^2 &gt; 0&#36; &#40;if &#36;x \neq 0&#36;&#41;.</p><h2>Inverses</h2><p>Let &#36;I&#36; be an &#36;n \times n&#36; <em>identify matrix</em>,  that is &#36;I&#36; is all &#36;0&#36;s with &#36;1&#36;s on the diagonal:</p><p>Then&#36;AI &#61; A&#36; and  &#36;IA &#61; A&#36;, if defined. For example:</p>$$~
+(AI)_{ij}
+= a_{i1} I_{1j} + \cdots+ a_{ij} I_{jj} + \cdots + a_{in} I_{nj}
+= a_{i1} 0+ \cdots+ a_{ij} 1+ \cdots + a_{in} 0
+= a_{ij}
+~$$<p>Let &#36;A&#36; be given &#40;and &#36;m \times n&#36;&#41; Then &#36;B&#36; is a <em>right inverse</em> if &#36;AB &#61; I&#36;.</p><blockquote>
+<p>Thm: A <em>square</em> matrix, &#36;A&#36;, can possess at most one right inverse.</p>
+</blockquote><p>Proof: a linear algebra proof that rests on a fact: a linear combination of a <em>basis</em> producing &#36;x&#36; is unique.</p><p>Suppose &#36;B&#36; is an inverse. We aim to show &#36;B&#36; is unique. The product</p>$$
+(AB)_{\cdot k} = \sum_l a_{\cdot l} b_{lk}
+$$
+
+So if we look at the $k$th column vector of a matrix and write this as $A_{:k}$, then:
+
+$$
+I_{:k} = \sum_l b_{lk}A_{:l}
+$$
+
+So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.
+
+> Theorem: If $A$ and $B$ are square matrices, then a right inverse is a left inverse.
+
+Suppose $B$ is a right inverse ($AB=I$). Then set $C = BA - I + B$ and note: $AC = ABA - AI + AB = A(BA) - A + I = I$, so $C=B$ and consequently $BA = I$ as well.
+
+So, if a square matrix $A$ has a $n\times n$ right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written $A^{-1}$.
+
+### How to find an inverse?
+
+We return to system of equations. There we know a few basic facts:
+
+* we could interchange the order in how we define our equations and we would have the same answers
+* we could replace one equation by its multiple by a **non**-zero constant and would still have the same answers
+* we could replace one equation by adding another to it and not effect the solutions.
+
+The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?
+
+Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, for $E'_j = -E_j$ and add this to $E'_i$ to get $E''_i = E'_i + E'_j = E_i + E_j - E_j = E_i$ and so the original set of equations will have the same solutions if we replace $E_i$ as specified.
+
+### Matrix equivalence
+
+We have systems of linear equations lend them selves to matrices, so elementary operations lend themselves to matrix operations.
+
+To illustrate:
+
+```
+A = [1 2 3; 4 5 6; 7 8 9]
+```
+
+We can switch rows 2 and 3 via let multiplication of the identity matrix with rows $2$ and $3$ swapped
+
+```
+[1 0 0; 0 0 1; 0 1 0] * A
+```
+
+We can multiply row 2 as follows:
+
+```
+[1 0 0; 0 pi 0; 0 0 1] * A
+```
+
+We can replace row $2$ with row $2$ plus row $3$ via:
+
+```
+[1 0 0; 0 1 0; 0 1 1] * A
+```
+
+If we think of these elementary operations in terms of left multiplication by an elementary matrix, we can write the transformed matrix as $E_m E_{m-1} \cdots E_2 E_1 A$.
+
+> Thm: If $A$ is invertible, we can find $A^{-1}$ from a sequence of elementary row operations.
+
+Idea: If we can find a sequence such that $E_m E_{m-1} \cdots E_2 E_1 A = I$, the $E_m E_{m-1} \cdots E_2 E_1 \cdot I = A^{-1}$. Why?
+
+$$~
+A^{-1}A = (E_m E_{m-1} \cdots E_2 E_1 \cdot I) A
+= E_m E_{m-1} \cdots E_2 E_1 (I \cdot A)
+= E_m E_{m-1} \cdots E_2 E_1 \cdot A
+= I.
+~$$<h3>Nonsingular matrix properties</h3><p>For an &#36;n \times n&#36; matrix &#36;A&#36;, all of these are equivalent:</p><ul>
+<li>&#36;A&#36; is nonsingular</li>
+<li>the <em>determinant</em> of &#36;A&#36; is non-zero</li>
+<li>The rows of &#36;A&#36; for a basis for &#36;R^n&#36;</li>
+<li>The columns of &#36;A&#36; for a basis for &#36;R^n&#36;</li>
+<li>The equation &#36;Ax&#61;0&#36; is only satisfied by &#36;x&#61;0&#36;.</li>
+<li>The equation &#36;Ax&#61;b&#36; has only one solution, &#36;x&#36;.</li>
+<li>A is a product of elementary matrices</li>
+<li>&#36;0&#36; is not an eigenvalue of &#36;A&#36;.</li>
+</ul><h2>Block multiplication</h2><p>Matrices can be partitioned into blocks. So for example:</p><pre class="sourceCode julia">B = [1 2; 3 4]
+C = [5 6; 6 5]
+O = [0 0; 0 0]
+I = [1 0; 0 1]
+A = [B C; O I]</pre>
+<pre class="output">
+4x4 Array{Int64,2}:
+ 1  2  5  6
+ 3  4  6  5
+ 0  0  1  0
+ 0  0  0  1</pre>
+
+<p>Problem 7 has one show that &#36;A^k&#36; is also a block matrix with Blocks &#36;B^k&#36; and &#36;&#40;B^k-I&#41;&#40;B-I&#41;^&#123;-1&#125;C&#36; to go with O and I. Let&#39;s see with k &#61; 2:</p><p>We need &#36;B-I&#36; to have an inverse. We check:</p><pre class="sourceCode julia">det(B-I)</pre>
+<pre class="output">
+-6.0</pre>
+
+<p>Now let &#36;k&#61;3&#36;, we have</p><pre class="sourceCode julia">k = 3
+out = A^k</pre>
+<pre class="output">
+4x4 Array{Int64,2}:
+ 37   54  117  114
+ 81  118  252  243
+  0    0    1    0
+  0    0    0    1</pre>
+
+<p>And now check the pieces:</p><pre class="sourceCode julia">out[1:2, 1:2] ==B^k</pre>
+<pre class="output">
+true</pre>
+
+<p>and</p><pre class="sourceCode julia">(B^k - I)* inv(B-I) * C == out[1:2, 3:4]</pre>
+<pre class="output">
+true</pre>
 
 
   </div>
