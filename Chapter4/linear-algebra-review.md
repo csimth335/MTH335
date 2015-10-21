@@ -311,15 +311,15 @@ Proof: a linear algebra proof that rests on a fact: a linear combination of a *b
 
 Suppose $B$ is an inverse. We aim to show $B$ is unique. The product
 
-$$
+$$~
 (AB)_{\cdot k} = \sum_l a_{\cdot l} b_{lk}
-$$
+~$$
 
 So if we look at the $k$th column vector of a matrix and write this as $A_{:k}$, then:
 
-$$
+$$~
 I_{:k} = \sum_l b_{lk}A_{:l}
-$$
+~$$
 
 So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.
 

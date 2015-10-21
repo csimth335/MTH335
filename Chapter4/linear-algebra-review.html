@@ -343,71 +343,47 @@ A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
 = a_{ij}
 ~$$<p>Let &#36;A&#36; be given &#40;and &#36;m \times n&#36;&#41; Then &#36;B&#36; is a <em>right inverse</em> if &#36;AB &#61; I&#36;.</p><blockquote>
 <p>Thm: A <em>square</em> matrix, &#36;A&#36;, can possess at most one right inverse.</p>
-</blockquote><p>Proof: a linear algebra proof that rests on a fact: a linear combination of a <em>basis</em> producing &#36;x&#36; is unique.</p><p>Suppose &#36;B&#36; is an inverse. We aim to show &#36;B&#36; is unique. The product</p>$$
+</blockquote><p>Proof: a linear algebra proof that rests on a fact: a linear combination of a <em>basis</em> producing &#36;x&#36; is unique.</p><p>Suppose &#36;B&#36; is an inverse. We aim to show &#36;B&#36; is unique. The product</p>$$~
 (AB)_{\cdot k} = \sum_l a_{\cdot l} b_{lk}
-$$
-
-So if we look at the $k$th column vector of a matrix and write this as $A_{:k}$, then:
-
-$$
+~$$<p>So if we look at the &#36;k&#36;th column vector of a matrix and write this as &#36;A_&#123;:k&#125;&#36;, then:</p>$$~
 I_{:k} = \sum_l b_{lk}A_{:l}
-$$
+~$$<p>So the &#36;k&#36;th column vector of &#36;I&#36; is a linear combination of the column vectors of &#36;A&#36;. This means the columns of &#36;A&#36; span the same space as the columns of &#36;I&#36;, which is &#36;R^n&#36;. So the columns of &#36;A&#36; form a basis for &#36;R^n&#36;, ans so the values &#36;b_&#123;lk&#125;&#36; are uniquely defined.</p><blockquote>
+<p>Theorem: If &#36;A&#36; and &#36;B&#36; are square matrices, then a right inverse is a left inverse.</p>
+</blockquote><p>Suppose &#36;B&#36; is a right inverse &#40;&#36;AB&#61;I&#36;&#41;. Then set &#36;C &#61; BA - I &#43; B&#36; and note: &#36;AC &#61; ABA - AI &#43; AB &#61; A&#40;BA&#41; - A &#43; I &#61; I&#36;, so &#36;C&#61;B&#36; and consequently &#36;BA &#61; I&#36; as well.</p><p>So, if a square matrix &#36;A&#36; has a &#36;n\times n&#36; right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written &#36;A^&#123;-1&#125;&#36;.</p><h3>How to find an inverse?</h3><p>We return to system of equations. There we know a few basic facts:</p><ul>
+<li>we could interchange the order in how we define our equations and we would have the same answers</li>
+<li>we could replace one equation by its multiple by a <strong>non</strong>-zero constant and would still have the same answers</li>
+<li>we could replace one equation by adding another to it and not effect the solutions.</li>
+</ul><p>The latter is on the only tricky one. If we use &#36;E&#39;_i &#61; E_i &#43; E_j&#36; instead, do we get a difference?</p><p>Well, if our solutions solved &#36;E_i&#36; and &#36;E_j&#36;, then it would also solve &#36;E&#39;_I&#36;, as &#36;0 &#43; 0&#36; is still &#36;0&#36;. To get the reverse, for &#36;E&#39;_j &#61; -E_j&#36; and add this to &#36;E&#39;_i&#36; to get &#36;E&#39;&#39;_i &#61; E&#39;_i &#43; E&#39;_j &#61; E_i &#43; E_j - E_j &#61; E_i&#36; and so the original set of equations will have the same solutions if we replace &#36;E_i&#36; as specified.</p><h3>Matrix equivalence</h3><p>We have systems of linear equations lend them selves to matrices, so elementary operations lend themselves to matrix operations.</p><p>To illustrate:</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 1  2  3
+ 4  5  6
+ 7  8  9</pre>
 
-So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.
+<p>We can switch rows 2 and 3 via let multiplication of the identity matrix with rows &#36;2&#36; and &#36;3&#36; swapped</p><pre class="sourceCode julia">[1 0 0; 0 0 1; 0 1 0] * A</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 1  2  3
+ 7  8  9
+ 4  5  6</pre>
 
-> Theorem: If $A$ and $B$ are square matrices, then a right inverse is a left inverse.
+<p>We can multiply row 2 as follows:</p><pre class="sourceCode julia">[1 0 0; 0 pi 0; 0 0 1] * A</pre>
+<pre class="output">
+3x3 Array{Float64,2}:
+  1.0      2.0     3.0   
+ 12.5664  15.708  18.8496
+  7.0      8.0     9.0   </pre>
 
-Suppose $B$ is a right inverse ($AB=I$). Then set $C = BA - I + B$ and note: $AC = ABA - AI + AB = A(BA) - A + I = I$, so $C=B$ and consequently $BA = I$ as well.
+<p>We can replace row &#36;2&#36; with row &#36;2&#36; plus row &#36;3&#36; via:</p><pre class="sourceCode julia">[1 0 0; 0 1 0; 0 1 1] * A</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+  1   2   3
+  4   5   6
+ 11  13  15</pre>
 
-So, if a square matrix $A$ has a $n\times n$ right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written $A^{-1}$.
-
-### How to find an inverse?
-
-We return to system of equations. There we know a few basic facts:
-
-* we could interchange the order in how we define our equations and we would have the same answers
-* we could replace one equation by its multiple by a **non**-zero constant and would still have the same answers
-* we could replace one equation by adding another to it and not effect the solutions.
-
-The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?
-
-Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, for $E'_j = -E_j$ and add this to $E'_i$ to get $E''_i = E'_i + E'_j = E_i + E_j - E_j = E_i$ and so the original set of equations will have the same solutions if we replace $E_i$ as specified.
-
-### Matrix equivalence
-
-We have systems of linear equations lend them selves to matrices, so elementary operations lend themselves to matrix operations.
-
-To illustrate:
-
-```
-A = [1 2 3; 4 5 6; 7 8 9]
-```
-
-We can switch rows 2 and 3 via let multiplication of the identity matrix with rows $2$ and $3$ swapped
-
-```
-[1 0 0; 0 0 1; 0 1 0] * A
-```
-
-We can multiply row 2 as follows:
-
-```
-[1 0 0; 0 pi 0; 0 0 1] * A
-```
-
-We can replace row $2$ with row $2$ plus row $3$ via:
-
-```
-[1 0 0; 0 1 0; 0 1 1] * A
-```
-
-If we think of these elementary operations in terms of left multiplication by an elementary matrix, we can write the transformed matrix as $E_m E_{m-1} \cdots E_2 E_1 A$.
-
-> Thm: If $A$ is invertible, we can find $A^{-1}$ from a sequence of elementary row operations.
-
-Idea: If we can find a sequence such that $E_m E_{m-1} \cdots E_2 E_1 A = I$, the $E_m E_{m-1} \cdots E_2 E_1 \cdot I = A^{-1}$. Why?
-
-$$~
+<p>If we think of these elementary operations in terms of left multiplication by an elementary matrix, we can write the transformed matrix as &#36;E_m E_&#123;m-1&#125; \cdots E_2 E_1 A&#36;.</p><blockquote>
+<p>Thm: If &#36;A&#36; is invertible, we can find &#36;A^&#123;-1&#125;&#36; from a sequence of elementary row operations.</p>
+</blockquote><p>Idea: If we can find a sequence such that &#36;E_m E_&#123;m-1&#125; \cdots E_2 E_1 A &#61; I&#36;, the &#36;E_m E_&#123;m-1&#125; \cdots E_2 E_1 \cdot I &#61; A^&#123;-1&#125;&#36;. Why?</p>$$~
 A^{-1}A = (E_m E_{m-1} \cdots E_2 E_1 \cdot I) A
 = E_m E_{m-1} \cdots E_2 E_1 (I \cdot A)
 = E_m E_{m-1} \cdots E_2 E_1 \cdot A
