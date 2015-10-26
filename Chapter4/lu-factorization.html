@@ -135,7 +135,7 @@ x_2 = (b_2 - a_{21}(b_1/a_{11})) / a_{22}
 ~$$<ul>
 <li>repeat. In general we have</li>
 </ul>$$~
-x_i = (b_i - \sum_{j=1}^{i-1} a_ij x_j) \cdot \frac{1}{a_{ii}}
+x_i = (b_i - \sum_{j=1}^{i-1} a_{ij} x_j) \cdot \frac{1}{a_{ii}}
 ~$$<p>It is important that we have &#36;a_&#123;ii&#125; \neq 0&#36;, as otherwise we will have issues dividing. But this will be the case if &#36;det&#40;A&#41; \neq 0&#36;. &#40;Why?&#41;</p><p>This method is called <em>forward substitution</em></p><h3>Upper triangular matrices</h3><p>A matrix &#36;U&#36; is <em>upper triangular</em> if &#36;u_&#123;ij&#125; &#61; 0&#36; if &#36;i &lt; j&#36;. For example:</p>$$~
 A = \left(
 \begin{array}{cccc}
@@ -158,12 +158,38 @@ A = \begin{array}{ccc}
 0 & 0 & 4\\
 0 & 5 & 6
 \end{array}
-~$$<p>Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could solve easily by: first solving row 2, then use that to solve row 3 and then finally row 4.</p><p>Define &#36;p &#61; &#91;p_1, p_2, \cdots, p_n&#93;&#36;,  to be a permutation vector if the mapping &#36;i \rightarrow p_i&#36; maps the set &#36;1, \dots, n&#36; to itself in a bijective manner <em>and</em> the matrix &#36;&#40;\alpha_&#123;ij&#125;&#41; &#61; &#40;a_&#123;p_i j&#125;&#41;&#36; is either upper or lower triangular.</p><p>&#40;In the above we would have &#36;p_1 &#61; 1, p_2 &#61; 3, and &#36;p_3 &#61; 2&#36;.&#41;</p><p>Then clearly we could solve the permuted system of equations. For example, in the case that we end up lower triangular, so that forward substitution works, we would have:</p>$$~
+~$$<p>Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could solve easily by: first solving row 2, then use that to solve row 3 and then finally row 4.</p><p>Define &#36;p &#61; &#91;p_1, p_2, \cdots, p_n&#93;&#36;,  to be a permutation vector if the mapping &#36;i \rightarrow p_i&#36; maps the set &#36;1, \dots, n&#36; to itself in a bijective manner <em>and</em> the matrix &#36;&#40;\alpha_&#123;ij&#125;&#41; &#61; &#40;a_&#123;p_i j&#125;&#41;&#36; is either upper or lower triangular.</p><p>&#40;In the above we would have &#36;p_1 &#61; 1, p_2 &#61; 3&#36;, and &#36;p_3 &#61; 2&#36;.&#41;</p><p>Then clearly we could solve the permuted system of equations. For example, in the case that we end up lower triangular, so that forward substitution works, we would have:</p>$$~
 x_i = (b_{p_i} -  \sum_{j=1}^{i-1} a_{p_i j}) / a_{p_i i}.
 ~$$<h2>Why bother?</h2><p>Suppose we knew that &#36;A&#61;LU&#36;, then we can solve &#36;Ax &#61; b&#36; easily by:</p><ul>
 <li>solve the  equatulation &#36;Ly &#61; b&#36; for &#36;y&#36;.</li>
 <li>But &#36;y &#61; Ux&#36;, so we solve &#36;Ux &#61; y&#36; for &#36;x&#36;.</li>
-</ul><p>So if we can <em>factorize</em> &#36;A &#61; LU&#36;, we can easily solve &#36;Ax &#61; b&#36;.</p><h2>Can we find LU for a given A?</h2><p>Suppose &#36;A &#61; LU&#36;, then we have:</p>$$~
+</ul><p>So if we can <em>factorize</em> &#36;A &#61; LU&#36;, we can easily solve &#36;Ax &#61; b&#36;.</p><h3>Example</h3><p>In Julia &#40;and MATLAB&#41; there is a built in solver for these problems:</p><pre class="sourceCode julia">U = [1 2; 0 1]</pre>
+<pre class="output">
+2x2 Array{Int64,2}:
+ 1  2
+ 0  1</pre>
+
+<pre class="sourceCode julia">b = [1, 3]
+x = U \ b</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ -5.0
+  3.0</pre>
+
+<pre class="sourceCode julia">U*x - b</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ 0.0
+ 0.0</pre>
+
+<p>In fact, there are many different methods depending on assumptions. For example, rationals:</p><pre class="sourceCode julia">U = [1//1 2; 0 1]
+U \ b</pre>
+<pre class="output">
+2-element Array{Rational{Int64},1}:
+ -5//1
+  3//1</pre>
+
+<p>There are special methods for many others...</p><h2>Can we find LU for a given A?</h2><p>Suppose &#36;A &#61; LU&#36;, then we have:</p>$$~
 a_{ij} = l_{i1} u_{1j} + l_{i2} u_{2j} + \cdots l_{in} u_{nj}
 ~$$<p>But:</p><ul>
 <li>lower triangular means &#36;l_&#123;ij&#125; &#61; 0&#36; if &#36;j &gt; i&#36;</li>
@@ -182,7 +208,7 @@ a_{jk} = \sum_{s=1}^{k-1} l_{js} u_{sk} + l_{jk} u_{kk}
 ~$$<p>As before, the sum is known, and here, so is &#36;u_&#123;kk&#125;&#36;, so we can solve for &#36;l_&#123;jk&#125;&#36; when &#36;j &gt; k&#36;. That is we can fill in the &#36;k&#36; column.</p><h3>Special cases</h3><ul>
 <li>If we always were to take &#36;l_&#123;ii&#125; &#61; 1&#36; we get Dolittle&#39;s factorization</li>
 <li>If we always were to take &#36;u_&#123;ii&#125; &#61; 1&#36; we get Crout&#39;s factorization</li>
-<li>If we take &#36;u_&#123;ii&#125; - l_&#123;ii&#125;&#36; we get Cholesky&#39;s factorization.</li>
+<li>If we take &#36;u_&#123;ii&#125; &#61; l_&#123;ii&#125;&#36; we get Cholesky&#39;s factorization.</li>
 </ul><h3>Example</h3><p>Let&#39;s look at this matrix</p><pre class="sourceCode julia">A = [1 1 1; 1 2 2; 1 2 3]</pre>
 <pre class="output">
 3x3 Array{Int64,2}:
@@ -246,6 +272,20 @@ U[3,3] = 1</pre>
 <pre class="output">
 1</pre>
 
+<pre class="sourceCode julia">L</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 1  0  0
+ 1  1  0
+ 1  1  1</pre>
+
+<p>and</p><pre class="sourceCode julia">U</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 1  1  1
+ 0  1  1
+ 0  0  1</pre>
+
 <p>And we verify:</p><pre class="sourceCode julia">A - L*U</pre>
 <pre class="output">
 3x3 Array{Int64,2}:
@@ -276,14 +316,105 @@ U[3,3] = 1</pre>
  0.0  0.0  0.0</pre>
 
 <h2>When do we know this will work?</h2><p>Define the &#36;k&#36;th leading principal minor of &#36;A&#36; to be the submatrix &#36;a_&#123;ij&#125;&#36; for &#36;1 \leq i,j \leq k&#36;. Call this &#36;A_k&#36;.</p><blockquote>
-<p>Thm: If &#36;A&#36; is &#36;n \times n&#36; and all &#36;n&#36; leading principle minors are non-singular, the &#36;A&#36; has an LU decomposition</p>
+<p>Thm: If &#36;A&#36; is &#36;n \times n&#36; and all &#36;n&#36; leading principle minors are non-singular, then &#36;A&#36; has an LU decomposition</p>
 </blockquote><p>Proof. Suppose by induction this is true for step &#36;k-1&#36;. The we have &#36;A_&#123;k-1&#125;&#36; can be factored: &#36;A_&#123;k-1&#125; &#61; L_&#123;k-1&#125; U_&#123;k-1&#125;&#36;.</p><p>We wish to find &#36;L_k&#36; and &#36;U_k&#36; which are extensions and satisfy &#36;A_k &#61; L_k U_k&#36;.</p><p>Consider the case &#36;1 \leq i \leq k-1&#36; and</p>$$~
 a_{ik} = \sum_{s = 1}^{k-1} l_{is}u_{sk}
 ~$$<p>We know the &#36;a_&#123;ik&#125;&#36;, the &#36;l&#36;&#39;s involved are from &#36;L_&#123;k-1&#125;&#36;. The &#36;u&#36;&#39;s we don&#39;t know &#40;yet&#41;, but as &#36;L_&#123;k-1&#125;&#36; is non-singular we can solve for the &#36;u&#36;s and this is just of the form &#36;b &#61; L_&#123;k-1&#125; x&#36;. So we can fill out the value of &#36;U_k&#36;.</p><p>Similarly, for &#36;1 \leq j \leq k-1&#36; we have:</p>$$~
 a_{kj} = \sum_{s=1}^{k-1} l_{ks} u_{sj}
 ~$$<p>This is of the form &#36;b &#61; U_&#123;k-1&#125; x&#36; so can be solved to fill out the value of &#36;L_k&#36;.</p><p>FInally, we need to solve for &#36;l_&#123;kk&#125;&#36; and &#36;u_&#123;kk&#125;&#36;, but we have:</p>$$~
 a_{kk} = \sum_s^{k-1} l_{ks} u_{sk} + l_{kk}u_{kk}
-~$$<p>If the value of &#36;l_&#123;kk&#125; &#61; 1&#36;, then &#36;u_&#123;kk&#125;&#36; can be solved as the sum is now known. That is, we can fill out &#36;L_k&#36; and &#36;U_k&#36; with &#36;A_k &#61; L_k U_k&#36;, as desired.</p><h2>Cholesky factorization</h2>
+~$$<p>If the value of &#36;l_&#123;kk&#125; &#61; 1&#36;, then &#36;u_&#123;kk&#125;&#36; can be solved as the sum is now known. That is, we can fill out &#36;L_k&#36; and &#36;U_k&#36; with &#36;A_k &#61; L_k U_k&#36;, as desired.</p><h2>Cholesky factorization</h2><p>We know the transpose of a lower triangular matrix is upper and vice versa. This gives hope to a factorization of the form &#36;A &#61; L L^T&#36;, known as the Cholesky factorization. When is this possible?</p><blockquote>
+<p>Thm: If &#36;A&#36; is real, symmetric and positive definite then it has a unque factorization &#36;A&#61;LL^T&#36; and &#36;L&#36; has a positive diagonal.</p>
+</blockquote><p>Pf: We must have &#36;Ax&#61;0&#36; has only a solution &#36;x&#61;0&#36;, as positive definite means &#36;x^T A x &gt; 0&#36; for non-zero &#36;x&#36;. By considering vectors of the form &#36;x &#61; &#91;x_1 x_2 \cdot x_k 0 0 \cdots 0&#93;&#36; we can see that &#36;A_k&#36; will also be non-singular.</p><p>So by the last theorem &#36;A&#61; LU&#36; for some &#36;l&#36; and &#36;U&#36;. But &#36;A^T &#61; A&#36; so &#36;LU &#61; &#40;LU&#41;^T &#61; U^T L^T&#36;. Multiplying on the right and left as follows gives</p>$$~
+\begin{align}
+L^{-1} (L U) (L^T)^{-1} &=L^{-1} U^T L^T (L^T)^{-1}\\
+U (L^T)^{-1} &= L^{-1} U^T.
+\end{align}
+~$$<p>The left side is upper triangular, the right side lower triangular, hence the must be a diagonal matrix &#36;D&#36;: &#36;D &#61; U &#40;L^T&#41;^&#123;-1&#125;&#36; and so  &#36;L D &#61; &#40;LU&#41;&#40;L^T&#41;^&#123;-1&#125; &#61; A&#40;L^T&#41;^&#123;-1&#125;&#36;, giving &#36;A &#61; L D L^T&#36;.</p><p>If we can show that &#36;D&#36; has all positive diagonal terms, then we can define &#36;D^&#123;1/2&#125;&#36; by &#36;&#40;\sqrt&#123;d_&#123;ii&#125;&#125;&#41;&#36; and express &#36;A&#36; as &#36;&#40;LD^&#123;1/2&#125;&#41; &#40;LD^&#123;1/2&#125;&#41;^T&#36; which is what we want.</p><p>So, why do we know &#36;D&#36; has all positive diagonal terms? Because &#36;D&#36; is positive definite:</p><p>Take &#36;x&#36; and then:</p>$$~
+\begin{align}
+x^T D x &= x^T (L^{-1}) A (L^T)^{-1} x\\
+&= (x^T L^{-1}) A ((L^T)^{-1} x)\\
+&= ((L^{-1})^Tx)^T A ((L^T)^{-1}x)\\
+&= ((L^{-1})^Tx)^T A ((L^{-1})^{t}x)
+&> 0.
+\end{align}
+~$$<p>The last line as &#36;A&#36; is positive definite and &#36;&#40;L^&#123;-1&#125;&#41;^Tx&#36; is non-zero. The fact we can swap out the inverse and transpose of a matrix is something to prove.</p><h2>Example</h2><p>This comes from statistics. Consider the <em>overdetermined</em> system:</p><pre class="sourceCode julia">A = [1 2; 3 5; 4 7; 1 8]</pre>
+<pre class="output">
+4x2 Array{Int64,2}:
+ 1  2
+ 3  5
+ 4  7
+ 1  8</pre>
+
+<pre class="sourceCode julia">b = [1,2,3,4]</pre>
+<pre class="output">
+4-element Array{Int64,1}:
+ 1
+ 2
+ 3
+ 4</pre>
+
+<p>The system &#36;Ax&#61;b&#36; has no solutions. However, this system will:</p>$$~
+(A^T A) x = A^T b
+~$$<p>&#40;Assuming &#36;A^TA&#36; is non-singular, we have it is symmetric and positive definite.&#41;</p><pre class="sourceCode julia">M = A' *A</pre>
+<pre class="output">
+2x2 Array{Int64,2}:
+ 27   53
+ 53  142</pre>
+
+<p>So we can take the cholesky decomposition:</p><pre class="sourceCode julia">L = chol(M)'   # default answer is upper triangular</pre>
+<pre class="output">
+2x2 LowerTriangular{Float64,Array{Float64,2}}:
+  5.19615  0.0    
+ 10.1999   6.16141</pre>
+
+<p>So we can solve &#36;LL^Tx &#61; A^T b&#36;. First we solve for &#36;y&#36; in &#36;Ly&#61;A^Tb&#36; with:</p><pre class="sourceCode julia">y = L \ (A'*b)</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ 4.42635
+ 3.22197</pre>
+
+<p>And then solve &#36;L^Tx &#61; y&#36;:</p><pre class="sourceCode julia">x = L' \ y</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ -0.174634
+  0.522927</pre>
+
+<p>This answer is not the &quot;answer&quot; &#40;as that doesn&#39;t exist&#41;:</p><pre class="sourceCode julia">A*x - b</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ -0.12878   
+  0.0907317 
+ -0.0380488 
+  0.00878049</pre>
+
+<p>However, it has a property: it is the <code>x</code> with the smallest difference:</p><pre class="sourceCode julia">norm(A*x - b)</pre>
+<pre class="output">
+0.16230053424013788</pre>
+
+<pre class="sourceCode julia">sort([norm(A*rand(2) - b) for _ in 1:10])</pre>
+<pre class="output">
+10-element Array{Any,1}:
+ 1.22897
+ 1.37635
+ 2.48972
+ 2.51601
+ 2.66068
+ 3.02016
+ 3.68322
+ 3.91979
+ 5.38158
+ 7.40613</pre>
+
+<h3>Why?</h3><p>&#40;P279&#41; Suppose &#36;Ax&#61;b&#36; has &#36;A&#36; being &#36;m \times n&#36; with &#36;m &gt; n&#36; and &#36;rank&#40;A&#41; &#61; n&#36;. Then, this will typically have no solutions. In that case, what is sought is a best solution in the sense of minimizing &#36;\| b - Ax \|_2&#36;.</p><p>Now suppose &#36;x&#36; solves &#36;A^TAx&#61;A^Tb&#36;, and &#36;y&#36; is some other value, then</p>$$~
+\begin{align}
+\|b - Ay\|_2^2 &= \|b - Ax + A(x-y)\|_2^2\\
+&= (b - Ax + A(x-y))^T \cdot  (b - Ax + A(x-y))\\
+&= (b - Ax)^T\cdot (b-Ax) + (b-Ax)^T\cdot (A(x-y)) + (A(x-y))^T \cdot (b-Ax) + (A(x-y)^T) \cdot (A(x-y))\\
+&= \| b - Ax \|_2^2 + \|A(x-y)\|_2^2 + 0
+&\geq  \| b - Ax \|_2^2
+\end{align}
+~$$<p>The latter because, &#36;Ax-b&#36; has a &#36;0&#36; dot product with vectors in the column space of &#36;A&#36; &#40;as &#36;A^T&#40;Ax-b&#41;&#61;0&#36;. But &#36;A&#40;x-y&#41;&#36; is in the column space of &#36;A&#36;. &#40;Any &#36;Az &#61; &#91;A_&#123;\cdot 1&#125; ; A_&#123;\cdot 2&#125; ; \cdots ; A_&#123;\cdot n&#125;&#93; \cdot z &#61; z_1A_&#123;\cdot 1&#125; &#43; z_2A_&#123;\cdot 2&#125; &#43; \cdots &#43; z_n A_&#123;\cdot n&#125;&#36;.&#41; So, the cross terms are 0 and the result holds.</p>
   </div>
 </div>  
 

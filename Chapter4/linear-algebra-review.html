@@ -177,7 +177,7 @@ x = [symbols("x$i") for i in 1:3]</pre>
     5*x1 + 6*x2 + 7*x3 - 8
  9*x1 + 10*x2 + 11*x3 - 12</pre>
 
-<h3>Notation</h3><p>We saw &#36;A&#36; has &#36;m&#36; rows and &#36;n&#36; columns.</p><p>Here we can view &#36;x&#36; and &#36;b&#36; as <em>vectors</em> or as matrices with 1 column. This is an identification, they are not mathematically the same thing.</p><h4>A matrix is a vector&#33; A vector is not a matrix&#33;</h4><p>A basic matrix in <code>Julia</code> is stored in contigous memory, so has an order. Here we can see what it is  by looking at the first 4 elements</p><pre class="sourceCode julia">A[1:4]</pre>
+<h3>Notation</h3><p>We saw &#36;A&#36; has &#36;m&#36; rows and &#36;n&#36; columns.</p><p>Here we can view &#36;x&#36; and &#36;b&#36; as <em>vectors</em> or as matrices with 1 column. This is an identification, they are not mathematically the same thing.</p><h4>A matrix is a vector&#33; A vector is not a matrix&#33;</h4><p>A basic matrix in <code>Julia</code> is stored in contiguous memory, so has an order. Here we can see what it is  by looking at the first 4 elements</p><pre class="sourceCode julia">A[1:4]</pre>
 <pre class="output">
 4-element Array{Int64,1}:
  1

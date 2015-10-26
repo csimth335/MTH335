@@ -123,7 +123,7 @@ Here we can view $x$ and $b$ as *vectors* or as matrices with 1 column. This is 
 
 #### A matrix is a vector! A vector is not a matrix!
 
-A basic matrix in `Julia` is stored in contigous memory, so has an order. Here we can see what it is  by looking at the first 4 elements
+A basic matrix in `Julia` is stored in contiguous memory, so has an order. Here we can see what it is  by looking at the first 4 elements
 
 ```
 A[1:4]

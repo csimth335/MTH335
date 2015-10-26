@@ -66,7 +66,7 @@ x_2 = (b_2 - a_{21}(b_1/a_{11})) / a_{22}
 * repeat. In general we have
 
 $$~
-x_i = (b_i - \sum_{j=1}^{i-1} a_ij x_j) \cdot \frac{1}{a_{ii}}
+x_i = (b_i - \sum_{j=1}^{i-1} a_{ij} x_j) \cdot \frac{1}{a_{ii}}
 ~$$
 
 It is important that we have $a_{ii} \neq 0$, as otherwise we will have issues dividing. But this will be the case if $det(A) \neq 0$. (Why?)
@@ -126,7 +126,7 @@ Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could 
 Define $p = [p_1, p_2, \cdots, p_n]$,  to be a permutation vector if the mapping $i \rightarrow p_i$ maps the set $1, \dots, n$ to itself in a bijective manner *and* the matrix $(\alpha_{ij}) = (a_{p_i j})$ is either upper or lower triangular.
 
 
-(In the above we would have $p_1 = 1, p_2 = 3, and $p_3 = 2$.)
+(In the above we would have $p_1 = 1, p_2 = 3$, and $p_3 = 2$.)
 
 Then clearly we could solve the permuted system of equations. For example, in the case that we end up lower triangular, so that forward substitution works, we would have:
 
@@ -143,6 +143,32 @@ Suppose we knew that $A=LU$, then we can solve $Ax = b$ easily by:
 * But $y = Ux$, so we solve $Ux = y$ for $x$.
 
 So if we can *factorize* $A = LU$, we can easily solve $Ax = b$.
+
+### Example
+
+In Julia (and MATLAB) there is a built in solver for these problems:
+
+```
+U = [1 2; 0 1]
+```
+
+```
+b = [1, 3]
+x = U \ b
+```
+
+```
+U*x - b
+```
+
+In fact, there are many different methods depending on assumptions. For example, rationals:
+
+```
+U = [1//1 2; 0 1]
+U \ b
+```
+
+There are special methods for many others...
 
 ## Can we find LU for a given A?
 
@@ -198,7 +224,7 @@ As before, the sum is known, and here, so is $u_{kk}$, so we can solve for $l_{j
 
 * If we always were to take $l_{ii} = 1$ we get Dolittle's factorization
 * If we always were to take $u_{ii} = 1$ we get Crout's factorization
-* If we take $u_{ii} - l_{ii}$ we get Cholesky's factorization.
+* If we take $u_{ii} = l_{ii}$ we get Cholesky's factorization.
 
 ### Example
 
@@ -301,6 +327,16 @@ L[3,3] = 1
 U[3,3] = 1
 ```
 
+```
+L
+```
+
+and
+
+```
+U
+```
+
 And we verify:
 
 ```
@@ -325,7 +361,7 @@ A[p,:]  -  L * U
 
 Define the $k$th leading principal minor of $A$ to be the submatrix $a_{ij}$ for $1 \leq i,j \leq k$. Call this $A_k$.
 
-> Thm: If $A$ is $n \times n$ and all $n$ leading principle minors are non-singular, the $A$ has an LU decomposition
+> Thm: If $A$ is $n \times n$ and all $n$ leading principle minors are non-singular, then $A$ has an LU decomposition
 
 Proof. Suppose by induction this is true for step $k-1$. The we have $A_{k-1}$ can be factored: $A_{k-1} = L_{k-1} U_{k-1}$.
 
@@ -358,15 +394,116 @@ $A_k = L_k U_k$, as desired.
 
 ## Cholesky factorization
 
-We know the transpose of a lower triangular matrix is upper and vice versa. This gives hope to a factorization of the form $A = L L^t$, known as the Cholesky factorization. When is this possible>
+We know the transpose of a lower triangular matrix is upper and vice versa. This gives hope to a factorization of the form $A = L L^T$, known as the Cholesky factorization. When is this possible?
 
-> Thm: If $A$ is real, symmetric and positive definite then it has a unque factorization $A=LL^t$ and $L$ has a positive diagonal.
+> Thm: If $A$ is real, symmetric and positive definite then it has a unque factorization $A=LL^T$ and $L$ has a positive diagonal.
 
-Pf: We must have $Ax=0$ has only a solution $x=0$, as positive definite means $x^t A x > 0$ for non-zero $x$. By considering vectors of the form $x = [x_1 x_2 \cdot x_k 0 0 \cdots 0]$ we can see that $A_k$ will also be non-singular.
+Pf: We must have $Ax=0$ has only a solution $x=0$, as positive definite means $x^T A x > 0$ for non-zero $x$. By considering vectors of the form $x = [x_1 x_2 \cdot x_k 0 0 \cdots 0]$ we can see that $A_k$ will also be non-singular.
 
-So by the last theorem $A= LU$ for some $l$ and U$. But $A^T = A$ so $LU = (LU)^t = U^t L^t$. Multiplying on the right by the invers of $L^t$ gives:
+So by the last theorem $A= LU$ for some $l$ and $U$. But $A^T = A$ so $LU = (LU)^T = U^T L^T$. Multiplying on the right and left as follows gives
 
 $$~
-L U (L^t)^{-1} = U^t L^t (L^t)^{-1} = U^t, \quad\text{or}
-U (L^t)^{-1}  = L^{-1} U^t
+\begin{align}
+L^{-1} (L U) (L^T)^{-1} &=L^{-1} U^T L^T (L^T)^{-1}\\
+U (L^T)^{-1} &= L^{-1} U^T.
+\end{align}
 ~$$
+
+The left side is upper triangular, the right side lower triangular, hence the must be a diagonal matrix $D$:
+$D = U (L^T)^{-1}$ and so  $L D = (LU)(L^T)^{-1} = A(L^T)^{-1}$, giving $A = L D L^T$.
+
+If we can show that $D$ has all positive diagonal terms, then we can define $D^{1/2}$ by $(\sqrt{d_{ii}})$ and express $A$ as $(LD^{1/2}) (LD^{1/2})^T$ which is what we want.
+
+So, why do we know $D$ has all positive diagonal terms? Because $D$ is positive definite:
+
+Take $x$ and then:
+
+$$~
+\begin{align}
+x^T D x &= x^T (L^{-1}) A (L^T)^{-1} x\\
+&= (x^T L^{-1}) A ((L^T)^{-1} x)\\
+&= ((L^{-1})^Tx)^T A ((L^T)^{-1}x)\\
+&= ((L^{-1})^Tx)^T A ((L^{-1})^{t}x)
+&> 0.
+\end{align}
+~$$
+
+The last line as $A$ is positive definite and $(L^{-1})^Tx$ is non-zero. The fact we can swap out the inverse and transpose of a matrix is something to prove.
+
+## Example
+
+This comes from statistics. Consider the *overdetermined* system:
+
+```
+A = [1 2; 3 5; 4 7; 1 8]
+```
+
+```
+b = [1,2,3,4]
+```
+
+The system $Ax=b$ has no solutions. However, this system will:
+
+$$~
+(A^T A) x = A^T b
+~$$
+
+(Assuming $A^TA$ is non-singular, we have it is symmetric and positive definite.)
+
+```
+M = A' *A
+```
+
+So we can take the cholesky decomposition:
+
+
+```
+L = chol(M)'   # default answer is upper triangular
+```
+
+So we can solve $LL^Tx = A^T b$. First we solve for $y$ in $Ly=A^Tb$ with:
+
+```
+y = L \ (A'*b)
+```
+
+And then solve $L^Tx = y$:
+
+```
+x = L' \ y
+```
+
+This answer is not the "answer" (as that doesn't exist):
+
+```
+A*x - b
+```
+
+However, it has a property: it is the `x` with the smallest difference:
+
+```
+norm(A*x - b)
+```
+
+```
+sort([norm(A*rand(2) - b) for _ in 1:10])
+```
+
+
+### Why?
+
+(P279) Suppose $Ax=b$ has $A$ being $m \times n$ with $m > n$ and $rank(A) = n$. Then, this will typically have no solutions. In that case, what is sought is a best solution in the sense of minimizing $\| b - Ax \|_2$.
+
+Now suppose $x$ solves $A^TAx=A^Tb$, and $y$ is some other value, then
+
+$$~
+\begin{align}
+\|b - Ay\|_2^2 &= \|b - Ax + A(x-y)\|_2^2\\
+&= (b - Ax + A(x-y))^T \cdot  (b - Ax + A(x-y))\\
+&= (b - Ax)^T\cdot (b-Ax) + (b-Ax)^T\cdot (A(x-y)) + (A(x-y))^T \cdot (b-Ax) + (A(x-y)^T) \cdot (A(x-y))\\
+&= \| b - Ax \|_2^2 + \|A(x-y)\|_2^2 + 0
+&\geq  \| b - Ax \|_2^2
+\end{align}
+~$$
+
+The latter because, $Ax-b$ has a $0$ dot product with vectors in the column space of $A$ (as $A^T(Ax-b)=0$. But $A(x-y)$ is in the column space of $A$. (Any $Az = [A_{\cdot 1} ; A_{\cdot 2} ; \cdots ; A_{\cdot n}] \cdot z = z_1A_{\cdot 1} + z_2A_{\cdot 2} + \cdots + z_n A_{\cdot n}$.) So, the cross terms are 0 and the result holds.

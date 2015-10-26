@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Neumann series and iterative methods</h1><p>When we have a norm, &#36;\| \cdot \|&#36;, we can talk about <em>convergence</em> of a sequence of vectors, &#36;v^k&#36; to a vector &#36;v&#36; or convergence of matrices.</p><blockquote>
+<p>Fact: For a finite dimensional vector space if &#36;v^k&#36; converges to &#36;v&#36; with one norm, it will with another.</p>
+</blockquote><p>Which is not the case on infinite dimensional spaces such as the space of functions.</p><h2>Example, iterations of a matrix &#36;A&#36;</h2><p>Take &#36;A&#36; to be a square matrix. Then we can form a series of matrices by</p>$$~
+A^0, A^1, A^2, \dots, A^n, \dots
+~$$<p>Example:</p><pre class="sourceCode julia">A = (1/4) * [1 2; 2 1]</pre>
+<pre class="output">
+2x2 Array{Float64,2}:
+ 0.25  0.5 
+ 0.5   0.25</pre>
+
+<p>Then we have</p><pre class="sourceCode julia">A^1, A^2, A^3, A^4</pre>
+<pre class="output">
+(
+2x2 Array{Float64,2}:
+ 0.25  0.5 
+ 0.5   0.25,
+
+2x2 Array{Float64,2}:
+ 0.3125  0.25  
+ 0.25    0.3125,
+
+2x2 Array{Float64,2}:
+ 0.203125  0.21875 
+ 0.21875   0.203125,
+
+2x2 Array{Float64,2}:
+ 0.160156  0.15625 
+ 0.15625   0.160156)</pre>
+
+<p>The terms seem to be getting smaller.</p><blockquote>
+<p>Claim: &#36;A^k \rightarrow 0&#36;.</p>
+</blockquote><p>Let&#39;s show the following: for a unit vector, we have &#36;&#40;4/3&#41;^k A^k u \rightarrow &#40;1/2&#41; &#91;1,1&#93;&#36;.</p><pre class="sourceCode julia">n = 1; (4/3)^n * A^n * [1,0]</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ 0.333333
+ 0.666667</pre>
+
+<pre class="sourceCode julia">n =5; (4/3)^n * A^n * [1,0]</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ 0.497942
+ 0.502058</pre>
+
+<p>And jumping ahead:</p><pre class="sourceCode julia">n = 20; (4/3)^n * A^n * [1,0]</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+ 0.5
+ 0.5</pre>
+
+<blockquote>
+<p>Claim: &#36;\sum A_k&#36; exists.</p>
+</blockquote><p>Such sums are callend <a href="https://en.wikipedia.org/wiki/Neumann_series">Neumann Series</a>.</p><p>We see that &#36;\| A_k \|&#36; looks like &#36;&#40;3/4&#41;^k&#36;, so the sum should exist, as:</p>$$~
+\| \sum{k=0}^n A^k \| \leq \sum_{k=0}^n \|A^k\| \leq \sum_{k=0}^n \|A\|^k \approx
+\sum_{k=0}^n (3/4)^k
+\rightarrow 1 / (1 - 3/4)
+~$$<p>In fact, we have more</p><h2>Theorem on convergence of Neumann series</h2><blockquote>
+<p>Theorem &#40;p198&#41;. If &#36;\|A \| &lt; 1&#36;, then the matrix &#36;I -A&#36; is invertible and its inverse can be expressed as</p>
+</blockquote>$$~
+(I-A)^{-1} = \sum_k A^k.
+~$$<p>Proof:</p><p>First, the matrix is invertible. If not, there is a non-zero &#36;x&#36; where &#36;&#40;I-A&#41;x &#61; 0&#36;. We can suppose it is a unit vector. But then from &#36;x &#61; Ax&#36; we have</p>$$~
+1 = \|x \| = \| Ax \| \leq \|A \| \cdot \| x \| = \| A \| < 1.
+~$$<p>This is of course a contradiction.</p><p>To see that the sum is the correct one, we note this is basically the same as showing &#36;\sum r^k &#61; 1/&#40;1-r&#41;&#36;, used above. Only instead of dividing, we multiply:</p>$$~
+(I -A) \sum^n A^k = \sum^n (I - A) A^k = \sum^n (A^k - A^{k+1}) =
+(A^0 - A^1) + (A^1 - A^2) + (A^2 - A^3) + \cdots + (A^{n+1} - A^n) = I - A^{n+1}.
+~$$<p>But from &#36;\|A^m\| \leq \|A\|^m&#36; we get the latter goes to &#36;0&#36;, and the convergence is to &#36;I&#36;.</p><h3>Alternatively</h3><blockquote>
+<p>Thm: &#40;200&#41; Suppose &#36;A&#36; and &#36;B&#36; are &#36;n \times n&#36; with &#36;\| I - AB \| &lt; 1&#36;, then <em>both</em> &#36;A&#36; and &#36;B&#36; are invertible and we can write as</p>
+</blockquote>$$~
+A^{-1} = B \sum(I - AB)^k
+~$$<p>Why? We can reexpress the previous one by saying &#36;A^&#123;-1&#125; &#61; \sum &#40;I-A&#41;^k&#36;, under assumptions. Applying this to &#36;AB&#36; gives that under our assumption we have:</p>$$~
+(AB)^{-1} = \sum (I - AB)^k
+~$$<p>But multiplying both sides by &#36;B&#36; gives the right hand side, whereas &#36;B&#40;AB&#41;^&#123;-1&#125; &#61; &#40;BB^&#123;-1&#125;A^&#123;-1&#125;&#41; &#61; A^&#123;-1&#125;&#36;.</p><h2>Iteratively solving &#36;Ax &#61;b&#36;.</h2><p>Suppose we have an <em>approximate</em> solution, &#36;x^0&#36; to &#36;Ax&#61;b&#36; and &#36;A&#36; is invertible. Then:</p>$$~
+x = A^{-1}b\quad x^0 = A^{-1} Ax^0.
+~$$<p>And so, we can write:</p>$$~
+x = x^0 + A^{-1}(b - Ax^0) = x^0 + e^0,
+~$$<p>Defining the error vector &#36;e^0&#36; as above. The residual vector is the difference between &#36;b&#36; and the value &#36;Ax^0&#36;, which id &#36;r^0 &#61; b - Ax^0&#36;.</p><p>The relationship between the error vector and the residual vector is:</p>$$~
+e^0 = A^{-1} r^0, \quad\text{or } Ae^0 = r^0
+~$$<p>Given the inputs, &#36;b&#36;, &#36;A&#36; and &#36;x^0&#36; we can compute &#36;r^0&#36; and then solve for &#36;e^0&#36;. This means we can refine our guess to give</p>$$~
+x^1 = x^0 + e^0
+~$$<p>If we expect round off errors or other errors, then this too will be an approximation. It should be a better one.</p><h3>Example</h3><p>From the book</p><pre class="sourceCode julia">A = [420 210 140 105; 210 140 105 84; 140 105 84 70; 105 84 70 60]</pre>
+<pre class="output">
+4x4 Array{Int64,2}:
+ 420  210  140  105
+ 210  140  105   84
+ 140  105   84   70
+ 105   84   70   60</pre>
+
+<p>and</p><pre class="sourceCode julia">b = [875, 539, 399, 319]</pre>
+<pre class="output">
+4-element Array{Int64,1}:
+ 875
+ 539
+ 399
+ 319</pre>
+
+<p>They claim this is a decent guess</p><pre class="sourceCode julia">x0 = [0.999988, 1.000137, 0.99967, 1.000215]</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ 0.999988
+ 1.00014 
+ 0.99967 
+ 1.00022 </pre>
+
+<p>And indeed we have:</p><pre class="sourceCode julia">r0 = b - A*x0</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ -0.000105
+ -7.0e-5  
+ -3.5e-5  
+ -4.8e-5  </pre>
+
+<p>Can we refine it?</p><pre class="sourceCode julia">e0 = A \ r0
+x1 = x0 + e0</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ 1.0
+ 1.0
+ 1.0
+ 1.0</pre>
+
+<p>The answer is &#36;&#91;1,1,1,1&#93;&#36;. We aren&#39;t quite there:</p><pre class="sourceCode julia">x1 - [1,1,1,1]</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ -1.11022e-15
+  3.73035e-14
+ -1.18683e-13
+  8.81517e-14</pre>
+
+<p>We try to refine it again:</p><pre class="sourceCode julia">r1 = b - A*x1
+e1 = A \ r1
+x2 = x1 + e1</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ 1.0
+ 1.0
+ 1.0
+ 1.0</pre>
+
+<p>And now</p><pre class="sourceCode julia">x2 - [1,1,1,1]</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ -1.11022e-15
+  3.73035e-14
+ -1.18683e-13
+  8.81517e-14</pre>
+
+<p>So no better, as we got there in one step.</p><h3></h3><p>Suppose we have a <em>perturbed</em> inverse for &#36;A&#36;, &#36;B&#36;, which yields &#36;x^0 &#61; B b&#36; and is used for solving. &#40;This might be due just to round off.&#41;</p><p>Then we have</p>$$~
+x^1 = x^0 + e^0 = x^0 + Br^0 = x^0 + B(b - Ax^0)
+~$$<p>And iterating:</p>$$~
+x^{k+1} = x^{k} + e^{k} = x^{k} + Br^{k} = x^{k} + B(b - Ax^k).
+~$$<p>This says &#36;x^&#123;k&#43;1&#125; - x^k&#36; is &#36;x^0 - &#40;BA&#41;x^k&#36;</p><p>If &#36;B&#36; is close to &#36;A^&#123;-1&#125;&#36;, then we should have &#36;\| I - BA\| &lt; 1&#36;. So we can express &#36;A^&#123;-1&#125;&#36; in iterms of &#36;B&#36; via the previous formulas.</p><blockquote>
+<p>Thm &#40;P202&#41;. If &#36;\| I - AB \| &lt; 1&#36; then we have for &#36;m \geq 0&#36;:</p>
+</blockquote>$$~
+x^m = B \sum_{k=0}^m (I - AB)^k b.
+~$$<p>The partial sums on the right hand side converge to &#36;A^&#123;-1&#125;b &#61; x&#36;, so our iterative refinement converges to &#36;x&#36;.</p><p>Proof: We use induction. The case &#36;m&#61;0&#36; is just saying &#36;x^0 &#61; BIb&#36;, which is the definition of &#36;x^0&#36;.</p><p>Assuming this is true for case &#36;m&#36;, we need to show it try for &#36;m&#43;1&#36;. We note that the right hand side can be worked around to:</p>$$~
+B \sum_{k=0}^{m+1} (I - AB)^k b = Bb + B\sum_{k=1}^{M+1} (I - AB)^kb = B(b + (I-AB)\sum_{k=0}^m (I-AB)^k b.
+~$$<p>Now, starting from the left hand side:</p>$$~
+\begin{align}
+x^{m+1}
+&= x^m + B(b - Ax^m)\\
+&= B \cdot \sum_{k=0}^m (I-AB)^k b + B\cdot (b - A(B \sum_{k=0}^m (I-AB)^k b))\\
+&= B \cdot (b + \sum_{k=0}^m (I-AB)^k b - AB \cdot \sum_{k=0}^m (I-AB)^k b)\\
+&= B \cdot (B + (I-AB) \cdot \sum_{k=0}^m (I-AB)^k b\\
+&= B \sum_{k=0}^{m+1} (I - AB)^k b.
+\end{align}
+~$$<h2>Generalizations</h2><p>We are again discussing indirect, iterative solutions to &#36;Ax&#61;b&#36;.</p><p>Suppose now &#36;B&#36; is not an approximate inverse, but just some matrix. Called &#36;Q&#36; in the book and given thename a splitting matrix. Then adding &#36;Qx&#36; to both sides of &#36;Ax &#61;b&#36; gives:</p>$$~
+Qx = (Q-A)x + b
+~$$<p>Which suggests an iterative scheme of the type</p>$$~
+Q x^{k+1} = (Q- A)x^k + b.
+~$$<p>&#40;If &#36;Q^&#123;-1&#125; &#61; B&#36;, then multiplying both sides by &#36;B&#36; shows that our previous equation &#36;x^&#123;k&#43;1&#125; &#61; x^k &#43; B&#40;b-Ax^k&#41;&#36; is a special case.&#41;</p><p>For this to be good in general, we would want:</p><ul>
+<li>the sequence &#36;x^k&#36; to be easy &#40;cheap&#41; to compute</li>
+<li>the sequence to converge rapidly</li>
+</ul><p>In which case, we can solve.</p><p>&#40;Suppose we had a large matrix, solving via &#36;LU&#36; takes &#36;n^3/3&#36; steps. If we can compute &#36;x^k&#36; cheaply, say order &#36;n^2&#36;, and convergence is rapid, this <em>could</em> be faster for large &#36;n&#36;.&#41;</p><h2>Example</h2><p>Let &#36;A&#36; be the matrix:</p><pre class="sourceCode julia">A= [1 1/2 1/3; 1/3 1 1/2; 1/2 1/3 1]
+b = [11, 11, 11]/18</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+ 0.611111
+ 0.611111
+ 0.611111</pre>
+
+<p>We take &#36;Q&#36; to be the identify matrix, &#36;I&#36;:</p><pre class="sourceCode julia">Q = eye(3)</pre>
+<pre class="output">
+3x3 Array{Float64,2}:
+ 1.0  0.0  0.0
+ 0.0  1.0  0.0
+ 0.0  0.0  1.0</pre>
+
+<p>We check that &#36;\| I - Q^&#123;-1&#125;A \| &lt; 1&#36;:</p><pre class="sourceCode julia">norm(I - A)</pre>
+<pre class="output">
+0.8333333333333333</pre>
+
+<p>So our convergence should hold.</p><p>With this &#36;Q&#36;, our iteration step is just x^&#123;k&#43;1&#125; &#61; &#40;I-A&#41;x^&#123;k&#125; &#43; b &#61; x^k &#43; &#40;b - Ax^k&#41; &#61; x^k &#43; r^k</p><p>And we start at &#36;x&#61;&#91;0,0,0&#93;&#36;. What do 100 iterations produce:</p><pre class="sourceCode julia">x = [0,0,0]
+r = b - A*x
+x = x + r</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+ 0.611111
+ 0.611111
+ 0.611111</pre>
+
+<p>and again</p><pre class="sourceCode julia">r = b - A*x
+x = x+r</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+ 0.101852
+ 0.101852
+ 0.101852</pre>
+
+<p>Now we repeat 100 more times:</p><pre class="sourceCode julia">for k in 1:100
+  r = b - A*x 
+  x = x + r
+end
+x, b - A*x</pre>
+<pre class="output">
+([0.3333333305382701,0.3333333305382701,0.3333333305382701],[5.124282664858981e-9,5.124282775881284e-9,5.124282664858981e-9])</pre>
+
+<p>Such a choice of &#36;Q&#36; is called the Richardson method.</p><h3>Example</h3><p>For a different example, take &#36;A&#36; by</p><pre class="sourceCode julia">A = [2 -1 0; 1 6 -2; 4 -3 9]</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 2  -1   0
+ 1   6  -2
+ 4  -3   9</pre>
+
+<p>and &#36;b&#36;:</p><pre class="sourceCode julia">b = [2, -4, 5]</pre>
+<pre class="output">
+3-element Array{Int64,1}:
+  2
+ -4
+  5</pre>
+
+<p>Now, let &#36;Q&#36; be the diagonal matrix of &#36;A&#36;. </p><pre class="sourceCode julia">Q = diagm(diag(A))   # diag finds element, diagm makes matrix</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 2  0  0
+ 0  6  0
+ 0  0  9</pre>
+
+<p>We have</p><pre class="sourceCode julia">norm(1 - inv(Q)*A)</pre>
+<pre class="output">
+2.319649816948576</pre>
+
+<p>So we should have convergence of the algorithm</p>$$~
+Qx^{k+1} = (Q-A)x^k + b
+~$$<p>If we start with &#36;x&#61;&#91;0,0,0&#93;&#36;, then our first step is given by</p><pre class="sourceCode julia">x = [0,0,0]
+x = Q \ ((Q-A)*x + b)</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+  1.0     
+ -0.666667
+  0.555556</pre>
+
+<p>We repeat a few times:</p><pre class="sourceCode julia">x = Q \ ((Q-A)*x + b)
+x = Q \ ((Q-A)*x + b)</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+  0.675926 
+ -0.814815 
+  0.0432099</pre>
+
+<p>Are we close?</p><pre class="sourceCode julia">A*x - b</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+  0.166667
+ -0.299383
+  0.537037</pre>
+
+<p>Not really, let&#39;s repeat 20 times:</p><pre class="sourceCode julia">for k in 1:20
+  x = Q \ ((Q-A)*x + b)
+end</pre>
+<p>And check the residual</p><pre class="sourceCode julia">A*x - b</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+  7.64267e-9
+ -2.52226e-8
+  5.48885e-8</pre>
+
+<p>Another 20 times gets us closer:</p><pre class="sourceCode julia">for k in 1:20
+  x = Q \ ((Q-A)*x + b)
+end
+A*x - b</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+  8.88178e-16
+ -8.88178e-16
+  4.44089e-15</pre>
+
+<p>For this method, called <em>Jacobi iteration</em> the solving part is trivial, as &#36;Q&#36; is diagonal. The multiplying by &#36;&#40;Q-A&#41;&#36; need not be costly for sparse matrices, so it could possibly be faster than the direct method of &#36;LU&#36; factorization.</p><h3>Example</h3><p>If we let &#36;Q&#36; be the lower triangular part of &#36;A&#36; we get the <em>Gauss-Seidel</em> method. Let&#39;s see that this converges as well:</p><p>For our same A, we know define &#36;Q&#36; by:</p><pre class="sourceCode julia">Q = tril(A)</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 2   0  0
+ 1   6  0
+ 4  -3  9</pre>
+
+<p>We have</p><pre class="sourceCode julia">norm(I - inv(Q)*A)</pre>
+<pre class="output">
+0.5780112546868472</pre>
+
+<p>so convergence should occure.</p><p>With a starting point at &#36;x&#61;&#91;0,0,0&#93;&#36; we dash off 25 iterations:</p><pre class="sourceCode julia">x = [0,0,0]
+for k in 1:20
+  x = Q \ ((Q-A)*x + b)
+end
+A*x - b</pre>
+<pre class="output">
+3-element Array{Float64,1}:
+ -1.15941e-11
+  9.57945e-12
+  0.0        </pre>
+
+<p>This method seems to converge faster than Jacobi iteration. It has other advantages, such as being able to be run in parallel.</p><h3>convergence of the method</h3><blockquote>
+<p>Thm. &#40;p210&#41; Suppose &#36;\| I - Q^&#123;-1&#125;A\| &lt; 1&#36; for some subordinate matrix notm. Then the sequence started at &#36;x^0&#36; will converge in the associated vector norm.</p>
+</blockquote><p>Pf. The algorithm starts from  &#36;Ax&#61;b&#36;, so if &#36;x&#36; is an actual solution, it is a fixed point of the algorithm. That is:</p>$$~
+Qx = (Q-A)x + b, \quad \text{and} Qx^{k+1} = (Q-A)x^{k} + b
+~$$<p>Solving – mathematically – by multiplying by &#36;Q^&#123;-1&#125;&#36; reexpresses these as:</p>$$~
+x = (I - Q^{-1}A)x + Q^{-1}b \text{and} x^{k+1} = (I-Q^{-1}A)x^{k} + Q^{-1}b.
+~$$<p>If we look at the difference vector</p>$$~
+x^{k+1} - x
+=  (I-Q^{-1}A)x^{k} + Q^{-1}b - ( (I - Q^{-1}A)x + Q^{-1}b)
+=  (I-Q^{-1}A)(x^{k} - x)
+~$$<p>So in norm, we have</p>$$~
+\| x^{k+1} -  x\| \leq \| I - Q^{-1}A\| \|x^k - x\|.
+~$$<p>Which when iterated shows &#36; \| x^&#123;k&#43;1&#125; -  x\| \rightarrow 0&#36;.</p><p>Now, we can say &#36;x&#36; exists because the assumption &#36;\| I - Q^&#123;-1&#125;A\| &lt; 1&#36; means that the &#36;Q^&#123;-1&#125;A&#36; is invertible, and hence so is &#36;A&#36;. So &#36;x &#61; A^&#123;-1&#125; b&#36;. Thus, any starting point will converge to &#36;x&#36;.</p><h2>An even more general case</h2><p>The following is an even more general iterative scheme:</p>$$~
+x^{k+1} = G x^k + c
+~$$<p>Where &#36;G&#36; is &#36;n \times n&#36; and &#36;c&#36; is a vector in &#36;R^n&#36;. What conditions will ensure that this will converge?</p><h3>Eigenvalues</h3><p>The answer will involve the <em>eigenvalues</em> of a matrix &#36;A&#36;.</p><p>Recall, these are those &#36;\lambda&#36; for which &#36;det&#40;A - \lambda I&#41; &#61; 0&#36;, this being the characteristic equation of &#36;A&#36; and is a polynomial. These values may be complex values. The <em>spectral</em> radius is defined as the largest eigenvalue in magnitude:</p>$$~
+\rho(A)  = \max \{ |\lambda|: det(A - \lambda I) = 0\}
+~$$<blockquote>
+<p>Theorem: &#40;p214&#41; The spectral radius of &#36;A&#36; is the minimal value over all possible subordinate matrix norms.</p>
+</blockquote><p>This says that we know</p>$$~
+\rho(A) \leq \| A\|
+~$$<p>for any subordinate matrix norm. And for and &#36;\epsilon &gt;0&#36; there is some subordinate matrix norm with &#36;\|A \| \leq \rho&#40;A&#41; &#43; \epsilon&#36;,</p><h3>Convergence</h3><p>The iteration</p>$$~
+x^{k+1} =  Gx^k + c
+~$$<p>will produce a sequence converging to &#36;&#40;I-G&#41;^&#123;-1&#125;c&#36; for any starting vector iff and only if &#36;\rho&#40;G&#41; &lt; 1&#36;.</p><p>Pf. We start by wrting</p>$$~
+x^k = G^k x^0 + \sum_{j=0}^{k-1} G^j c.
+~$$<p>We know there is some matrix norm with &#36;\| G \| &lt; 1&#36; &#40;the is the minimal value part&#41;. For this norm, we have &#36;\|G^kx^0\| \rightarrow 0&#36;.</p><p>The sum has a limit as &#36;k \rightarrow \infty&#36;, as the Neumann series theorem applies:</p>$$~
+\sum_{j=0}^\infty G^j c = (I-G)^{-1} c.
+~$$<p>Hence, as &#36;x^k \rightarrow &#40;I-G&#41;^&#123;-1&#125;c&#36;.</p><p>If &#36;\rho&#40;G&#41; \geq 1&#36;, then with &#36;x^0 &#61; 0&#36; we get &#36;x^k &#61; \sum_&#123;j&#61;0&#125;^&#123;k-1&#125; G^j c&#36;. We can select &#36;\lambda&#36; and &#36;u&#36; where &#36;Gu &#61; \lambda u&#36; and &#36;|\lambda| &gt; 1&#36;. Taking this as &#36;c&#36;, we get &#36;x^k &#61; \sum_&#123;j&#61;0&#125;^&#123;k-1&#125; \lambda^j u&#36; and this will diverge.</p>
+  </div>
+</div>  
+
+</body>
+</html>

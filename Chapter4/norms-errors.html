@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Norms and the analysis of errors</h1><p>Consider the task of walking in New York City. We need to go 3 blocks over and 4 blocks up? How far do we need to walk?</p><ul>
+<li>As the &quot;crow flies&quot; the answer is easy: &#36;\sqrt&#123;3^2 &#43; 4^2&#125;&#36;.</li>
+</ul><ul>
+<li>as you end up walking, the answer is easy: &#36;3 &#43; 4&#36;</li>
+</ul><ul>
+<li>if you need to know the farthest you go in any one direction, the answer is just the larger of &#36;3&#36; and &#36;4&#36;.</li>
+</ul><p>The point is, you might answer &quot;distance&quot; in different manners.</p><h2>Vector norms</h2><p>Let &#36;V&#36; be a vector space.</p><p>Define a <em>norm</em>  as a function, &#36;\| \cdot \|&#36;, from &#36;V&#36; to non-negative reals if it obeys:</p><ul>
+<li>&#36;\| x \| &gt; 0&#36; if &#36;x \neq 0&#36;.</li>
+</ul><ul>
+<li>&#36;\| \lambda x\| &#61; |\lambda| \| x\|&#36; for real &#36;\lambda&#36; and &#36;x \in V&#36;.</li>
+</ul><ul>
+<li>&#36;\|x &#43; y \| \leq \| x\| &#43; \| y \|&#36;. &#40;The triangle inequality&#41;</li>
+</ul><h3>Examples</h3><p>The familiar Euclidean distance is a norm where</p>$$~
+\| x \| = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}.
+~$$<p>We also have others:</p><ul>
+<li>The city walking norm:</li>
+</ul>$$~
+\| x \| = |x_1| + |x_2| + \cdots + |x_n|
+~$$<ul>
+<li>The max distance in any direction norm:</li>
+</ul>$$~
+\| x\| = max_i |x_i|
+~$$<p>In fact, for any &#36;p \geq 1&#36;, we can define the &#36;p&#36;-norm by:</p>$$~
+\| x \|_p = (x_1^p + x_2^p + \cdots + x_n^p)^{1/p}.
+~$$<p>With this, we have the &#36;2&#36;-norm, the &#36;1&#36;-norm and the limiting &#36;\infty&#36;-norm.</p><pre class="sourceCode julia">x = [1,2,3]
+norm(x, 2)  # default so just norm(x) works too</pre>
+<pre class="output">
+3.7416573867739413</pre>
+
+<pre class="sourceCode julia">norm(x, 1)</pre>
+<pre class="output">
+6.0</pre>
+
+<p>and</p><pre class="sourceCode julia">norm(x, Inf)</pre>
+<pre class="output">
+3.0</pre>
+
+<blockquote>
+<p>It is customary to call these the &#36;l_2&#36;, &#36;l_1&#36; and &#36;l_\infty&#36; norms.</p>
+</blockquote><h3>The unit ball</h3><p>With a  norm, we can define sets. Such as the set of points within a &quot;distance&quot; of &#36;1&#36; of &#36;x&#36;. Call this the unit ball about &#36;x&#36;:</p>$$~
+B_1(x) = \{ y : \| y - x\| \leq 1 \}
+~$$<p>We could define this for any size &#36;\delta&#36;, and would use the notation &#36;B_\delta&#40;x&#41;&#36; for that.</p><h2>Matrix norms</h2><p>A norm is a general thing and can be defined for matrices and other objects. A special case of matrix norms are those induced by a vector norm.</p><p>If we consider all vectors &#36;u&#36; with &#36;\| u \| &#61; 1&#36;, then we can map these vectors under a matrix &#36;A&#36; to a new set of vectors &#36;Au&#36;. How big are these? If we were to focus on the largest, we would consider</p>$$~
+\sup \{ \| Au \|: u \in V, \| u\| = 1 \}.
+~$$<p>This will vary depending on &#36;A&#36; – If &#36;A&#36; is a rotation, the lengths won&#39;t change so we will get &#36;1&#36; our. If &#36;A&#36; is a dilation, then some vectors will get stretched, so this would typically be different from &#36;1&#36;.</p><p>Define the <em>matrix norm</em> induced by the vector norm &#36;\| \cdot \|&#36; to be the value of this supremum:</p>$$~
+\| A\| = \sup \{ \| Au \|: u \in V, \| u\| = 1 \}.
+~$$<h3>This defines a norm</h3><blockquote>
+<p>Thm &#40;p188&#41; This matrix norm is a norm.</p>
+</blockquote><p>We have if &#36;A&#36; is non-zero, then there is some &#36;v&#36; with &#36;Av \neq 0&#36; and if we consider &#36;v/\|v\|&#36; some unit vector with &#36;Av \neq 0&#36;. Hence &#36;\| A \| \geq \|Av\| &gt; 0&#36;&gt;</p><p>If &#36;\lambda&#36; is non zero, the since &#36;\| \lambda v\| &#61; |\lambda| \| v\|&#36;, it will also be true that:</p>$$~
+\{ \| \lambda Au \|: u \in V, \| u\| = 1 \} = \{ |\lambda|\| Au \|: u \in V, \| u\| = 1 \}
+~$$<p>and so the &#36;\lambda&#36; can come outside.</p><p>Finally, we consider the triangle inequality and show it is inherited. We need to consider two matrices &#40;of the same size&#41;:</p>$$~
+\begin{align}
+\| A + B \|
+&= \sup \{ \| (A+B)u \|: \|u \| = 1\}\\
+&\leq \sup \{ \| Au \| + \|Bu \|: \|u \| = 1\}\\
+&\leq \sup \{ \| Au \|  : \|u \| = 1\} + \sup \{ \| Bu \|  : \|u \| = 1\}\\
+&\|A\| + \|B\|.
+\end{align}
+~$$<blockquote>
+<p>Corollary:</p>
+</blockquote>$$~
+\| Ax \| \leq \|A \| \cdot \| x\|.
+~$$<blockquote>
+<p>Corollary. If &#36;A&#36; and &#36;B&#36; are of the appropriate size, then</p>
+</blockquote>$$~
+\| A B \| \leq \| A \| \cdot \| B\|.
+~$$<p>&#40;Why? For unit &#36;x&#36; we have: &#36;\| &#40;AB&#41;x\| &#61; \|A &#40;Bx&#41;\| \leq \| A\| \cdot \| Bx\| \leq \|A\| \cdot \| B \| \cdot \|x \|&#36;.&#41;</p><h3>Can we identify these norms</h3><blockquote>
+<p>Thm. &#40;p287&#41; The norm induced by the &#36;2&#36;-norm is the largest singular value.</p>
+</blockquote><p>&#40;A singular value is an eigen value of &#36;A^T A&#36;.&#41;</p><blockquote>
+<p>Thm. &#40;p189&#41; The norm induced by the &#36;\infty&#36;-norm is</p>
+</blockquote>$$~
+\|A \|_\infty = \max_{1 \leq i \leq n} \sum_{j=1}^n | a_{ij}|
+~$$<p>That is, take the &#36;l_1&#36; norm for each row vector and find the largest value</p><blockquote>
+<p>Thm. The &#36;||A||_1&#36; norm is found by taking the &#36;l_1&#36; norm of each column vetor and finding the largest.</p>
+</blockquote><h2>Condition number</h2><p>Consider &#36;Ax&#61;b&#36;.</p><p>We wish to quantify when a matrix might give issues, beginning with two examples, the first when the matrix is slightly perturbed, the second when the target vector &#36;b&#36; is.</p><h3>perturbed matrix</h3><p>The inequalities &#36;\| Ax\| \leq \|A\| \|x\|&#36; and &#36;\|AB\| \leq \|A\| \|B\|&#36; are widely used. For ezample, Suppose we are considering &#36;Ax&#61;b&#36;. One solution would be to form the inverse and write &#36;x &#61; A^&#123;-1&#125; b&#36;. The compuation is not always possible though, so we might end up with &#36;B \approx A^&#123;-1&#125;&#36;. Then we have &#36;\tilde&#123;x&#125; &#61; Bb&#36;. What can we say about how far apart &#36;x&#36; and &#36;\tilde&#123;x&#125;&#36; are?</p>$$~
+\| x - \tilde{x} \| = \| x - Bb \| = \|x - BAx\| = \|(I - BA)x\| \leq \|I - BA\| \|x\|.
+~$$<p>So the <em>relative error</em> is bounded by:</p>$$~
+\frac{\| x - \tilde{x} \| } {\|x\|} \leq \|I - BA\|.
+~$$<p>If the relative error is big for small pertubations, then the problem is unstable.</p><h3>perturbed target vector</h3><p>Suppose &#36;A&#36; is invertible and we wish to solve &#36;Ax&#61;b&#36;, but instead have a perturbed value for &#36;b&#36;, &#36;\tilde&#123;b&#125;&#36;. &#40;Which might happen solving via a &#36;LU&#36; decomposition&#41;. Then we get values &#36;x&#36; and &#36;\tilde&#123;x&#125;&#36; which satisfy &#36;Ax &#61; b&#36; and &#36;A\tilde&#123;x&#125; &#61; \tilde&#123;b&#125;&#36;. How close are the &#36;x&#36;&#39;s?</p>$$~
+\| x - \tilde{x}\| - \| A^{-1}b - A^{-1} \tilde{b}\| = \| A^{-1}(b-\tilde{b}) \| \leq
+\| A^{-1}\| \|b - \tilde{b}\|.
+~$$<p>To get a sense of the <em>relative error</em>, we continue by multiplying and dividing by &#36;\|b\|&#36; on the right-hand side:</p>$$~
+\| x - \tilde{x}\|  \leq
+\| A^{-1}\| \|b\| \frac{ \|b - \tilde{b}\| }{\|b\|}
+= \| A^{-1}\|  \cdot  \|Ax\| \cdot \frac{ \|b - \tilde{b}\|} {\|b\|}
+\leq \| A^{-1}\| \cdot \|A\| \cdot  \|x\| \frac{ \|b - \tilde{b}\|}{\|b\|}.
+~$$<p>Dividing by &#36;\|x\|&#36; gives the relative error in &#36;x&#36; is bounded by &#36;\|A^&#123;-1&#125;\| \cdot \|A\|&#36; times the relative error in the &#36;b&#36;.</p><h3>Condition number</h3><p>The <em>condition number</em> of a matrix is given by</p>$$~
+\kappa(A) = \|A \| \cdot \|A^{-1}\|.
+~$$<p>Example,</p><pre class="sourceCode julia">A = [1 1 1; 2 2 5; 4 6 8]</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 1  1  1
+ 2  2  5
+ 4  6  8</pre>
+
+<p>What is the condition number? For the &#36;l_\infty&#36; norm, we have the row sums, &#36;\sum_j |a_&#123;ij&#125;|&#36; are &#36;3,9, 18&#36;, so &#36;18&#36; is &#36;\|A\|_\infty&#36;. We can show that &#36;A^&#123;-1&#125; &#61; &#40;1/6&#41; B&#36;, where</p><pre class="sourceCode julia">B = [14 2 -3;  -4 -4 3; -4 2 0]</pre>
+<pre class="output">
+3x3 Array{Int64,2}:
+ 14   2  -3
+ -4  -4   3
+ -4   2   0</pre>
+
+<p>The largest row sum is &#36;14 &#43; 2 &#43;3 &#61; 19&#36;. So the  &#36;l_\infty&#36; norm of the inverse is &#36;1/6 \cdot 19&#36;. This gives a condition number of:</p><pre class="sourceCode julia">18 * 19 /6</pre>
+<pre class="output">
+57.0</pre>
+
+<p>Which we can check with</p><pre class="sourceCode julia">cond(A, Inf)</pre>
+<pre class="output">
+57.0</pre>
+
+<h4>l_1 norm</h4><p>Had we done the &#36;l_1&#36; norm, we only need to take columns instead of rows. For that we see:</p>$$~
+\|A\|_1 = 14, \quad \|A^{-1}\| = (1/6) \cdot (14 + 4 + 4), \quad \text{and } \kappa(A) = 14 \cdot22 /6 = 51~1/3.
+~$$<p>This is confirmed by</p><pre class="sourceCode julia">cond(A, 1)</pre>
+<pre class="output">
+51.33333333333333</pre>
+
+<h4>l_2 norm</h4><p>Finally, we note that the &#36;l_2&#36; norms for &#36;A&#36; and &#36;A^&#123;-1&#125;&#36; can be found with:</p><pre class="sourceCode julia">B = inv(A)
+sqrt(maximum(eigvals(B'*B))) * sqrt(maximum(eigvals(A'*A)))</pre>
+<pre class="output">
+32.164266119208776</pre>
+
+<p>Which can be verified</p><pre class="sourceCode julia">cond(A, 2)</pre>
+<pre class="output">
+32.16426611920866</pre>
+
+<h3>Example, a matrix with a large condition number</h3><p>Consider the matrix</p>$$~
+A = \left[
+\begin{array}{cc}
+1 & 1 + \epsilon\\
+1 - \epsilon & 1
+\end{array}
+\right].
+$$~
+
+As the book points out, this has inverse
+
+$$~
+A^{-1}= \frac{1}{\epsilon^2} \cdot
+\left[
+\begin{array}{cc}
+1 & -1 - \epsilon\\
+-1 + \epsilon & 1
+\end{array}
+\right].
+$$~
+
+For small $\epsilon>0$, we can read off the $l_\infty$ norms. We have $l_2(A) =2 + \epsilon$ and
+$l_2(A^{-1}) = \epsilon^{-2} (2 + \epsilon)$. This means
+
+$$~
+\kappa(A) = \frac{(2+\epsilon)^2}{\epsilon^2} \approx 4 \epsilon^{-2}.
+~$$<p>So for small &#36;\epsilon&#36;, this can be large.</p><pre class="sourceCode julia">ep = 1e-2
+A = [1 1+ep; 1-ep 1]
+cond(A, Inf)</pre>
+<pre class="output">
+40401.00000000445</pre>
+
+<h4></h4><p>To see an example, let &#36;b &#61; &#91;3.02, 2.99&#93;&#36; and &#36;\tilde&#123;b&#125; &#61; &#91;3,3&#93;&#36;. The relative error is small</p><pre class="sourceCode julia">b = [3.02, 2.99]; bt = [3,3]
+norm(b - bt, Inf)/norm(b, Inf)</pre>
+<pre class="output">
+0.006622516556291397</pre>
+
+<p>But solving yields two values quite a distance apart</p><pre class="sourceCode julia">x, xt = A \ b, A \ bt</pre>
+<pre class="output">
+([0.9999999999955147,2.000000000004441],[-300.00000000003587,300.0000000000355])</pre>
+
+<p>And these have a relative error of:</p><pre class="sourceCode julia">norm(x-xt, Inf) / norm(x, Inf)</pre>
+<pre class="output">
+150.4999999996815</pre>
+
+<p>Here a small change in &#36;b&#36; led to a <em>large</em> change in determining &#36;x&#36;. Such a matrix is called <strong>ill conditioned</strong>.</p><h2>More notation</h2><p>Suppose &#36;Ax &#61; b&#36; and &#36;A\tilde&#123;x&#125; &#61; \tilde&#123;b&#125;&#36;. Define</p><ul>
+<li>the <em>residual vector</em> &#36;r &#61; b - A\tilde&#123;x&#125; &#61; b - \tilde&#123;b&#125;&#36;.</li>
+</ul><ul>
+<li>the <em>error vector</em> &#36;e&#61;x - \tilde&#123;x&#125;&#36;.</li>
+</ul><p>Then we have this relationship between their norms, given the condition number:</p>$$~
+\frac{1}{\kappa(A)} \frac{\|r\|}{\|b\|}
+\leq
+\frac{\|e\|}{\|b\|}
+\leq
+\kappa(A) \frac{\|r\|}{\|b\|}.
+~$$
+  </div>
+</div>  
+
+</body>
+</html>
