@@ -430,6 +430,104 @@ x^T D x &= x^T (L^{-1}) A (L^T)^{-1} x\\
 
 The last line as $A$ is positive definite and $(L^{-1})^Tx$ is non-zero. The fact we can swap out the inverse and transpose of a matrix is something to prove.
 
+
+### Proof take 2
+
+Here is an alternative [proof](http://www.math.iit.edu/~fass/477577_Chapter_7.pdf), perhaps more instructive. It requires a few facts about matrices which are symmetric and positive definite:
+
+* If $A$ is then $a_11 > 0$.
+* If $A$ is then any sub matrix formed by removing row $i$ and column $i$ will be
+* If $A$ is and $L$ has full rank, then $LAL^T$ is one.
+
+Suppose we have $A$ as assumed. Then we can write $A$ in the following way where $a_{11} > 0$.
+
+$$~
+A = \left[
+\begin{array}{cc}
+a_{11} & w^T\\
+w & K
+\end{array}
+\right]
+~$$
+
+By the second fact above, $K$ Is symmetric and positive definite.
+
+Now consider the following lower triangular matrix:
+
+$$~
+L_1 = \left[
+\begin{array}{cc}
+\sqrt{a_{11}} & 0\\
+\frac{w}{\sqrt{a_{11}}} & I
+\end{array}
+\right]
+~$$
+
+Then using block matrix multiplication we get this decomposition: $A = L B A_1 L^T$ where
+
+$$~
+B_1= \left[
+\begin{array}{cc}
+I & 0^T\\
+0 & K - \frac{ww^T}{a_{11}}
+\end{array}
+\right].
+~$$
+
+----
+
+To see:
+
+```
+using SymPy
+w, K= symbols("w,  K", real=true)
+w = [w]	 # a vector
+a_11 = symbols("a_11", positive=true)
+A = [a_11 w'; w K]
+L = [sqrt(a_11) 0; w*(1/sqrt(a_11)) 1]
+B_1 = [1 0;0 (K-w*w'*(1/a_11))]
+
+L*B_1*L'
+```
+
+----
+
+Let $A_1 =  K - ww^T / a_{11}$. Since $A$ is positive definite and $L$ has full rank (why?) it must be $B_1$ is positive definite. Hence, $A_1$ is too. But both $K$ and $ww^T$ are symmetric, so $A_1$ is also symmetric and positive definite.
+
+So we can find $M_2$, $B_2$, such that $A_1 = M_2 B_2 M_2^T$ and $B_2$ will have a symmetric, positive definite submatrix $A_2$. As written $M_2$ is $n-1 \times n-1$. We embed this into
+
+$$~
+L_2 =  \left[
+\begin{array}{cc}
+I & 0^T\\
+0 & M_2
+\end{array}
+\right].
+~$$
+
+And then $A = L_1 L_2 A_2 L_2^T L_1^T$ where
+
+$$~
+A_2 = \left[
+\begin{array}{cc}
+I_2 & 0^T\\
+0   & K_2
+\end{array}
+\right].
+~$$
+
+We see were this repeated, we would eventually get:
+
+$$~
+A = L_1 L_2 \cdots L_n \cdot I \cdot  L_n^T \cdots L_2^T L_1^T.
+~$$
+
+Letting $L = L_1 L_2 \cdots L_n$ yields the result, $A=LL^T$, after noting the the product of lower triangular matrices is lower triangular.
+
+
+
+
+
 ## Example
 
 This comes from statistics. Consider the *overdetermined* system:
@@ -458,7 +556,8 @@ So we can take the cholesky decomposition:
 
 
 ```
-L = chol(M)'   # default answer is upper triangular
+U = chol(M)'   # default answer is upper triangular
+L = U'
 ```
 
 So we can solve $LL^Tx = A^T b$. First we solve for $y$ in $Ly=A^Tb$ with:
@@ -501,7 +600,7 @@ $$~
 \|b - Ay\|_2^2 &= \|b - Ax + A(x-y)\|_2^2\\
 &= (b - Ax + A(x-y))^T \cdot  (b - Ax + A(x-y))\\
 &= (b - Ax)^T\cdot (b-Ax) + (b-Ax)^T\cdot (A(x-y)) + (A(x-y))^T \cdot (b-Ax) + (A(x-y)^T) \cdot (A(x-y))\\
-&= \| b - Ax \|_2^2 + \|A(x-y)\|_2^2 + 0
+&= \| b - Ax \|_2^2 + 0 + 0 + \|A(x-y)\|_2^2\\
 &\geq  \| b - Ax \|_2^2
 \end{align}
 ~$$

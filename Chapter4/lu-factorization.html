@@ -338,7 +338,62 @@ x^T D x &= x^T (L^{-1}) A (L^T)^{-1} x\\
 &= ((L^{-1})^Tx)^T A ((L^{-1})^{t}x)
 &> 0.
 \end{align}
-~$$<p>The last line as &#36;A&#36; is positive definite and &#36;&#40;L^&#123;-1&#125;&#41;^Tx&#36; is non-zero. The fact we can swap out the inverse and transpose of a matrix is something to prove.</p><h2>Example</h2><p>This comes from statistics. Consider the <em>overdetermined</em> system:</p><pre class="sourceCode julia">A = [1 2; 3 5; 4 7; 1 8]</pre>
+~$$<p>The last line as &#36;A&#36; is positive definite and &#36;&#40;L^&#123;-1&#125;&#41;^Tx&#36; is non-zero. The fact we can swap out the inverse and transpose of a matrix is something to prove.</p><h3>Proof take 2</h3><p>Here is an alternative <a href="http://www.math.iit.edu/~fass/477577_Chapter_7.pdf">proof</a>, perhaps more instructive. It requires a few facts about matrices which are symmetric and positive definite:</p><ul>
+<li>If &#36;A&#36; is then &#36;a_11 &gt; 0&#36;.</li>
+<li>If &#36;A&#36; is then any sub matrix formed by removing row &#36;i&#36; and column &#36;i&#36; will be</li>
+<li>If &#36;A&#36; is and &#36;L&#36; has full rank, then &#36;LAL^T&#36; is one.</li>
+</ul><p>Suppose we have &#36;A&#36; as assumed. Then we can write &#36;A&#36; in the following way where &#36;a_&#123;11&#125; &gt; 0&#36;.</p>$$~
+A = \left[
+\begin{array}{cc}
+a_{11} & w^T\\
+w & K
+\end{array}
+\right]
+~$$<p>By the second fact above, &#36;K&#36; Is symmetric and positive definite.</p><p>Now consider the following lower triangular matrix:</p>$$~
+L_1 = \left[
+\begin{array}{cc}
+\sqrt{a_{11}} & 0\\
+\frac{w}{\sqrt{a_{11}}} & I
+\end{array}
+\right]
+~$$<p>Then using block matrix multiplication we get this decomposition: &#36;A &#61; L B A_1 L^T&#36; where</p>$$~
+B_1= \left[
+\begin{array}{cc}
+I & 0^T\\
+0 & K - \frac{ww^T}{a_{11}}
+\end{array}
+\right].
+~$$<hr /><p>To see:</p><pre class="sourceCode julia">using SymPy
+w, K= symbols("w,  K", real=true)
+w = [w]	 # a vector
+a_11 = symbols("a_11", positive=true)
+A = [a_11 w'; w K]
+L = [sqrt(a_11) 0; w/sqrt(a_11) 1]
+B_1 = [1 0;0 (K-w*w'/a_11)]
+
+L*B_1*L'</pre>
+<pre class="output">
+2x2 Array{Any,2}:
+ a_11  w
+    w  K</pre>
+
+<p>&#40;This isn&#39;t perfect, as <code>w</code> messes up the automatic conversion to a matrix of symbolic objects.&#41;</p><hr /><p>Let &#36;A_1 &#61;  K - ww^T / a_&#123;11&#125;&#36;. Since &#36;A&#36; is positive definite and &#36;L&#36; has full rank &#40;why?&#41; it must be &#36;B_1&#36; is positive definite. Hence, &#36;A_1&#36; is too. But both &#36;K&#36; and &#36;ww^T&#36; are symmetric, so &#36;A_1&#36; is also symmetric and positive definite.</p><p>So we can find &#36;M_2&#36;, &#36;B_2&#36;, such that &#36;A_1 &#61; M_2 B_2 M_2^T&#36; and &#36;B_2&#36; will have a symmetric, positive definite submatrix &#36;A_2&#36;. As written &#36;M_2&#36; is &#36;n-1 \times n-1&#36;. We embed this into</p>$$~
+L_2 =  \left[
+\begin{array}{cc}
+I & 0^T\\
+0 & M_2
+\end{array}
+\right].
+~$$<p>And then &#36;A &#61; L_1 L_2 A_2 L_2^T L_1^T&#36; where</p>$$~
+A_2 = \left[
+\begin{array}{cc}
+I_2 & 0^T\\
+0   & K_2
+\end{array}
+\right].
+~$$<p>We see were this repeated, we would eventually get:</p>$$~
+A = L_1 L_2 \cdots L_n \cdot I \cdot  L_n^T \cdots L_2^T L_1^T.
+~$$<p>Letting &#36;L &#61; L_1 L_2 \cdots L_n&#36; yields the result, &#36;A&#61;LL^T&#36;, after noting the the product of lower triangular matrices is lower triangular.</p><h2>Example</h2><p>This comes from statistics. Consider the <em>overdetermined</em> system:</p><pre class="sourceCode julia">A = [1 2; 3 5; 4 7; 1 8]</pre>
 <pre class="output">
 4x2 Array{Int64,2}:
  1  2
@@ -362,56 +417,57 @@ x^T D x &= x^T (L^{-1}) A (L^T)^{-1} x\\
  27   53
  53  142</pre>
 
-<p>So we can take the cholesky decomposition:</p><pre class="sourceCode julia">L = chol(M)'   # default answer is upper triangular</pre>
+<p>So we can take the cholesky decomposition:</p><pre class="sourceCode julia">U = chol(M)'   # default answer is upper triangular
+L = U'</pre>
 <pre class="output">
-2x2 LowerTriangular{Float64,Array{Float64,2}}:
-  5.19615  0.0    
- 10.1999   6.16141</pre>
+2x2 UpperTriangular{Float64,Array{Float64,2}}:
+ 5.19615  10.1999 
+ 0.0       6.16141</pre>
 
 <p>So we can solve &#36;LL^Tx &#61; A^T b&#36;. First we solve for &#36;y&#36; in &#36;Ly&#61;A^Tb&#36; with:</p><pre class="sourceCode julia">y = L \ (A'*b)</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- 4.42635
- 3.22197</pre>
+ -16.282 
+  10.5495</pre>
 
 <p>And then solve &#36;L^Tx &#61; y&#36;:</p><pre class="sourceCode julia">x = L' \ y</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- -0.174634
-  0.522927</pre>
+ -3.13347
+  6.89947</pre>
 
 <p>This answer is not the &quot;answer&quot; &#40;as that doesn&#39;t exist&#41;:</p><pre class="sourceCode julia">A*x - b</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- -0.12878   
-  0.0907317 
- -0.0380488 
-  0.00878049</pre>
+  9.66548
+ 23.097  
+ 32.7624 
+ 48.0623 </pre>
 
 <p>However, it has a property: it is the <code>x</code> with the smallest difference:</p><pre class="sourceCode julia">norm(A*x - b)</pre>
 <pre class="output">
-0.16230053424013788</pre>
+63.3265770219158</pre>
 
 <pre class="sourceCode julia">sort([norm(A*rand(2) - b) for _ in 1:10])</pre>
 <pre class="output">
 10-element Array{Any,1}:
- 1.22897
- 1.37635
- 2.48972
- 2.51601
- 2.66068
- 3.02016
- 3.68322
- 3.91979
- 5.38158
- 7.40613</pre>
+  1.11337
+  2.49197
+  2.50891
+  2.8541 
+  3.89776
+  4.96715
+  5.42795
+  5.71885
+  7.3971 
+ 10.695  </pre>
 
 <h3>Why?</h3><p>&#40;P279&#41; Suppose &#36;Ax&#61;b&#36; has &#36;A&#36; being &#36;m \times n&#36; with &#36;m &gt; n&#36; and &#36;rank&#40;A&#41; &#61; n&#36;. Then, this will typically have no solutions. In that case, what is sought is a best solution in the sense of minimizing &#36;\| b - Ax \|_2&#36;.</p><p>Now suppose &#36;x&#36; solves &#36;A^TAx&#61;A^Tb&#36;, and &#36;y&#36; is some other value, then</p>$$~
 \begin{align}
 \|b - Ay\|_2^2 &= \|b - Ax + A(x-y)\|_2^2\\
 &= (b - Ax + A(x-y))^T \cdot  (b - Ax + A(x-y))\\
 &= (b - Ax)^T\cdot (b-Ax) + (b-Ax)^T\cdot (A(x-y)) + (A(x-y))^T \cdot (b-Ax) + (A(x-y)^T) \cdot (A(x-y))\\
-&= \| b - Ax \|_2^2 + \|A(x-y)\|_2^2 + 0
+&= \| b - Ax \|_2^2 + 0 + 0 + \|A(x-y)\|_2^2\\
 &\geq  \| b - Ax \|_2^2
 \end{align}
 ~$$<p>The latter because, &#36;Ax-b&#36; has a &#36;0&#36; dot product with vectors in the column space of &#36;A&#36; &#40;as &#36;A^T&#40;Ax-b&#41;&#61;0&#36;. But &#36;A&#40;x-y&#41;&#36; is in the column space of &#36;A&#36;. &#40;Any &#36;Az &#61; &#91;A_&#123;\cdot 1&#125; ; A_&#123;\cdot 2&#125; ; \cdots ; A_&#123;\cdot n&#125;&#93; \cdot z &#61; z_1A_&#123;\cdot 1&#125; &#43; z_2A_&#123;\cdot 2&#125; &#43; \cdots &#43; z_n A_&#123;\cdot n&#125;&#36;.&#41; So, the cross terms are 0 and the result holds.</p>

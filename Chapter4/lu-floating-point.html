@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>LU decomposition and floating point issues</h1><p>Solving &#36;A x &#61; b&#36; for &#36;x&#36; with inputs &#36;A&#36; and &#36;b&#36; can be done more efficiently by &#36;LU&#36; factorization, than by finding an inverse and then solving via &#36;x &#61; A^&#123;-1&#125;b&#36;. The number of steps is at least 1/3 as few.</p><p>However, there are still many steps needed &#40;&#36;n^3/3&#36;&#41; and we know that at each floating point operation we have:</p>$$~
+fl(x \odot y) = (x \odot y) (1 + \delta)
+~$$<p>Where &#36;\delta \leq \epsilon&#36;, the machine tolerance number. So, even if each operation introduces an error that is bounded, when there are many operations these errors can accumulate. How much?</p><h2>Recall</h2><p>We have seen such a question before in Theorem 1 on page 49:</p><blockquote>
+<p>Theorem: If &#36;x_1, x_2, \dots, x_n&#36; are positive machine numbers with unit roundoff &#36;\epsilon&#36; then the <em>relative</em> roundoff error in computing their sum is at most &#36;&#40;1&#43;\epsilon&#41;^n \approx n \epsilon&#36;.</p>
+</blockquote><p>A near analog is this theorem from p249 &#40;modified and simplified&#41;:</p><blockquote>
+<p>Theorem 2 p 249. Suppose &#36;x_1, \dots, x_n&#36; and &#36;y_1, \dots, y_n&#36; are machine numbers. &#40;We further suppose these are positive. Consider the sum &#36;\sum^n x_i y_i&#36; &#40;the dot product&#41;. If we compute in the natural way, then the machine value is bounded by the mathematical value times &#36;&#40;6/5\cdot&#40;n&#43;1&#41;\epsilon&#41;&#36;.</p>
+</blockquote><p>By the natural way, we mean &#36;z_k &#61; fl&#40;z_&#123;k-1&#125; &#43; fl&#40;x_ky_k&#41;&#41;&#36;.</p><h2>LU Factorization</h2><p>Let&#39;s look at the LU factorization with partial pivoting. The algorithm produces numbers &#36;a_&#123;ij&#125;^&#123;&#40;k&#41;&#125;&#36; and &#36;l_&#123;ik&#125;&#36; for &#36;k&#61;0,1,\dots,n&#36; steps.</p><p>Where we have for the case &#36;i &gt; k&#36; and &#36;j&gt;k&#36;</p>$$~
+a_{ij}^{(k+1)} = a_{ij}^{(k}) - l_{ik}a_{kj}^{(k)}, \quad\text{and }
+l_{ik} = \frac{a_{ik}^{(k)} }{a_{kk}^{(k)}}.
+~$$<p>With floating point concerns, this becomes:</p>$$~
+\tilde{a{_{ij}^{(k+1)} = fl(\tiled{a}_{ij}^{(k}) - fl( \tilde{l}_{ik}\tilde{a}_{kj}^{(k)})), \quad\text{and }
+\tilde{l}_{ik} = fl(\frac{\tilde{a}_{ik}^{(k)} }{\tilde{a}_{kk}^{(k)}}).
+~$$<p>So, the end of the process we have two matrices &#36;\tilde&#123;L&#125;&#36; and &#36;\tilde&#123;U&#125;&#36; instead of the mathematical &#36;L&#36; and &#36;U&#36;. How far away will these be?</p><blockquote>
+<p>Theorem &#40;p247&#41;. Under some pivoting assumptions</p>
+</blockquote>$$~
+\tilde{L} \tilde{U} = A + E
+~$$<p>Where the entries of &#36;E&#36; are bounded by:</p>$$~
+|e_{ij}| \leq 2n\epsilon \max |a_{ik}^{(k)}|.
+~$$<h2>And then...</h2><p>We solve &#36;Ax&#61;b&#36; by solving &#36;Ly&#61;b&#36; and then &#36;Ux&#61;y&#36;. But secretly we solve &#36;\tilde&#123;L&#125;y&#61;b&#36;. But the substitution will introduce errors. How big?</p><blockquote>
+<p>Thm 3 p250. If &#36;L&#36; is a &#36;n\times n&#36; lower triangular matrix of machine numbers &#40;like &#36;\tilde&#123;L&#125;&#36;&#41; and &#36;b&#36; a vector of machine numbers and &#36;y&#36; is computed by substituting with &#36;L&#36; and &#36;b&#36;, then the resulting vector, &#36;\tilde&#123;y&#125;&#36; is subject to rounding, so may not exactly solve &#36;Ly&#61;b&#36;. It does solve</p>
+</blockquote>$$~
+(L+\Delta) \tilde{y} = b
+~$$<p>Where the entries of &#36;\Delta&#36; satisfy:</p>$$~
+|\Delta_{ij}| \leq \frac{6}{5}(n+1) \epsilon |l_{ij}|.
+~$$<p>A similar theorem applies for solving &#36;Uy&#61;b&#36;, though the bound is includes &#36;|u_&#123;ij&#125;|&#36; terms.</p><h3>But with our pivoting...</h3><p>With our pivoting we have the entries of &#36;L&#36; are bounded by &#36;1&#36;, as we pivot to make the row chosen have the largest value and our entries involve &#36;a_&#123;ik&#125;^&#123;&#40;k&#41;&#125; / a_&#123;kk&#125;^&#123;&#40;k&#41;&#125;&#36;. This isn&#39;t the case for &#36;U&#36; and &#36;U&#36; can grow. For example, consider this <a href="http://www.math.iit.edu/~fass/477577_Chapter_7.pdf">matrix</a>:</p><pre class="sourceCode julia">n = 5
+A = I-tril(ones(n,n),-1)
+A[:,n] = ones(n)
+A</pre>
+<pre class="output">
+5x5 Array{Float64,2}:
+  1.0  -0.0  -0.0  -0.0  1.0
+ -1.0   1.0  -0.0  -0.0  1.0
+ -1.0  -1.0   1.0  -0.0  1.0
+ -1.0  -1.0  -1.0   1.0  1.0
+ -1.0  -1.0  -1.0  -1.0  1.0</pre>
+
+<p>We have</p><pre class="sourceCode julia">L,U,p = lu(A)
+U</pre>
+<pre class="output">
+5x5 Array{Float64,2}:
+ 1.0  -0.0  -0.0  -0.0   1.0
+ 0.0   1.0  -0.0  -0.0   2.0
+ 0.0   0.0   1.0  -0.0   4.0
+ 0.0   0.0   0.0   1.0   8.0
+ 0.0   0.0   0.0   0.0  16.0</pre>
+
+<p>The bottom right entry gets big. If fact, for &#36;n&#61;20&#36; we have:</p><pre class="sourceCode julia">n = 20
+A = I-tril(ones(n,n),-1)
+A[:,n] = ones(n)
+L,U,p = lu(A)
+U[n,n]</pre>
+<pre class="output">
+524288.0</pre>
+
+<p>This example is contrived as it produces the worst case results. Here we define:</p>$$~
+g_n(A) = \frac{\max_{ij}|U_{ij}|}{\max_{ij}|A_{ij}|}.
+~$$<p>&#40;The book defines a  related, but not identical quantity, but this fits more inline with the bounds given in the theorems.&#41;</p><p>Then the worst case is g_n&#40;A&#41; \leq 2^&#123;n-1&#125;.</p><p>In theory then the bound of the form:</p>$$~
+|\Delta_{ij}| \leq \frac{6}{5}(n+1) \epsilon |u_{ij}|
+~$$<p>Is just saying that the terms are like &#36;n2^n\epsilon&#36;, which for even modest size &#36;n&#36; would be  a problem.</p><p>However, in practice the growth is closer to &#36;n&#36; – not &#36;2^n&#36; which means that the LU decomposition is assumed to be stable to use.</p><h3>Example</h3><p>Let&#39;s see the difference between a random &#36;A&#36; and the one with the devious pattern:</p><pre class="sourceCode julia">n = 50
+x = rand(n)
+
+A = I-tril(ones(n,n),-1)
+A[:,n] = ones(n)
+
+L,U,p = lu(A)
+
+b = A[p,:]*x
+xtilde = U \ (L \ b)
+norm(x - xtilde, Inf)/norm(x, Inf)</pre>
+<pre class="output">
+0.012095807391007395</pre>
+
+<p>Whereas,</p><pre class="sourceCode julia">A = rand(n,n)
+L,U,p = lu(A)
+
+b = A[p,:]*x
+xtilde = U \ (L \ b)
+norm(x - xtilde, Inf)/norm(x, Inf)</pre>
+<pre class="output">
+9.602339249408017e-13</pre>
+
+<p>This is quite a difference. In the book, we find this bound:</p>$$~
+\frac{\| x - \tilde{x}\|_\infty}{\|x\|_\infty} \leq 4n^2 g_n(A) \kappa_\infty(A) \epsilon
+~$$<p>The &#36;\kappa&#36; is the condition number. This is for a slightly different definition of the growth number, but using ours we have:</p><pre class="sourceCode julia">growth(A,U=lu(A)[2]) = maximum(abs(U)) / maximum(abs(A))
+bound(A) = 4*size(A)[1] * growth(A) * cond(A, Inf) * eps()</pre>
+<pre class="output">
+bound (generic function with 1 method)</pre>
+
+<p>Then we have for our random matrix</p><pre class="sourceCode julia">bound(A)</pre>
+<pre class="output">
+6.585542553536475e-9</pre>
+
+<p>This is a small bound and we see that the actual value is orders of magnitude less</p><p>And for our devious one – where there is a a big relative error – we have a very large bound:</p><pre class="sourceCode julia">A = I-tril(ones(n,n),-1)
+A[:,n] = ones(n)
+bound(A)</pre>
+<pre class="output">
+1250.0</pre>
+
+
+  </div>
+</div>  
+
+</body>
+</html>
