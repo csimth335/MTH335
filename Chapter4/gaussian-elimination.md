@@ -176,9 +176,6 @@ s_i = max_{i \leq j \leq n} |a_{ij}| = \text{largest of } |a_{i1}|, |a_{i2}|, \d
 Then at step $i$, form the ratios: $|a_{li}/s_l|$, for $l$ running over the rows not already used for pivoting. Choose the $l$ with the largest ratio to be the new pivot row.
 
 
-(At step $i$, an easier strategy could be to just pick the row which has the largest value of $|a_{li}|$ where $l$ runs over the rows which have not been used to pivot. This has the effect that the matrix $L$ will have entries no greater than $1$ in absolute value.)
-
-
 ### Example
 
 Consider the matrix
@@ -191,7 +188,7 @@ A = copy(Aorig)
 
 We first do partial pivoting:
 
-As $3$ is the largest valuein the first column, we choose row 3 to pivot on, and eliminate the first entry in rows 1 and 2 by the appropriate multiplication. We store those values in a matrix $L$:
+As $3$ is the largest value in the first column, we choose row 3 to pivot on, and eliminate the first entry in rows 1 and 2 by the appropriate multiplication. We store those values in a matrix $L$:
 
 ```
 L = zeros(A) # copies size of A, fills with 0
@@ -404,7 +401,7 @@ $$~
 
 ## Special case -- Diagonally dominant matrices
 
-Call the matrix $A$ *diagonally dominant$ if the diagonal terms are the largest in each row and column. (That is $|a_{ii}| \geq |a_{il}|, |a_{ki}|$).
+Call the matrix $A$ *diagonally dominant* if the diagonal terms are the largest in each row and column. (That is $|a_{ii}| \geq |a_{il}|, |a_{ki}|$).
 
 > Thm: A diagonal dominant matrix is non-singular and has an LU factorization where no pivoting is necessary.
 

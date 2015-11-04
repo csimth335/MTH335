@@ -100,7 +100,7 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Gaussian Elimination</h1><p>The solving of &#36;Ax&#61;b&#36; is typically taught first by using Gaussian Elimination. Rather than find &#36;LU&#36; and then solve, we reduce the augmented matrix &#36;&#91;A | b&#93;&#36; to an upper triangular form and then back substitute.</p><p>Let&#39;s see that we get &#36;U&#36; and &#36;L&#36; from this familar process:</p><h2>Example</h2><p>Following the text, let</p><pre class="sourceCode julia">A = [6 -2 -2 4; 12 -8 6 10; 3 -13 9 3; -6 4 1 -18]</pre>
+<h1>Gaussian Elimination</h1><p>The solving of &#36;Ax&#61;b&#36; is typically taught first by using Gaussian Elimination. Rather than find &#36;LU&#36; and then solve, we reduce the augmented matrix &#36;&#91;A | b&#93;&#36; to an upper triangular form and then back substitute.</p><p>Let's see that we get &#36;U&#36; and &#36;L&#36; from this familar process:</p><h2>Example</h2><p>Following the text, let</p><pre class="sourceCode julia">A = [6 -2 -2 4; 12 -8 6 10; 3 -13 9 3; -6 4 1 -18]</pre>
 <pre class="output">
 4x4 Array{Int64,2}:
   6   -2  -2    4
@@ -135,7 +135,7 @@ M</pre>
  0//1  -12//1  10//1    1//1   21//1
  0//1    2//1  -1//1  -14//1  -26//1</pre>
 
-<p>Then we look at the second row. We use that &#36;M_&#123;22&#125;&#36; value to &quot;knock out&quot; those below it:</p><pre class="sourceCode julia">M[3,:] = M[3,:] -3*M[2,:]
+<p>Then we look at the second row. We use that &#36;M_&#123;22&#125;&#36; value to "knock out" those below it:</p><pre class="sourceCode julia">M[3,:] = M[3,:] -3*M[2,:]
 M[4,:] = M[4,:] +1//2 * M[2,:]
 M</pre>
 <pre class="output">
@@ -180,10 +180,10 @@ M</pre>
 (R_n R_{n-1} \cdots R_2 R_1)^{-1} [ U ~ b'] &= [A ~ b] \\
 [LU ~ Lb'] &= [A ~ b]
 \end{align}
-~$$<p>And we have &#36;LU &#61; A&#36;. Is &#36;L&#36; actually lower diagonal?</p><p>The &#36;R_m&#36; matrices look like &#36;I &#43; \lambda \delta_&#123;ij&#125;&#36;. The inverses for these are &#36;I - \delta^&#123;ij&#125;&#36;:</p>$$~
+~$$<p>And we have &#36;LU &#61; A&#36;. Is &#36;L&#36; actually lower diagonal?</p><p>The &#36;R_m&#36; matrices look like &#36;I &#43; \lambda \delta^&#123;ij&#125;&#36;. The inverses for these are &#36;I - \lambda \delta^&#123;ij&#125;&#36;:</p>$$~
 (I + \lambda \delta^{ij}) \cdot (I - \lambda \delta^{ij}) =
-I^2 + \lambda \delta^{ij})- \lambda \delta^{ij} - \lambda^2 \delta^{ij} = I.
-~$$<p>&#40;The &#36;lk&#36; term of &#36;\delta^&#123;ij&#125; \cdot \delta^&#123;ij&#125;&#36; is &#36;\sum_m \delta^&#123;ij&#125;&#40;lm&#41; \cdot \delta^&#123;ij&#125;&#40;mn&#41;&#36;. The first means &#36;m&#61;j&#36;, the second means &#36;m&#61;i&#36;, so this is &#36;0&#36; unless &#36;i&#61;j&#36;, but &#36;i &lt; j&#36;.&#41;</p><p>So the inverses are lower triangular.</p><p>Finally, &#36;R_p R_m &#61; &#40;I &#43; \lambda \delta^&#123;ij&#125;&#41;&#40;I &#43; \gamma \delta^&#123;kl&#125;&#41; &#61; I &#43;  \lambda \delta^&#123;ij&#125; &#43; \gamma \delta^&#123;kl&#125;&#36; which is lower triangular, so the product of the inverses will be.</p><p>Thus &#36;L&#36; is unit lower triangular, as the diagonal is all 1.</p><h2>Pivoting</h2><p>The book points out that these two problems are similar mathematically, but not computationally:</p>$$~
+I^2 + \lambda \delta^{ij}- \lambda \delta^{ij} - \lambda^2 \delta^{ij} = I.
+~$$<p>(The &#36;lk&#36; term of &#36;\delta^&#123;ij&#125; \cdot \delta^&#123;ij&#125;&#36; is &#36;\sum_m \delta^&#123;ij&#125;&#40;lm&#41; \cdot \delta^&#123;ij&#125;&#40;mn&#41;&#36;. The first means &#36;m&#61;j&#36;, the second means &#36;m&#61;i&#36;, so this is &#36;0&#36; unless &#36;i&#61;j&#36;, but &#36;i &lt; j&#36;.)</p><p>So the inverses are lower triangular.</p><p>Finally, &#36;R_p R_m &#61; &#40;I &#43; \lambda \delta^&#123;ij&#125;&#41;&#40;I &#43; \gamma \delta^&#123;kl&#125;&#41; &#61; I &#43;  \lambda \delta^&#123;ij&#125; &#43; \gamma \delta^&#123;kl&#125;&#36; which is lower triangular, so the product of the inverses will be.</p><p>Thus &#36;L&#36; is unit lower triangular, as the diagonal is all 1.</p><h2>Pivoting</h2><p>The book points out that these two problems are similar mathematically, but not computationally:</p>$$~
 A = \left[\begin{array}{cc}
 \epsilon & 1\\
 1 & 1
@@ -203,12 +203,12 @@ B = \left[\begin{array}{cc}
 x_2 &= \frac{2 - \epsilon^{-1}}{1 - \epsilon^{-1}} \approx 1\\
 x_1 &= \epsilon^{-1} [ 1 - \frac{2-\epsilon^{-1}}{1-\epsilon^{-1}}]
 \end{align}
-~$$<p>If &#36;\epsilon&#36; is small, then &#36;1/\epsilon&#36; is big and subtracting from 1 or 2 can be an issue. &#40;e.g., we saw <code>10^30 -1 &#61; 10^30</code> on the computer. So, in the computation of &#36;x_1&#36;, we might get &#36;1/\epsilon &#91;1 - 1&#93; &#61; 0&#36;. But, in fact, this is &#36; -\epsilon^&#123;-1&#125;/&#40;1-\epsilon^&#123;-1&#125;&#41; \approx 1&#36;.</p><p>Whereas, with &#36;Bx &#61; &#91;2; 1&#93;&#36;, we get </p>$$~
+~$$<p>If &#36;\epsilon&#36; is small, then &#36;1/\epsilon&#36; is big and subtracting from 1 or 2 can be an issue. (e.g., we saw <code>10^30 -1 &#61; 10^30</code> on the computer. So, in the computation of &#36;x_1&#36;, we might get &#36;1/\epsilon &#91;1 - 1&#93; &#61; 0&#36;. But, in fact, this is $ -\epsilon^{-1}/(1-\epsilon^{-1}) \approx 1$.</p><p>Whereas, with &#36;Bx &#61; &#91;2; 1&#93;&#36;, we get </p>$$~
 \begin{align}
 1\cdot x_1 + 1\cdot x_2 &= 2\\
 0 \cdot x_1 + (1 - \epsilon) x_2 &= 2 - \epsilon
 \end{align}
-~$$<p>So, &#36;x_2 &#61; &#40;1-2\epsilon&#41;/&#40;1 - \epsilon&#41; \approx 1&#36; and &#36;x_1 &#61; 2 - x_2 \approx 2 - 1 &#61; 1&#36;, as desired.</p><p>So, switching rows can make a <em>big</em> difference in the output when dealing with floating point.</p><p>&#40;We don&#39;t really switch, but rather keep track of which row is used to pivot using a permutation. Moving data in a matrix is costly, much more so than keeping track of indices.&#41;</p><h3>Pivoting strategies</h3><p>Pivoting results in  permutation of the rows of &#36;A&#36;. This can be written different ways. If &#36;P&#36; is a permutation matrix, then we can write &#36;LU &#61; PA&#36; as a &#36;LU&#36; factorization. Whereas, if <code>p</code> is a permutation vector, we can use the matrix notation of <code>julia</code> to write <code>L*U &#61; A&#91;p,:&#93;</code>.</p><p>There are different ways that pivot rows can be selected:</p><ul>
+~$$<p>So, &#36;x_2 &#61; &#40;1-2\epsilon&#41;/&#40;1 - \epsilon&#41; \approx 1&#36; and &#36;x_1 &#61; 2 - x_2 \approx 2 - 1 &#61; 1&#36;, as desired.</p><p>So, switching rows can make a <em>big</em> difference in the output when dealing with floating point.</p><p>(We don't really switch, but rather keep track of which row is used to pivot using a permutation. Moving data in a matrix is costly, much more so than keeping track of indices.)</p><h3>Pivoting strategies</h3><p>Pivoting results in  permutation of the rows of &#36;A&#36;. This can be written different ways. If &#36;P&#36; is a permutation matrix, then we can write &#36;LU &#61; PA&#36; as a &#36;LU&#36; factorization. Whereas, if <code>p</code> is a permutation vector, we can use the matrix notation of <code>julia</code> to write <code>L*U &#61; A&#91;p,:&#93;</code>.</p><p>There are different ways that pivot rows can be selected:</p><ul>
 <li><strong>partial pivoting</strong>: at step &#36;i&#36; choose the row with the largest value of &#36;|a_&#123;li|&#125;&#36;, where &#36;l&#36; runs over the rows that have <em>not</em> been used to pivot. </li>
 </ul><ul>
 <li><strong>complete pivoting</strong> consider the largest of all value values in rows not used for pivoting</li>
@@ -216,7 +216,7 @@ x_1 &= \epsilon^{-1} [ 1 - \frac{2-\epsilon^{-1}}{1-\epsilon^{-1}}]
 <li><strong>scaled row pivoting</strong>. Defing the scale of a row by:</li>
 </ul>$$~
 s_i = max_{i \leq j \leq n} |a_{ij}| = \text{largest of } |a_{i1}|, |a_{i2}|, \dots, |a_{in}|.
-~$$<p>Then at step &#36;i&#36;, form the ratios: &#36;|a_&#123;li&#125;/s_l|&#36;, for &#36;l&#36; running over the rows not already used for pivoting. Choose the &#36;l&#36; with the largest ratio to be the new pivot row.</p><p>&#40;At step &#36;i&#36;, an easier strategy could be to just pick the row which has the largest value of &#36;|a_&#123;li&#125;|&#36; where &#36;l&#36; runs over the rows which have not been used to pivot. This has the effect that the matrix &#36;L&#36; will have entries no greater than &#36;1&#36; in absolute value.&#41;</p><h3>Example</h3><p>Consider the matrix</p><pre class="sourceCode julia">Aorig = [-1.0 1 -4; 2 3 1; 3 3 2]
+~$$<p>Then at step &#36;i&#36;, form the ratios: &#36;|a_&#123;li&#125;/s_l|&#36;, for &#36;l&#36; running over the rows not already used for pivoting. Choose the &#36;l&#36; with the largest ratio to be the new pivot row.</p><h3>Example</h3><p>Consider the matrix</p><pre class="sourceCode julia">Aorig = [-1.0 1 -4; 2 3 1; 3 3 2]
 A = copy(Aorig)</pre>
 <pre class="output">
 3x3 Array{Float64,2}:
@@ -224,7 +224,7 @@ A = copy(Aorig)</pre>
   2.0  3.0   1.0
   3.0  3.0   2.0</pre>
 
-<p>We first do partial pivoting:</p><p>As &#36;3&#36; is the largest valuein the first column, we choose row 3 to pivot on, and eliminate the first entry in rows 1 and 2 by the appropriate multiplication. We store those values in a matrix &#36;L&#36;:</p><pre class="sourceCode julia">L = zeros(A) # copies size of A, fills with 0
+<p>We first do partial pivoting:</p><p>As &#36;3&#36; is the largest value in the first column, we choose row 3 to pivot on, and eliminate the first entry in rows 1 and 2 by the appropriate multiplication. We store those values in a matrix &#36;L&#36;:</p><pre class="sourceCode julia">L = zeros(A) # copies size of A, fills with 0
 i = 1
 p = 3
 ps = [p]
@@ -341,7 +341,7 @@ A</pre>
  0.0  1.0  -0.333333
  3.0  3.0   2.0     </pre>
 
-<p>Now we repeat, only we don&#39;t want to consider row 3, which we keep track of mentally and don&#39;t try to code.</p><pre class="sourceCode julia">s = mapslices(x->maximum(abs(x)), A, 2) </pre>
+<p>Now we repeat, only we don't want to consider row 3, which we keep track of mentally and don't try to code.</p><pre class="sourceCode julia">s = mapslices(x->maximum(abs(x)), A, 2) </pre>
 <pre class="output">
 3x1 Array{Float64,2}:
  3.33333
@@ -377,7 +377,7 @@ U = A[ps,  :]</pre>
  0.0  1.0  -0.333333
  0.0  0.0  -2.66667 </pre>
 
-<p>Our matrix &#36;L&#36; comes from using the  factors above &#40;where we used minus signs&#41;:</p><pre class="sourceCode julia">L = L[ps, :]</pre>
+<p>Our matrix &#36;L&#36; comes from using the  factors above (where we used minus signs):</p><pre class="sourceCode julia">L = L[ps, :]</pre>
 <pre class="output">
 3x3 Array{Float64,2}:
   1.0       0.0  0.0
@@ -424,15 +424,15 @@ lu(A)</pre>
 
 [3,1,2])</pre>
 
-<p>This agrees with the factorization we found with partial pivoting. The empirical claim is that partial pivoting is nearly always better compared to complete pivoting due to the extra overhead required for complete pivoting.</p><h2>Counting steps</h2><p>Suppose &#36;A&#36; is &#36;n \times n&#36;. If applicable, mathematicallly solving &#36;Ax &#61; b&#36; is as easy as writing &#36;x &#61; A^&#123;-1&#125; b&#36;. Why bother with &#36;LUx &#61; b&#36; and then solving both &#36;Ly&#61;b&#36; and &#36;Ux&#61;y&#36;? &#40;Actually we take  &#36;&#91;A ~b&#93;&#36; and find &#36;&#91;U ~ b&#39;&#93;&#36; then solve this backsubstitution problem.&#41;</p><p>One reason is it takes fewer steps.</p><p>The book argues that addition and subtraction are much cheaper to do than multiplication and division, so when counting operations, we should just count the long operations, <code>ops</code> or short.</p><p>Let&#39;s look at how many such operations are done for our pivoted Gaussian elimination. First the &#36;U&#36; term.</p><p>For &#36;i&#61;1&#36;, the first row is multiplied by some factor and &#36;n-1&#36; times and subtracted from other rows. This is &#36;n\cdot&#40;n-1&#41;&#36; steps, not counting the division to find the factor. For that, we have &#36;n&#36; operations to find the pivot row &#40;not counting the time to find a maximum, we did divide the &#36;i&#36;th column by the scale, hence &#36;n&#36;&#41;. So all told, we have basically &#36;n&#40;n-1&#41; &#43; n&#36; <code>ops</code>.</p><p>For &#36;i&#61;2&#36;, we could repeat, but note that we are basically working with matrix without the &#36;p&#36;th row and the first column, so we have the same computation with an &#36;&#40;n-1&#41; \times &#40;n-1&#41;&#36; size matrix. So the answer will be &#36;n-1&#36; <code>ops</code>.</p><p>And so on, to where we get this elimination costs us this many <code>ops</code>:</p>$$~
+<p>This agrees with the factorization we found with partial pivoting. The empirical claim is that partial pivoting is nearly always better compared to complete pivoting due to the extra overhead required for complete pivoting.</p><h2>Counting steps</h2><p>Suppose &#36;A&#36; is &#36;n \times n&#36;. If applicable, mathematicallly solving &#36;Ax &#61; b&#36; is as easy as writing &#36;x &#61; A^&#123;-1&#125; b&#36;. Why bother with &#36;LUx &#61; b&#36; and then solving both &#36;Ly&#61;b&#36; and &#36;Ux&#61;y&#36;? (Actually we take  &#36;&#91;A ~b&#93;&#36; and find &#36;&#91;U ~ b&#39;&#93;&#36; then solve this backsubstitution problem.)</p><p>One reason is it takes fewer steps.</p><p>The book argues that addition and subtraction are much cheaper to do than multiplication and division, so when counting operations, we should just count the long operations, <code>ops</code> or short.</p><p>Let's look at how many such operations are done for our pivoted Gaussian elimination. First the &#36;U&#36; term.</p><p>For &#36;i&#61;1&#36;, the first row is multiplied by some factor and &#36;n-1&#36; times and subtracted from other rows. This is &#36;n\cdot&#40;n-1&#41;&#36; steps, not counting the division to find the factor. For that, we have &#36;n&#36; operations to find the pivot row (not counting the time to find a maximum, we did divide the &#36;i&#36;th column by the scale, hence &#36;n&#36;). So all told, we have basically &#36;n&#40;n-1&#41; &#43; n&#36; <code>ops</code>.</p><p>For &#36;i&#61;2&#36;, we could repeat, but note that we are basically working with matrix without the &#36;p&#36;th row and the first column, so we have the same computation with an &#36;&#40;n-1&#41; \times &#40;n-1&#41;&#36; size matrix. So the answer will be &#36;n-1&#36; <code>ops</code>.</p><p>And so on, to where we get this elimination costs us this many <code>ops</code>:</p>$$~
 n^2 + (n-1)^2 + \cdots + 2^2 = \sum_{i=1}^n i^2 -1 = \frac{n(n-1)(2n-1)}{6} -1 \approx \frac{n^3}{3} + \frac{n^2}{2}.
-~$$<p>Now to count the steps to modify the &#36;b&#36; to get &#36;b&#39;&#36;. The first row introduces &#36;n-1&#36;, the second &#36;n-2&#36;, the third &#36;n-3&#36; and so on, so this involves &#36;\sum_&#123;i&#61;1&#125;^&#123;n-1&#125; u&#36;  or &#36;n&#40;n-1&#41;/2&#36;</p><p>To do the back substitution, we have &#36;1&#36; division for the first row, &#36;2&#36; <code>ops</code> for the second &#40;we have &#36;ax_j &#43; bx_&#123;j-1&#125;&#61;c&#36; and we solve for &#36;x_j&#36; through &#36;&#40;1/a&#41; \cdot &#40;c - bx_&#123;j-1&#125;&#41;&#36; which is &#36;2&#36; <code>ops</code>.&#41; And so on to give: &#36; 1 &#43;2 &#43; \cdots &#43;n&#36; or &#36;&#40;n&#43;1&#41;n/2&#36; counts.</p><p>All told we can put together to get a count. The book presents this a bit differently, for the case where we are solving &#36;&#91;A; b_1;b_2; \dots;b_m&#93;&#36; simulataneously, and then we have:</p><blockquote>
-<p>Theorem 4 &#40;p176&#41; on Long Operations: To solve &#36;Ax&#61;b&#36; for &#36;m&#36; vectors &#36;b&#36; where &#36;A&#36; is &#36;n\times n&#36; involves approximately this many <code>ops</code>:</p>
+~$$<p>Now to count the steps to modify the &#36;b&#36; to get &#36;b&#39;&#36;. The first row introduces &#36;n-1&#36;, the second &#36;n-2&#36;, the third &#36;n-3&#36; and so on, so this involves &#36;\sum_&#123;i&#61;1&#125;^&#123;n-1&#125; u&#36;  or &#36;n&#40;n-1&#41;/2&#36;</p><p>To do the back substitution, we have &#36;1&#36; division for the first row, &#36;2&#36; <code>ops</code> for the second (we have &#36;ax_j &#43; bx_&#123;j-1&#125;&#61;c&#36; and we solve for &#36;x_j&#36; through &#36;&#40;1/a&#41; \cdot &#40;c - bx_&#123;j-1&#125;&#41;&#36; which is &#36;2&#36; <code>ops</code>.) And so on to give: $ 1 +2 + \cdots +n$ or &#36;&#40;n&#43;1&#41;n/2&#36; counts.</p><p>All told we can put together to get a count. The book presents this a bit differently, for the case where we are solving &#36;&#91;A; b_1;b_2; \dots;b_m&#93;&#36; simulataneously, and then we have:</p><blockquote>
+<p>Theorem 4 (p176) on Long Operations: To solve &#36;Ax&#61;b&#36; for &#36;m&#36; vectors &#36;b&#36; where &#36;A&#36; is &#36;n\times n&#36; involves approximately this many <code>ops</code>:</p>
 </blockquote>$$~
 \frac{n^3}{3} + (\frac{1}{2} + m) n^2.
-~$$<p>So, for a single &#36;b&#36;, to solve &#36;Ax&#61;b&#36; by this method is basically &#36;n^3/3&#36; steps. Whereas to find the inverse itself &#40;and not counting the steps in &#36;A^&#123;-1&#125;b&#36;, can be found by taking &#36;m&#61;n&#36; in the formula &#40;reducing &#36;&#91;A;I&#93;&#36;&#41;. To give:</p>$$~
+~$$<p>So, for a single &#36;b&#36;, to solve &#36;Ax&#61;b&#36; by this method is basically &#36;n^3/3&#36; steps. Whereas to find the inverse itself (and not counting the steps in &#36;A^&#123;-1&#125;b&#36;, can be found by taking &#36;m&#61;n&#36; in the formula (reducing &#36;&#91;A;I&#93;&#36;). To give:</p>$$~
 \text{steps to find } A^{-1} = \frac{n^3}{3} + (\frac{1}{2} + n) n^2 \approx \frac{n^3}{3} + n^3 = \frac{4}{3} n^3.
-~$$<h2>Special case – Diagonally dominant matrices</h2><p>Call the matrix &#36;A&#36; *diagonally dominant&#36; if the diagonal terms are the largest in each row and column. &#40;That is &#36;|a_&#123;ii&#125;| \geq |a_&#123;il&#125;|, |a_&#123;ki&#125;|&#36;&#41;.</p><blockquote>
+~$$<h2>Special case – Diagonally dominant matrices</h2><p>Call the matrix &#36;A&#36; <em>diagonally dominant</em> if the diagonal terms are the largest in each row and column. (That is &#36;|a_&#123;ii&#125;| \geq |a_&#123;il&#125;|, |a_&#123;ki&#125;|&#36;).</p><blockquote>
 <p>Thm: A diagonal dominant matrix is non-singular and has an LU factorization where no pivoting is necessary.</p>
 </blockquote><p>This is a result of the fact that Gaussian elimination preserves the diagonal dominance, so picking a different partial pivot row or scaled pivot row is unecessary.</p><h2>tridiagonal system</h2><p>Consider the approximation formula for the second derivative:</p>$$~
 f''(x) \approx \frac{f(x + h) - 2 f(x) + f(x-h)}{h^2}
@@ -467,7 +467,7 @@ fs = map(f, xs)</pre>
   -0.470813
  -16.1917  </pre>
 
-<p>We see we don&#39;t have very good approximations to the second derivative. Were we to increase &#36;n&#36; this could be the case, except on the edge cases:</p><pre class="sourceCode julia">n = 1000
+<p>We see we don't have very good approximations to the second derivative. Were we to increase &#36;n&#36; this could be the case, except on the edge cases:</p><pre class="sourceCode julia">n = 1000
 xs = linspace(0, 1, n)
 fs = map(f, xs)
 
