@@ -463,7 +463,7 @@ L_1 = \left[
 \right]
 ~$$
 
-Then using block matrix multiplication we get this decomposition: $A = L B A_1 L^T$ where
+Then using block matrix multiplication we get this decomposition: $A = L B L^T$ where
 
 $$~
 B_1= \left[

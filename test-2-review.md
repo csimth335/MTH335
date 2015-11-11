@@ -117,8 +117,277 @@ $$~
 
 ## Chapter 4
 
-TBA
+Chapter 4 deals with the problem of simulataneous solutions of linear equations expressed in matrix form: $Ax=b$.
 
-## Chapter 5
+### 4.1 
+In the first section, there is a review of linear algebra concepts. Some important pieces are:
 
-TBA
+* how $Ax=b$ represents a system of equations
+* the language of matrix, vector, column vector, row vector
+* matrix operations: scalar multiplication, addition, subtraction, multiplication, transpose.
+* symmetric, positive definite matrices.
+* block multiplication of matrices
+* the inverse of a matrix
+* special types of matrices: square, invertible, symmetric, upper triangular, lower triangular, etc.
+
+
+### 4.2
+
+We looked at solving $Ax=b$ is special cases: diagonal matrices, upper triangular, or lower triangular.
+
+
+We looked at forming an LU decomposition of a matrix $A$. The first step of the method basically forms this matrix product:
+
+$$~
+A = \left[
+\begin{array}{cc}
+a_{11} & c^T\\
+b & A_1
+\end{array}
+\right]
+= L_1 \cdot U_1
+= \left[
+\begin{array}{cc}
+1 & 0\\
+b/a_{11} & L_2
+\end{array}
+\right]
+\cdot
+\left[
+\begin{array}{cc}
+a_{11} & c^t\\
+0 & R_2
+\end{array}
+\right]
+~$$
+
+(We won't do this method though, but you should know how to do Gaussian Elimination to find $LU$, with a possible $P$.)
+
+We saw a block-matrix multiplication method to find the Cholesky decomposition. It starts with
+
+$$~
+A = \left[
+\begin{array}{cc}
+a_{11} & w^T\\
+w & K
+\end{array}
+\right],
+\quad
+L_1 = \left[
+\begin{array}{cc}
+a_{11} & w^T\\
+w & K
+\end{array}
+\right]
+\quad\text{ and }
+
+B_1= \left[
+\begin{array}{cc}
+I & 0^T\\
+0 & K - \frac{ww^T}{a_{11}}
+\end{array}
+\right].
+~$$
+
+And then we have $A = L_1 B_1 L_1^T$, and we can repeat the work on $B_1$ to get a decomposition.
+
+We had these theorems:
+
+> If all $n$ leading principal minors of $A$ are non-singular, then $A$ has an $LU$ decomposition (without pivoting).
+
+>If $A$ is real, symmetric and positive definite then it has a unique (Cholesky) factorization $A=LL^T$ and $L$ has a positive diagonal.
+
+## 4.3 Gaussian Elimination
+
+The Gaussian Elimination process produces a matrix $U$, possibly with row swaps, and if one counts the row multipliers appropriately, a matrix $L$, where $LU=PA$, $P$ being a permutation matrix.
+
+The decomposition is not unique. In addition to having degrees of freedom to pick the diagonal values of $L$ and $U$, it depends on  the choice of pivot row. We discussed briefly three pivot types:
+
+* partial pivot
+* scaled pivot
+* complete pivoting
+
+you should know the partial pivoting, where the largest magnitude entry of $a_{li}$, in column $i$, after removing the previously chosen $i-1$ rows is taken to be the pivot row. This choice ensures the values $\lambda_i$ are all bounded by 1 in magnitude, so $L$ will be unit triangular with dominant diagonal.
+
+One compelling reason to choose to solve $Ax=b$ via solving $LUx=b$ is that it takes fewer steps than solving $x = A^{-1}b$. The following theorem allows us to count:
+
+> Theorem 4 (p176) on Long Operations: To solve $Ax=b$ for $m$ vectors $b$ where $A$ is $n\times n$ involves approximately this many `ops`:
+
+$$~
+\frac{n^3}{3} + (\frac{1}{2} + m) n^2.
+~$$
+
+## Section 4.4
+
+Section 4.4 introduces the concept of a norm. This makes talking about convergence possible, as it gives  a sense of size.
+
+We saw that a norm on a vector space was a function satisfying three properties:
+
+* $\| x \| = 0$ implies $x=0$;
+* $\| \lambda x \| = |\lambda| \cdot \| x \|$;
+* $\| x + y \| \leq \|x \| + \| y \|$.
+
+There main vector norms a indexed: $l_1$, $l_2$, and $l_\infty$. For $p \geq 1$, we have also
+
+$$~
+\| x \|_p = (|x_1|^p +|x_2|^p +|x_3|^p +\cdots + |x_n|^p)^{1/p}.
+~$$
+
+The induced matrix norm is a norm on the set of matrices that is derived from a norm on vectors. It is specified by:
+
+$$~
+\| A \|_p = \text{The largest value of } \{\|Ax\|_p: \|x \|_p = 1\}.
+~$$
+
+We commented that when $p=2$, this is related to the singular values of $A$, which are the eigen values of $A^TA$.
+
+When $p=\infty$, the $\| \cdot \|_{\infty}$ norm is related to largest of the $l_1$ norms of the column vectors of $A$.
+
+
+A useful inequality of matrix norms is $\| A B \| \leq \| A \| \cdot \| B \|$, Similarly, $\|Ax\| \leq \| A \| \cdot \| x \|$. These are true for the matrix norm induced by the vector norm.
+
+The use of norms make it possible to prove this inequality on the relative errors of solving $Ax=b$ when there is an error in finding $b$:
+
+$$~
+\frac{\| x - \tilde{x} \|}{\|x\|} \leq \kappa(A) \cdot \frac{\| b - \tilde{b} \|}{\|b\|}.
+~$$
+
+The condition number is $\kappa(A) = \| A \| \cdot \|A^{-1}\|$. 
+
+
+## Iterative schemes
+
+We spoke about a few iterative schemes. The first is used to "polish" approximate answers. It goes like:
+
+Suppose we have an approximate answer $x^{(0)}$ to $Ax=b$. Then we get the residual is
+
+$$~
+r^{(0)} = b - A x^{(0)}
+~$$
+
+And from here we solve the error from $A e^{(0)} = r^{(0)}$. And finally, we get
+
+$$~
+x^{(1)} = x^{(0)} + e^{(0)}.
+~$$
+
+I everything is exact, then this is the answer, but if there is some loss in solving, then it is an improved answer. In that case the process can be repeated.
+
+This can be made concrete by assuming we have an approximate inverse to $A$, called $B$. Then when solving $Ae^{(0)} = r^{(0})$ by multiplying by $B$, we lose some information. In that case, the value of $x^{(1)}$ satisfies:
+
+$$~
+r^{(0)} = b - A x^{(0)}; \quad e^{(0)} = B r^{(0)}; \quad x^{(1)} =x^{(0)} + e^{(0)}
+~$$
+
+And in general, the value of $x^{(m)}$ satisfies:
+
+$$~
+x^{(m)} = B \sum_{k=0}^m (I - AB)^k b.
+~$$
+
+The sum on the right is convergent if $\|I - AB \| < 1$ and so $x^{(m)}$ will converge.
+
+This requires knowing that when $\|A\|<1$, then $I-A$ is invertible and can be written as a Neumann sum.
+
+
+### Other convergent algorithms.
+
+If we have a *splitting matrix* $Q$, then we can form the equation $Qx = Qx - Ax + b$. Which suggests an iterative scheme of the type:
+
+$$~
+Q x^{(k+1)} = (Q- A)x^{(k)} + b.
+~$$
+
+For various choices of $Q$ this will converge:
+
+* $Q=I$ -- Richardson method
+* $Q=diag(A)$ -- Jacobi iteration
+* $Q = tril(A)$ -- Gauss-Seidel.
+
+As long as $\| I - Q^{-1}A \| < 1$ for some subordinate norm, this sequence will converge.
+
+More generally, if the iterative scheme is
+
+$$~
+x^{(k+1)} = Gx^{(k)} + c
+~$$
+
+then this will converge if the magnitude of the largest eigenvalue is less than 1.
+
+
+
+
+### Some sample problems
+
+* Show that the product of lower triangular matrices is lower triangular using the characacteriaztion that $L$ is LT if $l_{ij}=0$ when $j > i$ (the column index is bigger than the row one).
+
+
+
+* Solve for $x$ in $Ax=b$, when
+
+$$~
+A = \left[
+\begin{array}{ccc}
+1 & 0 & 0\\
+2 & 3 & 0\\
+4 & 5 & 6
+\end{array}
+\right],
+\quad
+b = [7,8,9]^T
+~$$
+
+
+
+
+* Decompose $A$ as a product of $L\cdot U$ using Gaussian Elimination when $A$ is
+
+$$~
+A = \left[
+\begin{array}{ccc}
+2 & 0 & -8\\
+-4 & -1 & 0\\
+7 & 4 & -5
+\end{array}
+\right].
+~$$
+
+Did you need to use a permutation matrix?
+
+Use your answer to solve $Ax=[1,2,3]^T$.
+
+
+* Find $\| A\|_\infty$ when $A$ is the matrix
+
+
+$$~
+A = \left[
+\begin{array}{ccc}
+2 & 0 & -8\\
+-4 & -1 & 0\\
+7 & 4 & -5
+\end{array}
+\right].
+~$$
+
+
+* Find the condition number of $A$ when $A$ is the matrix:
+
+$$~
+A = \left[
+\begin{array}{ccc}
+1 & 0 & 0\\
+2 & 3 & 0\\
+4 & 5 & 6
+\end{array}
+\right].
+~$$
+
+
+* Suppose we write $A = Q + B$ where $Q$ is invertible. Then the expression $Qx^{(k+1}) = (Q- A)x^{(k)} + b$ can be rewritten as
+
+$$~
+x^{(k+1)} = Q^{-1} B x^{(k)} + Q^{-1}b.
+~$$
+
+This is of the general form $x^{(k+1)} = Gx^{(k)} + c$. What  condition on $Q$ and $B$ will ensure convergence?

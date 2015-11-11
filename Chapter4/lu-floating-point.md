@@ -30,7 +30,7 @@ Let's look at the LU factorization with partial pivoting. The algorithm produces
 Where we have for the case $i > k$ and $j>k$
 
 $$~
-a_{ij}^{(k+1)} = a_{ij}^{(k}) - l_{ik}a_{kj}^{(k)}, \quad\text{and }
+a_{ij}^{(k+1)} = a_{ij}^{(k)} - l_{ik}a_{kj}^{(k)}, \quad\text{and }
 l_{ik} = \frac{a_{ik}^{(k)} }{a_{kk}^{(k)}}.
 ~$$
 
@@ -38,10 +38,10 @@ With floating point concerns, this becomes:
 
 
 $$~
-\tilde{a{_{ij}^{(k+1)} = fl(\tiled{a}_{ij}^{(k}) - fl( \tilde{l}_{ik}\tilde{a}_{kj}^{(k)})), \quad\text{and }
-\tilde{l}_{ik} = fl(\frac{\tilde{a}_{ik}^{(k)} }{\tilde{a}_{kk}^{(k)}}).
+\tilde{a}_{ij}^{(k+1)} =
+ fl(\tilde{a}_{ij}^{(k)} -  fl( \tilde{l}_{ik}\tilde{a}_{kj}^{(k)})), \quad\text{ and }
+\tilde{l}_{ik} = fl(\frac{\tilde{a}_{ik}^{(k)} }{\tilde{a}_{kk}^{(k)}}). 
 ~$$
-
 
 So, the end of the process we have two matrices $\tilde{L}$ and $\tilde{U}$ instead of the mathematical $L$ and $U$. How far away will these be?
 
@@ -82,8 +82,8 @@ With our pivoting we have the entries of $L$ are bounded by $1$, as we pivot to 
 
 ```
 n = 5
-A = I-tril(ones(n,n),-1)
-A[:,n] = ones(n)
+A = I-tril(ones(Int, n,n),-1)
+A[:,n] = ones(Int, n)
 A
 ```
 
@@ -99,8 +99,8 @@ The bottom right entry gets big. If fact, for $n=20$ we have:
 
 ```
 n = 20
-A = I-tril(ones(n,n),-1)
-A[:,n] = ones(n)
+A = I-tril(ones(Int, n,n),-1)
+A[:,n] = ones(Int, n)
 L,U,p = lu(A)
 U[n,n]
 ```
@@ -114,7 +114,7 @@ g_n(A) = \frac{\max_{ij}|U_{ij}|}{\max_{ij}|A_{ij}|}.
 
 (The book defines a  related, but not identical quantity, but this fits more inline with the bounds given in the theorems.)
 
-Then the worst case is $g_n(A) \leq 2^{n-1}.
+Then the worst case is $g_n(A) \leq 2^{n-1}$.
 
 In theory then the bound of the form:
 

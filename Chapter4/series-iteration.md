@@ -54,7 +54,7 @@ Such sums are callend [Neumann Series](https://en.wikipedia.org/wiki/Neumann_ser
 We see that $\| A_k \|$ looks like $(3/4)^k$, so the sum should exist, as:
 
 $$~
-\| \sum{k=0}^n A^k \| \leq \sum_{k=0}^n \|A^k\| \leq \sum_{k=0}^n \|A\|^k \approx
+\| \sum_{k=0}^n A^k \| \leq \sum_{k=0}^n \|A^k\| \leq \sum_{k=0}^n \|A\|^k \approx
 \sum_{k=0}^n (3/4)^k
 \rightarrow 1 / (1 - 3/4)
 ~$$
@@ -90,7 +90,7 @@ But from $\|A^m\| \leq \|A\|^m$ we get the latter goes to $0$, and the convergen
 
 ### Alternatively
 
-> Thm: (200) Suppose $A$ and $B$ are $n \times n$ with $\| I - AB \| < 1$, then *both* $A$ and $B$ are invertible and we can write as
+> Thm: (p200) Suppose $A$ and $B$ are $n \times n$ with $\| I - AB \| < 1$, then *both* $A$ and $B$ are invertible and we can write as
 
 $$~
 A^{-1} = B \sum(I - AB)^k
@@ -298,7 +298,7 @@ norm(I - A)
 So our convergence should hold.
 
 
-With this $Q$, our iteration step is just $x^{k+1} = (I-A)x^{k} + b = x^k + (b - Ax^k) = x^k + r^k
+With this $Q$, our iteration step is just $x^{k+1} = (I-A)x^{k} + b = x^k + (b - Ax^k) = x^k + r^k$
 
 And we start at $x=[0,0,0]$. What do 100 iterations produce:
 
@@ -350,7 +350,7 @@ Q = diagm(diag(A))   # diag finds element, diagm makes matrix
 We have
 
 ```
-norm(1 - inv(Q)*A)
+norm(I - inv(Q)*A)
 ```
 
 So we should have convergence of the algorithm
@@ -439,18 +439,18 @@ This method seems to converge faster than Jacobi iteration. It has other advanta
 
 ### convergence of the method
 
-> Thm. (p210) Suppose $\| I - Q^{-1}A\| < 1$ for some subordinate matrix notm. Then the sequence started at $x^0$ will converge in the associated vector norm.
+> Thm. (p210) Suppose $\| I - Q^{-1}A\| < 1$ for some subordinate matrix norm. Then the sequence started at $x^0$ will converge in the associated vector norm.
 
 Pf. The algorithm starts from  $Ax=b$, so if $x$ is an actual solution, it is a fixed point of the algorithm. That is:
 
 $$~
-Qx = (Q-A)x + b, \quad \text{and} Qx^{k+1} = (Q-A)x^{k} + b
+Qx = (Q-A)x + b, \quad \text{and } Qx^{k+1} = (Q-A)x^{k} + b
 ~$$
 
 Solving -- mathematically -- by multiplying by $Q^{-1}$ reexpresses these as:
 
 $$~
-x = (I - Q^{-1}A)x + Q^{-1}b \text{and} x^{k+1} = (I-Q^{-1}A)x^{k} + Q^{-1}b.
+x = (I - Q^{-1}A)x + Q^{-1}b \text{ and } x^{k+1} = (I-Q^{-1}A)x^{k} + Q^{-1}b.
 ~$$
 
 
