@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Review for test 3</h1><p>Test 3 is the <em>final</em> exam. It will <strong>NOT</strong> be comprehensive <strong>all</strong> of the material will come from chapters 6,7, and 8. (This is different from what was earlier announced!)</p><h2>Ch 6: Polynomial Interpolation</h2><p>The main goal: if we have points &#36;&#40;x_0, y_0&#41;, \dots, &#40;x_n, y_n&#41;&#36; where &#36;y_i &#61; f&#40;x_i&#41;&#36;, can we approximate the function &#36;f&#40;x&#41;&#36; with a polynomial &#36;p&#40;x&#41;&#36;?</p><blockquote>
+<p>Thm: if the &#36;x_i&#36;'s are distinct, then there is a <em>unique</em> polynomial of degree &#36;n&#36; with &#36;p&#40;x_i&#41; &#61; y_i&#36;.</p>
+</blockquote><p>There are two different ways to write this:</p><ul>
+<li>Newton form: &#36;p_n&#40;x&#41; &#61; \sum_&#123;i&#61;0&#125;^n c_i \prod_&#123;j&#61;0&#125;^&#123;i-1&#125; &#40;x - x_j&#41;&#36;. We saw that the constants can be written in terms of divided differences: &#36;c_i &#61; f&#91;x_0, x_1, \dots, x_i&#93;&#36;.</li>
+</ul><ul>
+<li>Lagrange form: &#36;p_n&#40;x&#41; &#61; \sum y_k l_k&#40;x&#41;&#36;. We mentioned that the &#36;l_k&#36; can be written in a terms of a product:</li>
+</ul>$$~
+l_i(x) = \prod_{j=0, j \neq i}^n \frac{x - x_j}{x_i - x_j}.
+~$$<p>The Newton form represents &#36;p&#36; in terms of polynomials of degree &#36;i&#36; whereas the Lagrange form has terms all of degree &#36;n&#36;.</p><h3>Error:</h3>$$~
+f(x) - p_n(x) = \frac{1}{(n+1)!} f^{(n+1)}(\xi) \prod_{i=0}^n (x - x_i)
+~$$<p>This gives a bound on the error.</p><h3>Convergence</h3><p>Even if it is true that for each &#36;x&#36;, &#36;f&#40;x&#41; - p_n&#40;x&#41; \rightarrow 0&#36; it need not be the case that &#36;\|f - p_n\|_\infty &#61; max_&#123;a \leq x \leq b&#125;|f&#40;x&#41; - p_n&#40;x&#41;| \rightarrow 0&#36;. As we saw on the computer there can be wild oscillations near the edges in &#36;p_n&#36;. In fact: if the interpolation points are evenly spaced the interpolating polynomials become unbounded.</p><h3>HW Problems</h3><p>6.1: 1, 2, 12</p><blockquote>
+<p>6.1:1 Find polyomials that interpolate:</p>
+</blockquote><p>a) &#36;&#40;3,5&#41;, &#40;7,-1&#41;&#36;. Two points determine a line. Using point slope we have:</p><pre class="sourceCode julia">using SymPy   ## we assume Julia version 0.4, not 0.3 below...
+x = symbols("x")
+x0,y0 = (3,5)
+x1,y1=(7, -1)
+m = (y1-y0) // (x1 - x0)
+y = y0 + m * ( x - x0)</pre>
+<div class="well well-sm">
+$$- \frac{3 x}{2} + \frac{19}{2}$$</div>
+
+<p>b) We have three points now. A quick graph shows they are not collinear, so the answer will be quadratic. At this point, we use a formula to plug into. LaGrange's form gives:</p><pre class="sourceCode julia">xs = [7,1,2]
+ys = [146,2,1]
+l(i::Int, xs) = prod( [i==j ? 1 : (x-xs[j]) / (xs[i] - xs[j]) for j in 1:length(xs)] )
+
+p = ys[0+1]*l(0+1, xs) + ys[1+1] * l(1+1,xs) + ys[2+1] * l(2+1, xs)
+simplify(p)</pre>
+<div class="well well-sm">
+$$5 x^{2} - 16 x + 13$$</div>
+
+<p>We can check this is correct:</p><pre class="sourceCode julia">map(p, xs)</pre>
+<div class="well well-sm">
+\begin{bmatrix}146\\2\\1\end{bmatrix}</div>
+
+<p>c) If doing this by hand and using Newton's method we could leverage the fact that a new point is added. Here is how.</p><p>We add a new point, &#36;&#40;3,10&#41;&#36;, so a recursive formula might be good. Here we use the first formula on p311 to find &#36;c_k&#36;:</p><pre class="sourceCode julia">push!(xs, 3) 
+ck = (10 - p(3)) / prod([xs[end] - u for u in xs[1:end-1]])
+q = p + ck*prod([x-xs[i] for i in 1:length(xs)-1])
+simplify(q)</pre>
+<div class="well well-sm">
+$$5 x^{2} - 16 x + 13$$</div>
+
+<p>checking:</p><pre class="sourceCode julia">map(q, xs)</pre>
+<div class="well well-sm">
+\begin{bmatrix}146\\2\\1\\10\end{bmatrix}</div>
+
+<p>Wait! the polynomial &#36;q&#36; is the same as &#36;p&#36;. The new point lies on the parabola. The theorem guarantees a unique polynomial exists of degree &#36;n&#36; or less, not necessarily of degree &#36;n&#36;.</p><p>d) this is similar, only &#36;y&#61;12&#36; not 10 and we expect to get a 3rd degree polynomial:</p><pre class="sourceCode julia">ck = (12 - p(3)) / prod([xs[end] - u for u in xs[1:end-1]])
+q = p + ck*prod([x-xs[i] for i in 1:length(xs)-1])
+simplify(q)</pre>
+<div class="well well-sm">
+$$- \frac{x^{3}}{4} + \frac{15 x^{2}}{2} - \frac{87 x}{4} + \frac{33}{2}$$</div>
+
+<p>e) We can do this by taking advantage of the fact that all but one of the points are zeros, so we know the polynomial <em>must</em> have this form:</p><pre class="sourceCode julia">c = symbols("c")
+p = c * (x-1.5)*(x-2.7) * (x-3.1) * (x+6.6)*(x-11)</pre>
+<div class="well well-sm">
+$$c \left(x - 11\right) \left(x - 3.1\right) \left(x - 2.7\right) \left(x - 1.5\right) \left(x + 6.6\right)$$</div>
+
+<p>Now we just need to solve &#36;p&#40;-2.1&#41; &#61;1&#36; to find &#36;c&#36;:</p><pre class="sourceCode julia">solve(p(x=>-2.1) -1, c)</pre>
+<div class="well well-sm">
+\begin{bmatrix}0.000188785706173323\end{bmatrix}</div>
+
+<blockquote>
+<p>6.1:2  Show that polynomial interpolation is a linear map. That is we can add before or after interpolation.</p>
+</blockquote><p>Suppose &#36;f&#36; and &#36;g&#36; are functions with interpolating polynomials &#36;p&#36; and &#36;q&#36;. If we show that &#36;&#40;p&#43;q&#41;&#40;x_i&#41; &#61; &#40;f&#43;g&#41;&#40;x_i&#41;&#36; for each &#36;i&#36;, then by the <em>uniqueness</em> of interpolating polynomials we will be done. But:</p>$$~
+(p+q)(x_i) = p(x_i) + q(x_i) = f(x_i) + g(x_i) = (f+g)(x_i).
+~$$<blockquote>
+<p>6.1 12</p>
+</blockquote><p>Let's just see if this works for a small case, first, try &#36;n&#61;3&#36;.</p><p>Then the algorithm produces:</p>$$~
+(((a_3 b_3 + a_2)b_1 + a_1)b_2 + a_0) b_3
+~$$<p>Does this equal the sum? We'll we see we get these terms:</p>$$~
+a_3 b_3 \cdot b_1 \cdot b_3, \quad a_2 b_1 \cdot b_2 \cdot b_3, \quad a_1 b_2 \cdot b_3, \quad a_0 b_3
+~$$<p>So, no, this isn't right!</p><p>To verify, if that isn't enough. Let's do the case &#36;n&#61;2&#36; symbolically:</p><pre class="sourceCode julia">as = Sym["a$i" for i in 0:2]
+bs = Sym["b$i" for i in 0:2]
+n=2
+x = as[n+1] * bs[n+1]
+for i in 1:n
+x= (x + as[n-i + 1]) * bs[i + 1]
+end
+
+expand(x)</pre>
+<div class="well well-sm">
+$$a_{0} b_{2} + a_{1} b_{1} b_{2} + a_{2} b_{1} b_{2}^{2}$$</div>
+
+<p>And compare to:</p><pre class="sourceCode julia">sum([as[i+1] * prod( [bs[j+1] for j in 0:i]) for i in 0:n])
+</pre>
+<div class="well well-sm">
+$$a_{0} b_{0} + a_{1} b_{0} b_{1} + a_{2} b_{0} b_{1} b_{2}$$</div>
+
+<blockquote>
+<p>6.2: 4,</p>
+</blockquote><p>Show if &#36;f&#36; is a polynomial of degree &#36;k&#36; then for &#36;n &gt; k&#36; we have &#36;p&#91;x_0, \dots, x_n&#93; &#61; 0&#36;.  This is easy if you know that the divided difference is like &#36;Cp^&#123;&#40;n&#41;&#125;&#40;\xi&#41;&#36; where &#36;n &gt; k&#36;. But a polynomial of degree &#36;k&#36; will have a 0 &#36;n&#36;th derivative in this case.</p><p>Alternatively, you can say that the Newton form is <strong>unique</strong>, so any extra terms of the type &#36;f&#91;x_0, \dots, x_n&#93;&#40;x-x_0&#41; \cdots &#40;x-x&#41;&#123;n-1&#125;&#36; must be &#36;0&#36; if &#36;n &gt; k&#36;.</p><blockquote>
+<p>6.2 12. For the function &#36;f&#40;x&#41; &#61; x^m&#36; show the divided difference is &#36;1&#36; if &#36;n&#61;m&#36; and &#36;0&#36; if &#36;n&gt;m&#36;.</p>
+</blockquote><p>The last part is 6.2.4. For the first, we use Theorem 4, again, to see that if &#36;f&#40;x&#41; &#61; x^n&#36; then</p>$$~
+f[x_0, x_1, \dots, x_n] = \frac{1}{n!} f^{(n)}(\xi).
+~$$<p>But &#36;f^&#123;&#40;n&#41;&#125;&#40;x&#41; &#61; n&#33;&#36;, a constant. Combine the two.</p><blockquote>
+<p>6.2 13 (n=1 only) The other cases are more algebra:</p>
+</blockquote><p>This is like a product rule. The &#36;n&#61;1&#36; case is proved like that:</p><p><img src="http://i.imgur.com/xlwCxkr.jpg" alt="Imgur" /></p><h2>Ch7: Numeric differentiation and Integration</h2><p>Again, we have a table of function values &#36;&#40;x_0, y_0&#41;, \dots, &#40;x_n, y_n&#41;&#36; where &#36;y_i &#61; f&#40;x_i&#41;&#36;, What can we say about the derivate of &#36;f&#36;? The integral of &#36;f&#36;?</p><p>We had a basic scheme:</p><ul>
+<li>Find &#36;p_n&#40;x&#41;&#36; an interpolating polynomial</li>
+<li>Find &#36;p_n&#39;&#40;x&#41;&#36; of &#36;\int_a^b p_n&#40;x&#41;dx&#36;.</li>
+<li>Approximate the desired answer by the computed answer.</li>
+<li>Assess the error</li>
+</ul><h3>Differentiation</h3><p>For differentiation it was mentioned that if we applied the above to points &#36;x&#36;, &#36;x-h&#36; and &#36;x&#43;h&#36;, we would get the central difference formula:</p>$$~
+f'(x) \approx \frac{f(x+h) - f(x-h)}{2h}.
+~$$<p>The forward difference equation is &#36;&#40;f&#40;x&#43;h&#41; - f&#40;x&#41;&#41;/h&#36;.</p><p>The error in the approximation – when done on the computer – has two sources of error:</p><ul>
+<li>truncation error – what happens when using an approximate polynomial of degree &#36;n&#36; and not an infinite series</li>
+<li>floating point error – resulting from putting the problem on the computer</li>
+</ul><p>For the forward difference, the truncation error is <em>roughly</em> &#36;\mathcal&#123;O&#125;&#40;h&#41;&#36;, whereas the floating point error is &#36;\mathcal&#123;O&#125;&#40;\delta/h&#41;&#36;. So there needs to be a balance if using: take &#36;h&#36; small enough so the truncation error isn't large but not <em>too</em> small so that the floating point error isn't large.</p><p>The central difference has similar floating point error, but truncation error like &#36;\mathcal&#123;O&#125;&#40;h^2&#41;&#36;.  (It is basically &#36;f&#39;&#39;&#39;&#40;\xi&#41;/6\cdot h^2&#36;.)</p><p>We mentioned automatic differentiation, but this won't be on the test.</p><h2>Integration</h2><p>The process of approximating &#36;f&#36; by &#36;p&#36; and integrating &#36;p&#36; leads to 3 familar concepts:</p><ul>
+<li>The Riemann sum is when &#36;n&#61;0&#36;, or using a constant for interpolation</li>
+<li>The trapezoid rule is when &#36;n&#61;1&#36;, or using a linear polynomial for interpolation</li>
+<li>Simpson't rule is when &#36;n&#61;2&#36;, that is a polynomial is used for interpolation</li>
+</ul><p>Rather than globally approximate &#36;&#91;a,b&#93;&#36; with just a few points, what is done if that interval is partitioned and on each subpartition the approximation is used. With this we saw errors, &#36;\int_a^b f&#40;x&#41; dx - \int_a^b p_n&#40;x&#41; dx&#36;, given by</p><ul>
+<li>Riemann &#36;&#40;b-a&#41;^2/n&#36;</li>
+<li>Trapezoid &#36;-1/12f&#39;&#39;&#40;\xi&#41;&#40;b-a&#41;^3/n^2&#36;</li>
+<li>Simpsons &#36;-1/180 f&#39;&#39;&#39;&#39;&#40;\xi&#41;&#40;b-a&#41;^5/n^4&#36;</li>
+</ul><h3>Generalized</h3><p>The expression &#36;\int_a^b p_n&#40;x&#41;dx&#36; can be written differently taking LaGrange's form for polynomial interpolation:</p>$$~
+\int_a^b f(x) dx \approx
+\int_a^b p_n(x) dx - \int_a^b \sum_{k=0}^n f(x_k) l_k(x) dx
+= \sum_{k=0}^n f(x_k) \int_a^b l_k(x)dx = \sum_{k=0}^n f(x_k) A_k.
+~$$<p>The points &#36;x_k&#36; are called the <em>nodes</em> and the terms &#36;A_k&#36; the <em>weights</em>. Both can be precomputed, as they do not depend on &#36;f&#36;.</p><p>The main use here are quadrature formulas:</p><blockquote>
+<p>(p493) Let &#36;w&#36; be a positive weight function (like &#36;w&#40;x&#41; &#61; 1&#36;) and let &#36;q&#36; be a non-zero polynomial of degree &#36;n&#43;1&#36; that is &#36;w&#36;-orthogonal to the space of polynomials of degree &#36;n&#36; or less. Then If &#36;x_0, x_1, \dots, x_n&#36; are the zeros of &#36;q&#36;, the quadrature formula derived by using these zeros as the nodes and used in the weight computation will be <em>exact</em> for any polynomial of degree &#36;2n&#43;1&#36; or less.</p>
+</blockquote><p>(This is an improvement over polynomial interpolation, where the answer is exact for polynomials of degree &#36;n&#36; or less.)</p><p>We saw one family of orthogonal polynomials, those when &#36;w&#61;1&#36;. These were the Legendre polynomials satisfying the recursion:</p>$$~
+P_0(x) = 1, \quad P_1(x) =x, \quad (n+1)P_{n+1}(x) = (2n + 1) x P_n(x)  - n P_{n-1}(x).
+~$$<h3>Error</h3><p>If we defined</p>$$~
+\int_a^b f(x) w(x) dx = \sum_{i=0}^n A_i f(x_i) + E
+~$$<p>Then for &#36;f&#36; in &#36;C^&#123;2&#40;n&#43;1&#41;&#125;&#40;&#91;a,b&#93;&#41;&#36; the error can be written as:</p>$$~
+E = \frac{1}{(2n)!} f^{(2(n+1))}(\xi) \int_a^b (\prod(x-x_i))^2 w(x) dx
+~$$<h3>Questions</h3><blockquote>
+<p>7.1 6 (for &#36;f&#39;&#40;x&#41;&#36; only),</p>
+</blockquote><p>We will do this symbolically about the point &#36;x&#61;0&#36;:</p><pre class="sourceCode julia">h = symbols("h")
+g = SymFunction("g")
+k=5
+1/(12h) * ( -series(g(2h), n=k)+ 8*series(g(h), n=k) - 8*series(g(-h), n=k) + series(g(-2h),  n=k))</pre>
+<div class="well well-sm">
+$$\frac{1}{12 h} \left(12 h \left. \frac{d}{d \xi_{1}} g{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }} + \mathcal{O}\left(h^{5}\right)\right)$$</div>
+
+<p>It may not look it, but that is &#36;g&#39;&#40;0&#41; &#43; \mathcal&#123;O&#125;&#40;h^4&#41;&#36;.</p><blockquote>
+<p>7.2 1</p>
+</blockquote><p>Newton-Cotes is done by integrating the interpolating polynomial. Using &#36;g&#36;, we have:</p><pre class="sourceCode julia">x = symbols("x")
+xs = Sym[0, 1//3, 2//3, 1]
+l(i::Int,xs) = prod( [j == i ? 1 : (x-xs[j+1]) / (xs[i+1] - xs[j+1]) for j in 0:3])
+p = g(0) * l(0, xs) + g(1//3) * l(1, xs) + g(2//3) * l(2, xs) + g(1)*l(3, xs)</pre>
+<div class="well well-sm">
+$$3 x \left(- 3 x + 2\right) \left(- \frac{3 x}{2} + \frac{3}{2}\right) g{\left (0.333333333333333 \right )} + \frac{3 x}{2} \left(- 3 x + 3\right) \left(3 x - 1\right) g{\left (0.666666666666667 \right )} + x \left(\frac{3 x}{2} - \frac{1}{2}\right) \left(3 x - 2\right) g{\left (1 \right )} + \left(- 3 x + 1\right) \left(- \frac{3 x}{2} + 1\right) \left(- x + 1\right) g{\left (0 \right )}$$</div>
+
+<p>And we integrate from &#36;0&#36; to &#36;1&#36;:</p><pre class="sourceCode julia">integrate(p, (x, 0, 1))</pre>
+<div class="well well-sm">
+$$\frac{1}{8} g{\left (0 \right )} + \frac{3}{8} g{\left (0.333333333333333 \right )} + \frac{3}{8} g{\left (0.666666666666667 \right )} + \frac{1}{8} g{\left (1 \right )}$$</div>
+
+<p>We can see the weights: &#36;1/8&#36;, &#36;3/8&#36;, &#36;3/8&#36;, &#36;1/8&#36;.</p><blockquote>
+<p>7.2 2</p>
+</blockquote><p>We need to show that for &#36;p&#40;x&#41; &#61; ax^3 &#43; bx^2 &#43; cx &#43; d&#36; we have that &#36;\int_u^v p&#40;x&#41; dx&#36; is given by Simpson's rule.</p><p>First, Simpson's rule will integrate any <em>quadratic</em> polynomial, as it basically estiamates the function by a quadratic polynomial so the rule will find the given function. But this need not be the case for a cubic. In fact, it is a happy coincedence.</p><p>Second, it is enough to do this over the interval &#36;&#91;0,1&#93;&#36; by a change of variable. So we do that. First, we have the integral of &#36;p&#40;x&#41;&#36;:</p><pre class="sourceCode julia">a,b,c,d,x = symbols("a,b,c,d,x")
+p = a*x^3 + b*x^2 + c*x + d
+q = integrate(p, (x, 0, 1))</pre>
+<div class="well well-sm">
+$$\frac{a}{4} + \frac{b}{3} + \frac{c}{2} + d$$</div>
+
+<p>Now we apply Simspons rule to &#36;p&#36;:</p><pre class="sourceCode julia">q1 = (1-0)//6 * (p(0) + 4*p(1//2) + p(1))</pre>
+<div class="well well-sm">
+$$\frac{a}{4} + \frac{b}{3} + \frac{c}{2} + d$$</div>
+
+<p>And we simply ask are they equal by seeing if their difference is 0?</p><pre class="sourceCode julia">simplify(q - q1)</pre>
+<div class="well well-sm">
+$$0$$</div>
+
+<blockquote>
+<p>7.2.27 Prove the Chebyshev polynomials are orthogonal.</p>
+</blockquote><p>This follow from a trick that re-expresses the polynomial in terms of &#36;U_n&#40;x&#41; &#61; \cos&#40;n acos&#40;x&#41;&#41;&#36;. For then</p>$$~
+\int_{-1}^1 U_n U_m \sqrt{1-x^2}dx = - \int_0^\pi \cos(mu) \cos(nu) du.
+~$$<p>The latter is integrated by using a formula for sums:</p>$$~
+\frac{-1}{2} \int_0^\pi (\cos((m-n)u) + \cos((m+n)u)) du
+~$$<p>When &#36;m\neq n&#36; these are &#36;0&#36; and otherwise yield &#36;\pi/2&#36;.</p><blockquote>
+<p>7.3 3</p>
+</blockquote><p>Derive the Gaussian Quadrature formula for &#36;n&#61;3&#36;.</p><p>For the Gaussian Quadrature, the nodes are the roots of the 4th degree Legendre polynomial and the weights are the integrals thereoff.</p><p>it all starts with the Legendre Polynomials. See Example 1 p496 to find a reference on p401 for</p>$$~
+p4(x) = x^4 - 6/7x^2 + 3/35
+~$$<p>This is a quadratic polynomial in &#36;x^2&#36;, so the quadratic formula can be used. We skip to the chase:</p><pre class="sourceCode julia">x = symbols("x")
+p4 = x^4 - 6//7*x^2 + 3//35
+xs = polyroots(p4) |> keys |> collect |> sort</pre>
+<pre class="output">
+4-element Array{Any,1}:
+  -sqrt(2*sqrt(30)/35 + 3/7)
+ -sqrt(-2*sqrt(30)/35 + 3/7)
+  sqrt(-2*sqrt(30)/35 + 3/7)
+   sqrt(2*sqrt(30)/35 + 3/7)</pre>
+
+<p>With these, the values of &#36;A_i&#36; come from integrating the LaGrange form of the interpolating polynomial:</p><pre class="sourceCode julia">function l(i::Int, xs)    # another way to define l_i
+  us = copy(xs)
+  xi = splice!(us, i+1)
+  prod( [(x - u)/(xi - u) for u in us])
+end
+
+A(i) = integrate(l(i, xs), (x, -1, 1))
+As = map(A, 0:3) |> N</pre>
+<pre class="output">
+4-element Array{Float64,1}:
+ 0.347855
+ 0.652145
+ 0.652145
+ 0.347855</pre>
+
+<p>We can then approximate an integral. For example, &#36;\int_&#123;-1&#125;^1 \exp&#40;x&#41; dx &#61; 2.350402387287602\dots&#36;:</p><pre class="sourceCode julia">[exp(xi)*Ai for (xi,Ai) in zip(xs, As)] |> sum |> N</pre>
+<pre class="output">
+2.350402092156377</pre>
+
+<blockquote>
+<p>7.3 6</p>
+</blockquote><p>We can determine monic polynomial &#36;q&#40;x&#41;&#36; of degree &#36;n&#43;1&#36; orthogonal to each polynomial of degree &#36;n&#36; or less by ensuring that</p>$$~
+q(x) = x^{n+1} + c_nx^n + \cdots + c_1 x + x_0
+~$$<p>satisifes &#36;\int_&#123;-1&#125;^1 q&#40;x&#41; x^k dx &#61; 0&#36; for all &#36;0 \leq k \leq n&#36;.</p><p>Doing so would lead us to the equations of this type for &#36;n&#61;5&#36;</p><pre class="sourceCode julia">n = 5
+a, b= -1, 1
+cs = Sym["c$i" for i in 0:n]
+q = x^(n+1) + sum([ cs[i+1]*x^i for i in 0:n])
+eqs = Sym[integrate(q*x^k,(x,a,b)) for k in 0:n]</pre>
+<div class="well well-sm">
+\begin{bmatrix}2 c_{0} + \frac{2 c_{2}}{3} + \frac{2 c_{4}}{5} + \frac{2}{7}\\\frac{2 c_{1}}{3} + \frac{2 c_{3}}{5} + \frac{2 c_{5}}{7}\\\frac{2 c_{0}}{3} + \frac{2 c_{2}}{5} + \frac{2 c_{4}}{7} + \frac{2}{9}\\\frac{2 c_{1}}{5} + \frac{2 c_{3}}{7} + \frac{2 c_{5}}{9}\\\frac{2 c_{0}}{5} + \frac{2 c_{2}}{7} + \frac{2 c_{4}}{9} + \frac{2}{11}\\\frac{2 c_{1}}{7} + \frac{2 c_{3}}{9} + \frac{2 c_{5}}{11}\end{bmatrix}</div>
+
+<p>Solving for 0 yields:</p><pre class="sourceCode julia">solve(eqs, cs)</pre>
+<div class="well well-sm">
+\begin{equation*}\begin{cases}c_{5} & \text{=>} &0\\c_{3} & \text{=>} &0\\c_{0} & \text{=>} &- \frac{5}{231}\\c_{2} & \text{=>} &\frac{5}{11}\\c_{4} & \text{=>} &- \frac{15}{11}\\c_{1} & \text{=>} &0\\\end{cases}\end{equation*}</div>
+
+<p>So</p><pre class="sourceCode julia">q = x^6 - 15//11 * x^4 + 5//11 * x^2 -5//231</pre>
+<div class="well well-sm">
+$$x^{6} - \frac{15 x^{4}}{11} + \frac{5 x^{2}}{11} - \frac{5}{231}$$</div>
+
+<p>Is orthogonal.</p><p>Is this a good way to go about this? Likely not, it isn't very efficient as compared to the interative scheme.</p><ul>
+<li>The Gauss weights and nodes for &#36;n&#61;3&#36; are given by:</li>
+</ul><pre class="sourceCode julia">nodes = [-sqrt(3 / 5), 0.0, sqrt(3 / 5)]
+weights = [5 // 9, 8 // 9, 5 // 9]</pre>
+<pre class="output">
+3-element Array{Rational{Int64},1}:
+ 5//9
+ 8//9
+ 5//9</pre>
+
+<p>Use these to estimate &#36;\int_&#123;-1&#125;^1 \sin&#40;x&#41; dx&#36;.</p><p>ANS: We just need to evaluate the sum of each term &#36;f&#40;x_i&#41;A_i&#36;:</p><pre class="sourceCode julia">f(x) = sin(x)
+sum([ f(xi)*Ai for (xi, Ai) in zip(nodes, weights)])</pre>
+<pre class="output">
+0.0</pre>
+
+<ul>
+<li>Use the error term and the fact that &#36;|f^&#123;&#40;2n&#41;&#125;&#40;\xi&#41; |&lt;1&#36; to estimate the error.</li>
+</ul><p>For this odd function the error is 0, as the expression will be exact. However, if we didn't know this, then the error for this function is bounded by Theorem 4, which if we take &#36;n&#61;3&#36; here gives a bound of</p>$$~
+\frac{f^{(6)}(\xi)}{6!} \int_a^b q^2(x) \cdot 1 dx
+~$$<p>This is just:</p><pre class="sourceCode julia">n = 3
+1/ factorial(2n) * integrate((x-xs[1]) * (x - xs[2]) * (x - xs[3]), (x, -1, 1)) |> N</pre>
+<pre class="output">
+0.0005208588322981769</pre>
+
+<p>That is basically <code>5e-4</code>.</p><h2>Chapter 8. Differential Equations</h2><p>The IVP (initial value problem) is a specification about a function &#36;x&#40;t&#41;&#36; through a relation involving its derivative at time &#36;t&#36;:</p>$$~
+x'(t) = f(t, x), \quad x(t_0) = x_0
+~$$<p>In 8.1, we see that an IVP may not have an answer for all &#36;t&#36;; it may not have an answer at all; and if it does have an answer, it may not be unique.</p><p>There are theorems which will vouch for uniqueness and existence:</p><blockquote>
+<p>Thm 1. Existence theorem</p>
+</blockquote><p>If &#36;f&#36; is <em>continuous</em> on a rectangle centered at &#36;&#40;t_0, x_0&#41;&#36;, say:</p>$$~
+R = \{ (t,x) : |t - t_0| \leq \alpha, |x - x_0| \leq \beta \}.
+~$$<p>Then the inital value problem has a solution &#36;x&#40;t&#41;&#36; for &#36;|t - t_0| \leq min&#40;\alpha, \beta/M&#41;&#36; where &#36;M&#36; maximizes &#36;|f|&#36; in &#36;R&#36;.</p><blockquote>
+<p>Thm 2 (p526). If both &#36;f&#36; and &#36;\partial f/\partial x&#36; are <em>continuous</em> in R, then there is a unique solution for &#36;|t - t_0| \leq min&#40;\alpha, \beta/M&#41;&#36;</p>
+</blockquote><blockquote>
+<p>Thm 3 If f is Lipshitz then the intial value problem will have a unique solution in some interval.</p>
+</blockquote><p>Precisely, if &#36;f&#36; is continuous on the strip &#36;a \leq t\leq b&#36; and &#36;x \in &#40;-\infty, \infty&#41;&#36; <em>and</em> satisfies the inequality for a fixed &#36;L&#36;:</p>$$~
+| f(t,x_1) - f(t, x_2) | \leq L | x_1 - x_2|
+~$$<p>then the solution exists on the interval &#36;&#91;a,b&#93;&#36;.</p><hr /><p>The last two give conditions on &#36;f&#36; that guarantee an answer exists and is unique, at least for some values of &#36;t&#36;.</p><h3>Euler's method</h3><p>The granddaddy of all methods to numerically approximate the solution to an IVP is Euler's method:</p><p>From a sequence of time steps &#36;t_i &#61; t_0 &#43;  ih&#36;, where &#36;h&#36; is the small time step, Euler's method defines a sequence of &#36;x_i&#36; values through</p>$$~
+x_{i+1} = x_{i} + f(t_i, x_i)
+~$$<p>The approximate local truncation error at each step is like &#36;\mathcal&#123;O&#125;&#40;h^2&#41;&#36;, so if things are nice, the global truncation error will be like &#36;\mathcal&#123;O&#125;&#40;h&#41;&#36;, when the number of steps is basically &#36;1/h&#36;.</p><h3>Taylor methods</h3><p>The Euler method can be derived by starting with a Taylor series:</p>$$~
+x(t + h) = x(t) + x'(t)h + x''(t)/2 \cdot h^2 + \cdots + x^{(n)}(t)/n! \cdot h^n + \mathcal{O}(h^{n+1})
+~$$<p>Then truncating at the first order. As the IVP defines &#36;x&#39;&#40;t&#41;&#36; in terms of &#36;f&#36;, Euler's method is nothing more than the tangent line approximation.</p><p>Using more terms can be done by differentiating, though that gets tricky.</p><h3>Runge-Kutte methods</h3><p>The Runge - Kutte methods generalize Euler's method by adding various combinations of the approximations for &#36;f&#36;. The two discussed in class were:</p><ul>
+<li>Heun's method where</li>
+</ul>$$~
+\begin{align}
+x_{n+1} &= x_n + \frac{1}{2} F_1 + \frac{1}{2} F_2, \text{ where}\\
+F_1(x) &= h\cdot f(t, x)\\
+F_2(x) &= h\cdot f(t+h, F_1)
+\end{align}
+~$$<p>This has  local truncation errors of &#36;\mathcal&#123;O&#125;&#40;h^3&#41;&#36;</p><ul>
+<li>The fourth order method</li>
+</ul>$$~
+\begin{align}
+x_{n+1} &= x_n + \frac{1}{6}( F_1 + 4F_2 + 4F_3 + F_4), \text{ where}\\
+F_1 &= h\cdot f(t_n, x_n)\\
+F_2 &= h\cdot f(t_n+h, F_1/2)\\
+F_3 &= h\cdot f(t_n+h, F_2/2)\\
+F_2 &= h\cdot f(t_n+h, F_3)\\
+\end{align}
+~$$<p>This has  local truncation errors of &#36;\mathcal&#123;O&#125;&#40;h^5&#41;&#36; and global error of  &#36;\mathcal&#123;O&#125;&#40;h^4&#41;&#36;</p><h3>Multistep methods</h3><p>The general multistep model might look like this (from p557)</p>$$~
+a_k x_n + a_{k-1}x_{n-1} + \cdots + a_0 x_{n-k} =
+h( b_k f_n + f_{k-1} f_{n-1} + \cdots + b_0 f_{n-k}).
+~$$<p>We discussed:</p><ul>
+<li>if &#36;b_k \neq 0&#36; the method is <em>implicit</em> otherwise it is explicit</li>
+<li>Definining &#36;p&#40;x&#41;&#36; and &#36;q&#40;x&#41;&#36; using the coefficients &#36;a&#36; and &#36;b&#36; that the method converges only if all the roots of &#36;p&#36; are in or on the unit disc, and if on, they are simple roots <em>and</em> &#36;p&#40;1&#41;&#61;0&#36; and &#36;p&#39;&#40;1&#41; &#61; q&#40;1&#41;&#36;. (Consistent and stable)</li>
+<li>If &#36;f_x &lt; \lambda&#36;, the if the local truncation error is &#36;\mathcal&#123;O&#125;&#40;h^&#123;m&#43;1&#125;&#41;&#36; then the global error is &#36;\mathcal&#123;O&#125;&#40;h^m&#41;&#36;</li>
+</ul><p>Some special cases:</p><ul>
+<li>Euler's method</li>
+<li>Backward Euler</li>
+<li>Adams Bashworth</li>
+<li>Adams Moulton</li>
+</ul><h3>Problems</h3><ul>
+<li>Let an IVP be given by &#36;x&#39;&#40;t&#41; &#61; atan&#40;x&#41;, \quad x&#40;0&#41; &#61; 0&#36;. Is &#36;f&#40;t,x&#41;&#36;</li>
+</ul><ol>
+<li>continuous in the strip &#36;0 \leq t \leq 10&#36; and &#36;-\infty &lt; x &lt; \infty&#36;?</li>
+<li>does it satisfy &#36;~ |f&#40;t,x_1&#41; - f&#40;t,x_2&#41;| \leq L |x_1 - x_2| ~&#36;</li>
+</ol><blockquote>
+<p>ANS:</p>
+</blockquote><p>The condition is satisfied if there is a derivative in &#36;x&#36; that is bound. But the derivative of the arctangent is bounded by &#36;1&#36; in absolute value.</p><ul>
+<li>Use one of the theorems in section 8.1 to show p9 on page 528. You need to show that &#36;\beta/M&#36; can be as large of the value, where &#36;M&#36; is the biggest that &#36;f&#40;t,x&#41;&#36; can be in when &#36;|x| &lt; \beta&#36;.</li>
+</ul><p>We need to maximize  &#36;\beta/M&#36;, where &#36;M&#36; is the maximum over &#36;&#91;-\beta, beta&#93;&#36;. But &#36;t^2 &#43; e^x&#36; is increasing, so we have to maximize &#36;\beta/&#40;t^2 &#43; exp&#40;\beta&#41;&#41;&#36;. This is a bit tricky, but we can verify that for &#36;|t| \leq 0.351&#36; it works:</p><pre class="sourceCode julia">using Roots
+M(beta) = 0.351^2 + exp(beta)
+x0 = fzero(D(beta -> beta/M(beta)), 1)    # crtical point of the function beta/M(beta)
+f(x0)</pre>
+<pre class="output">
+0.8641195031781626</pre>
+
+<p>That this is more than <code>0.351</code> and the theorem says &#36;t \leq min&#40;\alpha, \beta/M&#41;&#36;, the problem is shown.</p><ul>
+<li>Using &#36;h&#61;1/3&#36; use Euler's method to solve the IVP at &#36;t&#61;1&#36; with</li>
+</ul>$$~
+x'(t) = 10 - 3x \cdot t\quad
+x(0) = 1
+~$$<pre class="sourceCode julia">h = 1/3
+f(t, x) = 10-3x
+t0, x0 = 0, 1
+t1, x1 = t0 + h, x0 + h * f(t0, x0)
+t2, x2 = t1 + h, x1 + h * f(t1, x1)
+t3, x3 = t2 + h, x2 + h * f(t2, x2)
+x3</pre>
+<pre class="output">
+3.333333333333333</pre>
+
+<ul>
+<li>Using &#36;h&#61;1/3&#36; use the Heun's method to solve the following IVP at &#36;t&#61;1&#36;. </li>
+</ul>$$~
+x'(t) = 1 + x^2,\quad x(0)=0
+~$$<pre class="sourceCode julia">h = 1/3
+h(t, x) = 1 + x^2
+function heun(f, t,x)
+  F1 = h*f(t, x)
+  F2 = h*f(t + h, F1)
+  x + (1/2) *F1 + (1/2)*F2
+end
+
+t1, x1 = t0 + h, heun(f, t0, x0)
+t2, x2 = t1 + h, heun(f, t1, x1)
+t3, x3 = t2 + h, heun(f, t2, x2)
+x3</pre>
+<pre class="output">
+6.0</pre>
+
+<ul>
+<li>problem 2, page 546</li>
+</ul><p>We need to solve for &#36;x&#39;&#40;t&#41; &#61; f&#40;t,x&#41;&#36;, so solving for &#36;x&#39;&#36; we see:</p>$$~
+x' = (3-x) / (2t + x)
+~$$<p>So &#36;f&#40;t,x&#41; &#61; &#40;3-x&#41;/&#40;2t&#43;x&#41;&#36;.</p><ul>
+<li>The Runge Kutte method is often called <code>rk45</code>, as the global error is order 4 and the local error order 5. Assuming this, what should be the step size &#36;h&#36; so that the error at time &#36;1&#36; (starting at &#36;0&#36; is basically &#36;10^&#123;-5&#125;&#36;?</li>
+</ul><blockquote>
+<p>Ans</p>
+</blockquote><p>Assuming that &#36;\mathcal&#123;O&#125;&#40;h^5&#41;&#36; means basically &#36;h^5&#36;, that is &#36;C&#61;1&#36; we have to solve: &#36;h^4 \leq 10^&#123;-5&#125;&#36;. But &#36;h&#61;&#40;b-a&#41;/n&#36; so if we are looking at an interval of length &#36;1&#36;, we should have &#36;n \approx 10^&#123;5/4&#125;&#36;.</p><ul>
+<li>The second-order Adams-Bashworth method is</li>
+</ul>$$~
+x_{n+1} = x_n + h[(3/2) f_n - (1/2) f_{n-1}]
+~$$<p>Take &#36;h&#61;1/4&#36;. Using Euler's method to find &#36;x_1&#36;, find &#36;x_4&#36; when</p>$$~
+x'(t) = t + x, \quad
+x'(0) = 1
+~$$<pre class="sourceCode julia">f(t,x) = t+x
+h = 1/4
+t0, x0 = 0, 1
+t1, x1 = t0 + h,x0 + h*f(t0, x0)   # Euler step
+t2, x2 = t1 + h,  x1 + h * (3/2 * f(t1, x1) - 1/2 * f(t0, x0))
+t3, x3 = t2 + h,  x2 + h * (3/2 * f(t2, x2) - 1/2 * f(t1, x1))
+t4, x4 = t3 + h,  x3 + h * (3/2 * f(t3, x3) - 1/2 * f(t1, x1))
+x4</pre>
+<pre class="output">
+3.2841796875</pre>
+
+<ul>
+<li>The implicit Euler (backward) is</li>
+</ul>$$~
+x_{n+1} = x_n + h f(t_{n+1}, x_{n+1}).
+~$$<p>For the IVP</p>$$~
+x'(t) = -10x, \quad x(0) =1
+~$$<p>The implicitness can be solved directly, as &#36;f&#36; is linear. Using &#36;h&#61;1/3&#36;, find &#36;x_3&#36;.</p><blockquote>
+<p>Ans.</p>
+</blockquote><p>As an aside, we need to solve at each step</p>$$~
+x_{n+1} = x_n - 10 x_{n+1}
+~$$<p>That is simply &#36;x_n/11&#36;. So,</p><pre class="sourceCode julia">f(t,x) = -10x
+h = 1/3
+t0, x0 = 0, 1
+t1, x1 = t0+h, x0/11
+t2, x2 = t1 +h, x1/11
+t3, x3 = t2+h, x2/11
+x3</pre>
+<pre class="output">
+0.0007513148009015778</pre>
+
+<ul>
+<li>The multistep method is convergent if it is both stable and consistent. Both these may be checked by accompanying polynomials.</li>
+</ul><p>Show the  second-order Adams-Bashworth method </p>$$~
+x_{n+1} = x_n + h[(3/2) f_n - (1/2) f_{n-1}]
+~$$<p>is convergent.</p><blockquote>
+<p>Ans</p>
+</blockquote><p>We have &#36;p&#40;x&#41; &#61; x^2 - x&#61;x&#40;x-1&#41;&#36; and &#36;q&#40;x&#41; &#61; 3/2 \cdot x - 1/2&#36;. So, we need to check:</p><ul>
+<li>the zeros of &#36;p&#36; are 0 and 1, so the zeros are not ouside the unit disc and any on the boundary are simple.</li>
+<li>we have &#36;p&#40;1&#41; &#61; 0&#36; and &#36;p&#39;&#40;1&#41; &#61; 2 &#61; q&#40;1&#41;&#36;.</li>
+</ul><ul>
+<li>The Runge Kutta methods involve a certain number of function evaluations per step. The following table shows the best possible local truncation error for a given number of function evaluations:</li>
+</ul><pre class="sourceCode julia">Evals  order
+2  2
+3  3
+4  4
+5  4
+6  5
+7  6
+8  6
+9  7</pre>
+<ul>
+<li>Why might this suggest using an order 4 method?</li>
+</ul><p>Going from 4 to 5 does not increase the order, but does mean more work done.</p><ul>
+<li>Euler's method has 1 evaluation for order 2. Compare the sum of the 1-step errors in using 4 steps of Euler of size &#36;h/4&#36; with one step of a fourth order RK method with order 4. What values of &#36;h&#36; would make one more attractive than the other?</li>
+</ul><blockquote>
+<p>Ans:</p>
+</blockquote><p>Euler would have &#36;4 h/4 \approx&#40;x&#41;&#36;, whereas at RK would have &#36;h^4&#36;. So if &#36;|h| &lt; 1&#36; , the second is better.</p>
+  </div>
+</div>  
+
+</body>
+</html>

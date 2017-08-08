@@ -154,7 +154,7 @@ $$~
 
 That is, take the $l_1$ norm for each row vector and find the largest value
 
-> Thm. The $||A||_1$ norm is found by taking the $l_1$ norm of each column vetor and finding the largest.
+> Thm. The $||A||_1$ norm is found by taking the $l_1$ norm of each column vector and finding the largest.
 
 ## Condition number
 

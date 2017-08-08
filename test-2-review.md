@@ -1,5 +1,7 @@
 # Review for test 2
 
+> 11/11: Please let me know if something seems wrong. I may add more questions, but wanted to get this up sooner than later.
+
 This is some of the material that will be up for testing on test 2.
 
 ## Chapter 3
@@ -241,7 +243,7 @@ $$~
 
 We commented that when $p=2$, this is related to the singular values of $A$, which are the eigen values of $A^TA$.
 
-When $p=\infty$, the $\| \cdot \|_{\infty}$ norm is related to largest of the $l_1$ norms of the column vectors of $A$.
+When $p=\infty$, the $\| \cdot \|_{\infty}$ norm is related to largest of the $l_1$ norms of the **row** vectors of $A$.
 
 
 A useful inequality of matrix norms is $\| A B \| \leq \| A \| \cdot \| B \|$, Similarly, $\|Ax\| \leq \| A \| \cdot \| x \|$. These are true for the matrix norm induced by the vector norm.
@@ -252,7 +254,7 @@ $$~
 \frac{\| x - \tilde{x} \|}{\|x\|} \leq \kappa(A) \cdot \frac{\| b - \tilde{b} \|}{\|b\|}.
 ~$$
 
-The condition number is $\kappa(A) = \| A \| \cdot \|A^{-1}\|$. 
+The condition number is $\kappa(A) = \| A \| \cdot \|A^{-1}\|$. It depends on the  norm used.
 
 
 ## Iterative schemes
@@ -315,8 +317,6 @@ x^{(k+1)} = Gx^{(k)} + c
 then this will converge if the magnitude of the largest eigenvalue is less than 1.
 
 
-
-
 ### Some sample problems
 
 * Show that the product of lower triangular matrices is lower triangular using the characacteriaztion that $L$ is LT if $l_{ij}=0$ when $j > i$ (the column index is bigger than the row one).
@@ -356,6 +356,47 @@ Did you need to use a permutation matrix?
 
 Use your answer to solve $Ax=[1,2,3]^T$.
 
+* Prove or disprove: If $L$ and $U$ are lower and upper triangular, then $UL$ can not be upper triangular.
+
+* A symmetric, positive-definite matrix satisfies the inequality: $|a_{ij}|^2 \leq a_{ii} a_{jj}|$ Verify if this is the case for the symmetric matrix
+
+$$~
+A = \left[
+\begin{array}{cc}
+1 & 2\\
+2 & 1
+\end{array}
+\right]
+~$$
+
+Does $A$ have a Cholesky decomposition?
+
+* for the matrix
+
+```
+using SymPy
+A = [ Sym(4) 1 2; 1 2 3; 2 1 2]
+```
+
+The LU decomposition is given by:
+
+```
+L, U, p = lu(A)
+```
+
+From this, we have inverses:
+
+```
+inv(L)
+```
+
+and
+
+```
+inv(U)
+```
+
+Show that we can find $A^{-1}$ using these two matrices. What is the value?
 
 * Find $\| A\|_\infty$ when $A$ is the matrix
 
@@ -371,7 +412,7 @@ A = \left[
 ~$$
 
 
-* Find the condition number of $A$ when $A$ is the matrix:
+* Find the condition number of $A$ using the $l_\infty$ norm when $A$ is the matrix:
 
 $$~
 A = \left[
@@ -390,4 +431,40 @@ $$~
 x^{(k+1)} = Q^{-1} B x^{(k)} + Q^{-1}b.
 ~$$
 
-This is of the general form $x^{(k+1)} = Gx^{(k)} + c$. What  condition on $Q$ and $B$ will ensure convergence?
+This is of the general form $x^{(k+1)} = Gx^{(k)} + c$. Using the criteria that the spectral radius of $G$ must be less than 1, how does this translate to a condition on $Q$ and $B$ that will ensure convergence?
+
+* Define the matrix $A$ and vector $b$ by
+
+```
+A = [1 2; 3 4]
+```
+
+and
+
+```
+b = [1,2]
+```
+
+A guess at an answer is $x^{(0)} = [-1/4, 1/4]$. Compute the residual value $r^{(0)} = b - Ax^{(0)}$. The error $e^{(0)}$ satisfies $Ae^{(0)} = r^{(0))}$. Find $e^{(0)}$.
+
+
+* Let the matrix $A$ be given by:
+
+```
+A = [1 1/2; 1/3 1/4]
+```
+
+The Jacobi method takes $Q$ to be the diagonal of $Q$. Is it guaranteed to converge for some $b$? (Use the $\|\cdot \|_\infty$ norm.)
+
+You might be interested in this computation:
+
+```
+Q = diagm(diag(A)) # [1 0; 0 1/4]
+I - inv(Q) * A
+```
+
+* Prove that is $A$ is invertible and $\| B - A\| < \|A^{-1}\|^{-1}$ then $B$ is invertible.
+
+* Prove that if $A$ is invertible, $(A^{-1})^T = (A^T)^{-1}$.
+
+* Suppose $A$ is invertible. Show that there exists an $\epsilon > 0$ such that any $B$ satisfying $\|A - B\| < \

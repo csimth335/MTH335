@@ -341,48 +341,41 @@ A</pre>
  0.0  1.0  -0.333333
  3.0  3.0   2.0     </pre>
 
-<p>Now we repeat, only we don't want to consider row 3, which we keep track of mentally and don't try to code.</p><pre class="sourceCode julia">s = mapslices(x->maximum(abs(x)), A, 2) </pre>
-<pre class="output">
-3x1 Array{Float64,2}:
- 3.33333
- 1.0    
- 3.0    </pre>
-
-<pre class="sourceCode julia">i = 2
+<p>Now we repeat, only we don't want to consider row 3, which we keep track of mentally and don't try to code.</p><pre class="sourceCode julia">i = 2
 A[:,i]./ s</pre>
 <pre class="output">
 3x1 Array{Float64,2}:
- 0.6
- 1.0
- 1.0</pre>
+ 0.5     
+ 0.333333
+ 1.0     </pre>
 
-<p>The answer is &#36;p&#61;2&#36; now. We  continue by subtracting a multiple of row 2 from row 1 </p><pre class="sourceCode julia">p = 2
+<p>The answer is &#36;p&#61;1&#36; now. We  continue by subtracting a multiple of row 1 from row 2</p><pre class="sourceCode julia">p = 1
 push!(ps, p)
 L[p, i] = 1
-L[1,i] = A[1,i] /A[p,i]
-A[1,:] = A[1,:] - L[1,i] * A[p,:]
+L[2,i] = A[2,i] /A[p,i]
+A[2,:] = A[2,:] - L[2,i] * A[p,:]
 A</pre>
 <pre class="output">
 3x3 Array{Float64,2}:
- 0.0  0.0  -2.66667 
- 0.0  1.0  -0.333333
- 3.0  3.0   2.0     </pre>
+ 0.0  2.0  -3.33333
+ 0.0  0.0   1.33333
+ 3.0  3.0   2.0    </pre>
 
-<p>So we have our permutation vector: &#36;p &#61; &#91;3, 2, 1&#93;&#36;. Our matrix &#36;U&#36; is then seen to be</p><pre class="sourceCode julia">push!(ps, 1)
-L[1,3] = 1
+<p>So we have our permutation vector: &#36;p &#61; &#91;3, 1, 2&#93;&#36;. Our matrix &#36;U&#36; is then seen to be</p><pre class="sourceCode julia">push!(ps, 2)
+L[2,3] = 1
 U = A[ps,  :]</pre>
 <pre class="output">
 3x3 Array{Float64,2}:
- 3.0  3.0   2.0     
- 0.0  1.0  -0.333333
- 0.0  0.0  -2.66667 </pre>
+ 3.0  3.0   2.0    
+ 0.0  2.0  -3.33333
+ 0.0  0.0   1.33333</pre>
 
 <p>Our matrix &#36;L&#36; comes from using the  factors above (where we used minus signs):</p><pre class="sourceCode julia">L = L[ps, :]</pre>
 <pre class="output">
 3x3 Array{Float64,2}:
   1.0       0.0  0.0
-  0.666667  1.0  0.0
- -0.333333  2.0  1.0</pre>
+ -0.333333  1.0  0.0
+  0.666667  0.5  1.0</pre>
 
 <p>Finally, we check that we got what we wanted: &#36;LU&#36; is the permuted &#36;A&#36;:</p><pre class="sourceCode julia">L*U - Aorig[ps,:]</pre>
 <pre class="output">
@@ -396,17 +389,17 @@ U = A[ps,  :]</pre>
 (
 3x3 Array{Float64,2}:
   1.0       0.0  0.0
-  0.666667  1.0  0.0
- -0.333333  2.0  1.0,
+ -0.333333  1.0  0.0
+  0.666667  0.5  1.0,
 
 3x3 Array{Float64,2}:
- 3.0  3.0   2.0     
- 0.0  1.0  -0.333333
- 0.0  0.0  -2.66667 ,
+ 3.0  3.0   2.0    
+ 0.0  2.0  -3.33333
+ 0.0  0.0   1.33333,
 
-[3,2,1])</pre>
+[3,1,2])</pre>
 
-<p>This is different than partial pivoting, as might be expected in some cases. The &#36;LU&#36; factorization is not unique. What can be said is:</p><blockquote>
+<p>This ended up being the same as partial pivoting, as might be expected in some cases, but certainly not all, as the &#36;LU&#36; factorization is not unique. What can be said is:</p><blockquote>
 <p>Theorem 2, p173 With pivoting, there is a factorization &#36;LU &#61; PA&#36;.</p>
 </blockquote><h3>Compare to lu function</h3><p>Julia has a built in <code>lu</code> function to return the triple:</p><pre class="sourceCode julia">A = copy(Aorig)
 lu(A)</pre>
@@ -427,7 +420,7 @@ lu(A)</pre>
 <p>This agrees with the factorization we found with partial pivoting. The empirical claim is that partial pivoting is nearly always better compared to complete pivoting due to the extra overhead required for complete pivoting.</p><h2>Counting steps</h2><p>Suppose &#36;A&#36; is &#36;n \times n&#36;. If applicable, mathematicallly solving &#36;Ax &#61; b&#36; is as easy as writing &#36;x &#61; A^&#123;-1&#125; b&#36;. Why bother with &#36;LUx &#61; b&#36; and then solving both &#36;Ly&#61;b&#36; and &#36;Ux&#61;y&#36;? (Actually we take  &#36;&#91;A ~b&#93;&#36; and find &#36;&#91;U ~ b&#39;&#93;&#36; then solve this backsubstitution problem.)</p><p>One reason is it takes fewer steps.</p><p>The book argues that addition and subtraction are much cheaper to do than multiplication and division, so when counting operations, we should just count the long operations, <code>ops</code> or short.</p><p>Let's look at how many such operations are done for our pivoted Gaussian elimination. First the &#36;U&#36; term.</p><p>For &#36;i&#61;1&#36;, the first row is multiplied by some factor and &#36;n-1&#36; times and subtracted from other rows. This is &#36;n\cdot&#40;n-1&#41;&#36; steps, not counting the division to find the factor. For that, we have &#36;n&#36; operations to find the pivot row (not counting the time to find a maximum, we did divide the &#36;i&#36;th column by the scale, hence &#36;n&#36;). So all told, we have basically &#36;n&#40;n-1&#41; &#43; n&#36; <code>ops</code>.</p><p>For &#36;i&#61;2&#36;, we could repeat, but note that we are basically working with matrix without the &#36;p&#36;th row and the first column, so we have the same computation with an &#36;&#40;n-1&#41; \times &#40;n-1&#41;&#36; size matrix. So the answer will be &#36;n-1&#36; <code>ops</code>.</p><p>And so on, to where we get this elimination costs us this many <code>ops</code>:</p>$$~
 n^2 + (n-1)^2 + \cdots + 2^2 = \sum_{i=1}^n i^2 -1 = \frac{n(n-1)(2n-1)}{6} -1 \approx \frac{n^3}{3} + \frac{n^2}{2}.
 ~$$<p>Now to count the steps to modify the &#36;b&#36; to get &#36;b&#39;&#36;. The first row introduces &#36;n-1&#36;, the second &#36;n-2&#36;, the third &#36;n-3&#36; and so on, so this involves &#36;\sum_&#123;i&#61;1&#125;^&#123;n-1&#125; u&#36;  or &#36;n&#40;n-1&#41;/2&#36;</p><p>To do the back substitution, we have &#36;1&#36; division for the first row, &#36;2&#36; <code>ops</code> for the second (we have &#36;ax_j &#43; bx_&#123;j-1&#125;&#61;c&#36; and we solve for &#36;x_j&#36; through &#36;&#40;1/a&#41; \cdot &#40;c - bx_&#123;j-1&#125;&#41;&#36; which is &#36;2&#36; <code>ops</code>.) And so on to give: $ 1 +2 + \cdots +n$ or &#36;&#40;n&#43;1&#41;n/2&#36; counts.</p><p>All told we can put together to get a count. The book presents this a bit differently, for the case where we are solving &#36;&#91;A; b_1;b_2; \dots;b_m&#93;&#36; simulataneously, and then we have:</p><blockquote>
-<p>Theorem 4 (p176) on Long Operations: To solve &#36;Ax&#61;b&#36; for &#36;m&#36; vectors &#36;b&#36; where &#36;A&#36; is &#36;n\times n&#36; involves approximately this many <code>ops</code>:</p>
+<p>Theorem 4 (p176) on Long Operations: To solve &#36;Ax&#61;b&#36; using Gaussian elimination with scaled row pivoting for &#36;m&#36; vectors &#36;b&#36; where &#36;A&#36; is &#36;n\times n&#36; involves approximately this many <code>ops</code>:</p>
 </blockquote>$$~
 \frac{n^3}{3} + (\frac{1}{2} + m) n^2.
 ~$$<p>So, for a single &#36;b&#36;, to solve &#36;Ax&#61;b&#36; by this method is basically &#36;n^3/3&#36; steps. Whereas to find the inverse itself (and not counting the steps in &#36;A^&#123;-1&#125;b&#36;, can be found by taking &#36;m&#61;n&#36; in the formula (reducing &#36;&#91;A;I&#93;&#36;). To give:</p>$$~

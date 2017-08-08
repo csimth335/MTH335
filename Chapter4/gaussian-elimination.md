@@ -292,33 +292,30 @@ A
 
 Now we repeat, only we don't want to consider row 3, which we keep track of mentally and don't try to code.
 
-```
-s = mapslices(x->maximum(abs(x)), A, 2) 
-```
 
 ```
 i = 2
 A[:,i]./ s
 ```
 
-The answer is $p=2$ now. We  continue by subtracting a multiple of row 2 from row 1 
+The answer is $p=1$ now. We  continue by subtracting a multiple of row 1 from row 2
 
 ```
-p = 2
+p = 1
 push!(ps, p)
 L[p, i] = 1
-L[1,i] = A[1,i] /A[p,i]
-A[1,:] = A[1,:] - L[1,i] * A[p,:]
+L[2,i] = A[2,i] /A[p,i]
+A[2,:] = A[2,:] - L[2,i] * A[p,:]
 A
 ```
 
 
 
-So we have our permutation vector: $p = [3, 2, 1]$. Our matrix $U$ is then seen to be
+So we have our permutation vector: $p = [3, 1, 2]$. Our matrix $U$ is then seen to be
 
 ```
-push!(ps, 1)
-L[1,3] = 1
+push!(ps, 2)
+L[2,3] = 1
 U = A[ps,  :]
 ```
 
@@ -341,7 +338,7 @@ For scaled pivoting we found:
 L, U, ps
 ```
 
-This is different than partial pivoting, as might be expected in some cases. The $LU$ factorization is not unique. What can be said is:
+This ended up being the same as partial pivoting, as might be expected in some cases, but certainly not all, as the $LU$ factorization is not unique. What can be said is:
 
 
 > Theorem 2, p173 With pivoting, there is a factorization $LU = PA$.
@@ -384,7 +381,7 @@ To do the back substitution, we have $1$ division for the first row, $2$ `ops` f
 
 All told we can put together to get a count. The book presents this a bit differently, for the case where we are solving $[A; b_1;b_2; \dots;b_m]$ simulataneously, and then we have:
 
-> Theorem 4 (p176) on Long Operations: To solve $Ax=b$ for $m$ vectors $b$ where $A$ is $n\times n$ involves approximately this many `ops`:
+> Theorem 4 (p176) on Long Operations: To solve $Ax=b$ using Gaussian elimination with scaled row pivoting for $m$ vectors $b$ where $A$ is $n\times n$ involves approximately this many `ops`:
 
 $$~
 \frac{n^3}{3} + (\frac{1}{2} + m) n^2.

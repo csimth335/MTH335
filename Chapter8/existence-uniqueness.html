@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Existence and Uniqueness</h1><p>The basic model we have is a initial value problem of the type:</p>$$~
+x'(t) = f(t, x), \quad x(t_0) = x_0$.
+~$$<p>Example,</p>$$~
+x'(t) = a.
+~$$<p>Here &#36;f&#40;t,x&#41; &#61; a&#36; for some constant &#36;a&#36;. We know that we can "integrate" to get &#36;x&#40;t&#41; &#61; at&#36;. The formula for the velocity when acceleration is constant.</p><p>What about when there is a drag:</p>$$~
+x'(t) = a - cx(t)
+~$$<p>Then &#36;f&#40;t,x&#41; &#61; a-cx&#36;. Is there a simple solution?</p><p>Fact: not all initial-value problems will have a solution.</p><p>Fact: even if there are solutions, they may blow up.</p><p>Example from the book:</p>$$~
+x' = 1 + x^2, \quad x(0) = 0
+~$$<p>This has solution &#36;\tan&#40;x&#41;&#36; on &#36;&#40;0,\pi/2&#41;&#36;, but blows up at &#36;\pi/2&#36;></p><h3>Existence</h3><blockquote>
+<p>Thm 1. Existence theorem</p>
+</blockquote><p>If &#36;f&#36; is <em>continuous</em> on a rectangle centered at &#36;&#40;t_0, x_0&#41;&#36;, say:</p>$$~
+R = \{ (t,x) : |t - t_0| \leq \alpha, |x - x_0| \leq \beta \}.
+~$$<p>Then the inital value problem has a solution &#36;x&#40;t&#41;&#36; for &#36;|t - t_0| \leq min&#40;\alpha, \beta/M&#41;&#36; where &#36;M&#36; maximizes &#36;|f|&#36; in &#36;R&#36;.</p><p>Example: &#36;f&#40;t,x&#41; &#61; 1 &#43; x^2&#36;. This is continuous everywhere. On an interval of the form &#36;R_&#123;\alpha,\beta&#125;&#36; centered at &#36;&#40;0,0&#41;&#36;, the maximum value of &#36;f&#36; will be &#36;1 &#43; \beta^2&#36;. So &#36;\beta/M &#61; \beta/&#40;1 &#43; beta^2&#41;&#36; This is largest at &#36;beta&#61;1&#36; or &#36;M&#61;1/2&#36;. So this guarantee only guarantees existence through &#36;-1/2, 1/2&#36; for &#36;t&#36;, but it is wider.</p><h3>Uniqueness</h3><blockquote>
+<p>Thm 2 (p526). If both &#36;f&#36; and &#36;\partial f/\partial x&#36; are <em>continuous</em> in R, then there is a unique solution for &#36;|t - t_0| \leq min&#40;\alpha, \beta/M&#41;&#36;</p>
+</blockquote><h3>Existence and uniqueness</h3><blockquote>
+<p>Thm 3 If f is Lipshitz then the intial value problem will have a unique solution in some interval.</p>
+</blockquote><p>Precisely, if &#36;f&#36; is continuous on the strip &#36;a \leq t\leq b&#36; and &#36;x \in &#40;-\infy, \infty&#41;&#36; <em>and</em> satisfies the inequality for a fixed &#36;L&#36;:</p>$$~
+| f(t,x_1) - f(t, x_2) | \leq L | x_1 - x_2|
+~$$<p>then the solution exists on the interval &#36;&#91;a,b&#93;&#36;.</p>
+  </div>
+</div>  
+
+</body>
+</html>

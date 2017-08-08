@@ -100,7 +100,9 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Review for test 2</h1><p>This is some of the material that will be up for testing on test 2.</p><h2>Chapter 3</h2><p>In Chapter 3 we discussed various means to solve the equation &#36;f&#40;x&#41;&#61;0&#36; where &#36;f: R \rightarrow R&#36;. (That is a &#36;f&#36; is a scalar-valued function of a real variable). This formulation applies to finding answers for each of these equations:</p>$$~
+<h1>Review for test 2</h1><blockquote>
+<p>11/11: Please let me know if something seems wrong. I may add more questions, but wanted to get this up sooner than later.</p>
+</blockquote><p>This is some of the material that will be up for testing on test 2.</p><h2>Chapter 3</h2><p>In Chapter 3 we discussed various means to solve the equation &#36;f&#40;x&#41;&#61;0&#36; where &#36;f: R \rightarrow R&#36;. (That is a &#36;f&#36; is a scalar-valued function of a real variable). This formulation applies to finding answers for each of these equations:</p>$$~
 \begin{align}
 \sin(x) -x + 1/2 &= 0\\
 \tan(x) + x &= 1\\
@@ -249,9 +251,9 @@ I & 0^T\\
 \| x \|_p = (|x_1|^p +|x_2|^p +|x_3|^p +\cdots + |x_n|^p)^{1/p}.
 ~$$<p>The induced matrix norm is a norm on the set of matrices that is derived from a norm on vectors. It is specified by:</p>$$~
 \| A \|_p = \text{The largest value of } \{\|Ax\|_p: \|x \|_p = 1\}.
-~$$<p>We commented that when &#36;p&#61;2&#36;, this is related to the singular values of &#36;A&#36;, which are the eigen values of &#36;A^TA&#36;.</p><p>When &#36;p&#61;\infty&#36;, the &#36;\| \cdot \|_&#123;\infty&#125;&#36; norm is related to largest of the &#36;l_1&#36; norms of the column vectors of &#36;A&#36;.</p><p>A useful inequality of matrix norms is &#36;\| A B \| \leq \| A \| \cdot \| B \|&#36;, Similarly, &#36;\|Ax\| \leq \| A \| \cdot \| x \|&#36;. These are true for the matrix norm induced by the vector norm.</p><p>The use of norms make it possible to prove this inequality on the relative errors of solving &#36;Ax&#61;b&#36; when there is an error in finding &#36;b&#36;:</p>$$~
+~$$<p>We commented that when &#36;p&#61;2&#36;, this is related to the singular values of &#36;A&#36;, which are the eigen values of &#36;A^TA&#36;.</p><p>When &#36;p&#61;\infty&#36;, the &#36;\| \cdot \|_&#123;\infty&#125;&#36; norm is related to largest of the &#36;l_1&#36; norms of the <strong>row</strong> vectors of &#36;A&#36;.</p><p>A useful inequality of matrix norms is &#36;\| A B \| \leq \| A \| \cdot \| B \|&#36;, Similarly, &#36;\|Ax\| \leq \| A \| \cdot \| x \|&#36;. These are true for the matrix norm induced by the vector norm.</p><p>The use of norms make it possible to prove this inequality on the relative errors of solving &#36;Ax&#61;b&#36; when there is an error in finding &#36;b&#36;:</p>$$~
 \frac{\| x - \tilde{x} \|}{\|x\|} \leq \kappa(A) \cdot \frac{\| b - \tilde{b} \|}{\|b\|}.
-~$$<p>The condition number is &#36;\kappa&#40;A&#41; &#61; \| A \| \cdot \|A^&#123;-1&#125;\|&#36;. </p><h2>Iterative schemes</h2><p>We spoke about a few iterative schemes. The first is used to "polish" approximate answers. It goes like:</p><p>Suppose we have an approximate answer &#36;x^&#123;&#40;0&#41;&#125;&#36; to &#36;Ax&#61;b&#36;. Then we get the residual is</p>$$~
+~$$<p>The condition number is &#36;\kappa&#40;A&#41; &#61; \| A \| \cdot \|A^&#123;-1&#125;\|&#36;. It depends on the  norm used.</p><h2>Iterative schemes</h2><p>We spoke about a few iterative schemes. The first is used to "polish" approximate answers. It goes like:</p><p>Suppose we have an approximate answer &#36;x^&#123;&#40;0&#41;&#125;&#36; to &#36;Ax&#61;b&#36;. Then we get the residual is</p>$$~
 r^{(0)} = b - A x^{(0)}
 ~$$<p>And from here we solve the error from &#36;A e^&#123;&#40;0&#41;&#125; &#61; r^&#123;&#40;0&#41;&#125;&#36;. And finally, we get</p>$$~
 x^{(1)} = x^{(0)} + e^{(0)}.
@@ -265,7 +267,7 @@ Q x^{(k+1)} = (Q- A)x^{(k)} + b.
 <li>&#36;Q&#61;I&#36; – Richardson method</li>
 <li>&#36;Q&#61;diag&#40;A&#41;&#36; – Jacobi iteration</li>
 <li>&#36;Q &#61; tril&#40;A&#41;&#36; – Gauss-Seidel.</li>
-</ul><p>As long as &#36;\| I - Q^&#123;-1&#125;A \| &lt; 1&#36; for some subordinate nor, this sequence will converge.</p><p>More generally, if the iterative scheme is</p>$$~
+</ul><p>As long as &#36;\| I - Q^&#123;-1&#125;A \| &lt; 1&#36; for some subordinate norm, this sequence will converge.</p><p>More generally, if the iterative scheme is</p>$$~
 x^{(k+1)} = Gx^{(k)} + c
 ~$$<p>then this will converge if the magnitude of the largest eigenvalue is less than 1.</p><h3>Some sample problems</h3><ul>
 <li>Show that the product of lower triangular matrices is lower triangular using the characacteriaztion that &#36;L&#36; is LT if &#36;l_&#123;ij&#125;&#61;0&#36; when &#36;j &gt; i&#36; (the column index is bigger than the row one).</li>
@@ -292,6 +294,51 @@ A = \left[
 \end{array}
 \right].
 ~$$<p>Did you need to use a permutation matrix?</p><p>Use your answer to solve &#36;Ax&#61;&#91;1,2,3&#93;^T&#36;.</p><ul>
+<li>Prove or disprove: If &#36;L&#36; and &#36;U&#36; are lower and upper triangular, then &#36;UL&#36; can not be upper triangular.</li>
+</ul><ul>
+<li>A symmetric, positive-definite matrix satisfies the inequality: &#36;|a_&#123;ij&#125;|^2 \leq a_&#123;ii&#125; a_&#123;jj&#125;|&#36; Verify if this is the case for the symmetric matrix</li>
+</ul>$$~
+A = \left[
+\begin{array}{cc}
+1 & 2\\
+2 & 1
+\end{array}
+\right]
+~$$<p>Does &#36;A&#36; have a Cholesky decomposition?</p><ul>
+<li>for the matrix</li>
+</ul><pre class="sourceCode julia">using SymPy
+A = [ Sym(4) 1 2; 1 2 3; 2 1 2]</pre>
+<div class="well well-sm">
+\begin{bmatrix}4&1&2\\1&2&3\\2&1&2\end{bmatrix}</div>
+
+<p>The LU decomposition is given by:</p><pre class="sourceCode julia">L, U, p = lu(A)</pre>
+<pre class="output">
+(
+
+⎡ 1    0   0⎤
+⎢           ⎥
+⎢1/4   1   0⎥
+⎢           ⎥
+⎣1/2  2/7  1⎦,
+
+
+⎡4   1    2 ⎤
+⎢           ⎥
+⎢0  7/4  5/2⎥
+⎢           ⎥
+⎣0   0   2/7⎦,
+
+[1,2,3])</pre>
+
+<p>From this, we have inverses:</p><pre class="sourceCode julia">inv(L)</pre>
+<div class="well well-sm">
+\begin{bmatrix}1&0&0\\- \frac{1}{4}&1&0\\- \frac{3}{7}&- \frac{2}{7}&1\end{bmatrix}</div>
+
+<p>and</p><pre class="sourceCode julia">inv(U)</pre>
+<div class="well well-sm">
+\begin{bmatrix}\frac{1}{4}&- \frac{1}{7}&- \frac{1}{2}\\0&\frac{4}{7}&-5\\0&0&\frac{7}{2}\end{bmatrix}</div>
+
+<p>Show that we can find &#36;A^&#123;-1&#125;&#36; using these two matrices. What is the value?</p><ul>
 <li>Find &#36;\| A\|_\infty&#36; when &#36;A&#36; is the matrix</li>
 </ul>$$~
 A = \left[
@@ -302,7 +349,7 @@ A = \left[
 \end{array}
 \right].
 ~$$<ul>
-<li>Find the condition number of &#36;A&#36; when &#36;A&#36; is the matrix:</li>
+<li>Find the condition number of &#36;A&#36; using the &#36;l_\infty&#36; norm when &#36;A&#36; is the matrix:</li>
 </ul>$$~
 A = \left[
 \begin{array}{ccc}
@@ -311,7 +358,46 @@ A = \left[
 4 & 5 & 6
 \end{array}
 \right].
-~$$
+~$$<ul>
+<li>Suppose we write &#36;A &#61; Q &#43; B&#36; where &#36;Q&#36; is invertible. Then the expression &#36;Qx^&#123;&#40;k&#43;1&#125;&#41; &#61; &#40;Q- A&#41;x^&#123;&#40;k&#41;&#125; &#43; b&#36; can be rewritten as</li>
+</ul>$$~
+x^{(k+1)} = Q^{-1} B x^{(k)} + Q^{-1}b.
+~$$<p>This is of the general form &#36;x^&#123;&#40;k&#43;1&#41;&#125; &#61; Gx^&#123;&#40;k&#41;&#125; &#43; c&#36;. Using the criteria that the spectral radius of &#36;G&#36; must be less than 1, how does this translate to a condition on &#36;Q&#36; and &#36;B&#36; that will ensure convergence?</p><ul>
+<li>Define the matrix &#36;A&#36; and vector &#36;b&#36; by</li>
+</ul><pre class="sourceCode julia">A = [1 2; 3 4]</pre>
+<pre class="output">
+2x2 Array{Int64,2}:
+ 1  2
+ 3  4</pre>
+
+<p>and</p><pre class="sourceCode julia">b = [1,2]</pre>
+<pre class="output">
+2-element Array{Int64,1}:
+ 1
+ 2</pre>
+
+<p>A guess at an answer is &#36;x^&#123;&#40;0&#41;&#125; &#61; &#91;-1/4, 1/4&#93;&#36;. Compute the residual value &#36;r^&#123;&#40;0&#41;&#125; &#61; b - Ax^&#123;&#40;0&#41;&#125;&#36;. The error &#36;e^&#123;&#40;0&#41;&#125;&#36; satisfies &#36;Ae^&#123;&#40;0&#41;&#125; &#61; r^&#123;&#40;0&#41;&#41;&#125;&#36;. Find &#36;e^&#123;&#40;0&#41;&#125;&#36;.</p><ul>
+<li>Let the matrix &#36;A&#36; be given by:</li>
+</ul><pre class="sourceCode julia">A = [1 1/2; 1/3 1/4]</pre>
+<pre class="output">
+2x2 Array{Float64,2}:
+ 1.0       0.5 
+ 0.333333  0.25</pre>
+
+<p>The Jacobi method takes &#36;Q&#36; to be the diagonal of &#36;Q&#36;. Is it guaranteed to converge for some &#36;b&#36;? (Use the &#36;\|\cdot \|_\infty&#36; norm.)</p><p>You might be interested in this computation:</p><pre class="sourceCode julia">Q = diagm(diag(A)) # [1 0; 0 1/4]
+I - inv(Q) * A</pre>
+<pre class="output">
+2x2 Array{Float64,2}:
+  0.0      -0.5
+ -1.33333   0.0</pre>
+
+<ul>
+<li>Prove that is &#36;A&#36; is invertible and &#36;\| B - A\| &lt; \|A^&#123;-1&#125;\|^&#123;-1&#125;&#36; then &#36;B&#36; is invertible.</li>
+</ul><ul>
+<li>Prove that if &#36;A&#36; is invertible, &#36;&#40;A^&#123;-1&#125;&#41;^T &#61; &#40;A^T&#41;^&#123;-1&#125;&#36;.</li>
+</ul><ul>
+<li>Suppose &#36;A&#36; is invertible. Show that there exists an &#36;\epsilon &gt; 0&#36; such that any &#36;B&#36; satisfying \|A - B\| < \</li>
+</ul>
   </div>
 </div>  
 

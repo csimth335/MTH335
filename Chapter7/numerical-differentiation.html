@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Numeric derivatives</h1><p>If we only know &#36;f&#36; at &#36;n&#43;1&#36; points, how can we approximate the derivative of &#36;f&#36;? Other derivatives? What about integrals?</p><p>No luck without adding in some assumptions – functions can be too crazy,</p><p>For example, if we <em>know</em> &#36;f&#36; is a polynomial of degree &#36;n&#36; then we know it is uniquely determined by these points, and we can <em>explicitly</em> compute it. From there derivatives or integrals are routine.</p><h2>forward approximation</h2><p>We are familiar with the limit:</p>$$~
+f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h}.
+~$$<p>This gives rise to the approximation:</p>$$~
+f'(x) \approx \frac{f(x+h) - f(x)}{h}.
+~$$<p>For linear functions this is in fact exact. For other functions, it is likely not exact, except by happenstance.</p><h3>Error</h3><p>We can look at the error from Taylor's remainder theorem:</p>$$~
+f(x+h) = f(x) + f'(x)h + \frac{1}{2!}f''(\xi)(h)^2.
+~$$<p>We rearrange to get:</p>$$~
+\frac{f(x+h) - f(x)}{h} = f'(x) + \frac{1}{2!}f''(\xi)\cdot h.
+~$$<p>So we can get a sense of the error: &#36;h/2 \cdot f&#39;&#39;&#40;\xi&#41;&#36;. This is the <em>truncation error</em>. Call it &#36;d h&#36;, for some &#36;d&#36;</p><p>There is also <em>floating point</em> error. In the expression we are subtracting two terms of like size. Recall</p>$$~
+fl( f(fl(x+h)) - f(fl(x)) ) = (f((x+h)(1+\delta_1)) - f(x(1 + \delta_2)))(1 + \delta_3)
+\approx f(x+h) - f(x) + c x \delta.
+~$$<p>Dividing by &#36;h&#36;, we would get</p>$$~
+fl(\frac{f(fl(x+h)) - f(fl(x))}{h}) \approx \frac{f(x+h) - f(x)}{h} + \frac{cx\delta}{h}.
+$$~
+
+We see the two errors that come in if this is done in floating point: the truncation error is the first term, the floating point error the second. Recall, typically $\delta \approx 10^{-16}$, so if $c=1$ and $x=1$, say, we have the error in doing this in floating point is like:
+
+$$~
+error = d h + 10^{-16} h
+~$$<p>Making the error as small as possible has to balance of both errors, as choosing &#36;h&#36; too small runs into floating point error and too big runs into truncation error.</p><h3>Example</h3><p>Let's look at forming the derivative of the tangent.</p><p>We have &#36;f&#40;x&#41; &#61; atan&#40;x&#41;&#36; and &#36;c&#61;\sqrt&#123;2&#125;&#36; (as in the book</p><pre class="sourceCode julia">f(x) = atan(x)
+c = sqrt(2)
+hs = [1/10^i for i in 5:20]
+[(f(c+h) - f(c)) / h for h in hs]</pre>
+<pre class="output">
+16-element Array{Any,1}:
+  0.333332
+  0.333333
+  0.333333
+  0.333333
+  0.333333
+  0.333333
+  0.333333
+  0.3334  
+  0.333067
+  0.333067
+  0.333067
+  0.0     
+  0.0     
+  0.0     
+ -0.0     
+  0.0     </pre>
+
+<p>We see that somewhere the answer went off the rails.</p><h3>A strategy</h3><p>Can we get smaller truncation error, so we can get more accuracy before round off considerations come into play?</p><p>The central difference will also converge to &#36;f&#39;&#36;. However, the error is different:</p>$$~
+\begin{align}
+&f(x+h) = f(x) + f'(x) h + f''(x)h^2/2 + f'''(\xi_1)h^3/6\\
+&f(x-h) = f(x) - f'(x) h + f''(x)h^2/2 - f'''(\xi_2)h^3/6
+\end{align}
+~$$<p>Subtract and divide by &#36;2h&#36; to get:</p>$$~
+\frac{f(x+h) - f(x)}{2h} = f'(x) + \frac{h^2}{12}(f'''(\xi_1) + f'''(xi_2)).
+~$$<p>We we too assume &#36;f&#39;&#39;&#39;&#36; is continuous, then we could replace $ (f'''(\xi_1) + f'''(xi_2))$ with &#36;2f&#39;&#39;&#39;&#40;\xi_3&#41;&#36;, so the error is basically</p>$$~
+\frac{h^2}{6} f'''(\xi)
+~$$<p>(The above is similar to a test question to find an approximate second derivative using &#36;f&#40;x&#43;h&#41;- 2f&#40;x&#41; &#43; f&#40;x-h&#41;&#36;...</p><h3>Relate to polynomial</h3><p>What would be derivative of the function if you only knew its values at &#36;x-h, x, x&#43;h&#36;?</p><p>Well, we could find the interpolating polynomial and find its derivative.</p><p>For example, suppose in general we have points &#36;x_0, x_1, x_2&#36;:</p>$$~
+p2(x) = f[x_0] + f[x_0,x1](x-x_0) + f[x_0,x_1,x_2] (x-x0)(x-x1)
+~$$<p>Differentiating:</p>$$~
+p2'(x) = f[x_0,x_1] + f[x_0, x_1, x_2](2x - (x_0+x_1))
+~$$<p>Does this give a familiar formula?</p><pre class="sourceCode julia">dd(f, xs) =   length(xs) ==1 ? f(xs[1]) : (dd(f,xs[2:end]) - dd(f,xs[1:end-1])) / (xs[end] - xs[1])
+using SymPy
+x,h = symbols("x,h")
+
+f(x) = atan(x)
+x0, x1, x2 = x-h, x, x + h
+dd(f, [x0,x1]) + dd(f, [x0,x1,x2])*(2x -(x0 + x1)) |> simplify</pre>
+<div class="well well-sm">
+$$\frac{1}{2 h} \left(\operatorname{atan}{\left (h - x \right )} + \operatorname{atan}{\left (h + x \right )}\right)$$</div>
+
+<h3>Automatic Differentation</h3><p><a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a> is an alternate means to compute numeric derivatives that does not suffer from truncation error. (This is different from symbolic differentiation.) There are two flavors, we will mention an implementation of <em>forward</em> automatic differentiation.</p><p>There are various ways to view this, but we will choose Taylor series.</p><p>Consider the first-order Taylor series for &#36;f&#40;x&#41;&#36; about &#36;c&#36;:</p>$$~
+f(x) = f(c) + f'(c)(x-c) + \mathcal{O}(x-c)^2
+~$$<p>So, we can think of a function &#36;f&#40;x&#41;&#36; in terms of &#36;f&#40;c&#41;&#36; and &#36;f&#39;&#40;c&#41;&#36;. With this, we can define an algebra of functions:</p>$$~
+\begin{align}
+f(x) &= \begin{bmatrix} f(x)\\f'(x) \end{bmatrix}\\
+\lambda f(x) &= \begin{bmatrix}\lambda f(x)\\\lambda f'(x)\end{bmatrix}\\
+f(x) + g(x) &= \begin{bmatrix}f(x) + g(x)\\ f'(x) + g'(x)\end{bmatrix}\\
+f(x) \cdot g(x) &= \begin{bmatrix}f(x) \cdot g(x)\\ f'(x)g(x) + f(x)g'(x)\end{bmatrix}\\
+f(x)^n &= \begin{bmatrix}f(x) ^n\\ nf(x)^{n-1} f'(x) \end{bmatrix}\\
+f(g(x)) &= \begin{bmatrix}f(g(x))\\ f'(g(x)) g'(x) \end{bmatrix}
+\end{align}
+~$$<p>Then we can just follow these rules. For example &#36;\sin&#40;x^2&#41;&#36; would be the composition of the sine function with &#36;x&#36; times itself:</p>$$~
+\sin(x^2) =
+\begin{bmatrix}\sin(\cdot)\\\cos(\cdot)\end{bmatrix} \circ (
+\begin{bmatrix}x\\1\end{bmatrix} \cdot \begin{bmatrix}x\\1\end{bmatrix} )
+= \begin{bmatrix}\sin(\cdot)\\\cos(\cdot)\end{bmatrix} \circ
+\begin{bmatrix}x \cdot x\\ x\cdot 1 + 1\cdot x\end{bmatrix}
+= \begin{bmatrix} \sin(x^2) \cos(x^2) \cdot 2x\end{bmatrix}
+~$$<p>We can implement this with just a little work:</p><pre class="sourceCode julia">type DFunction
+f
+fp
+end
+
+## Some functions
+Sin = DFunction(sin, cos)
+Cos = DFunction(cos, x->-sin(x))
+Exp = DFunction(exp, exp)
+X = DFunction(x->x, x->1)
+
+## Some operations
+import Base: *, +,-,  ^
+
+(*)(lambda::Real, F::DFunction) = DFunction(x->lambda*F.f(x), x->lambda*F.fp(x))
++(F::DFunction, G::DFunction) = DFunction(x->F.f(x) + G.f(x), x -> F.fp(x) + G.fp(x))
+-(F::DFunction, G::DFunction) = DFunction(x->F.f(x) - G.f(x), x -> F.fp(x) - G.fp(x))
+(*)(F::DFunction, G::DFunction) = DFunction(x->F.f(x) * G.f(x), x -> F.fp(x) * G.f(x) + F.f(x) * G.fp(x))
+^(F::DFunction, n) = DFunction(x->F.f(x) ^ n, x -> n * F.f(x)^(n-1) * F.fp(x) )
+Base.call(F::DFunction, G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
+Base.call(F::DFunction, x::Real) = F.f(x)
+Base.ctranspose(F::DFunction) = x->F.fp(x) ## does '</pre>
+<pre class="output">
+ctranspose (generic function with 48 methods)</pre>
+
+<pre class="sourceCode julia">Sin(1) - sin(1)</pre>
+<pre class="output">
+0.0</pre>
+
+<pre class="sourceCode julia">Sin'(1) - cos(1)</pre>
+<pre class="output">
+0.0</pre>
+
+<pre class="sourceCode julia">(Sin(Cos(Exp(X))))'(3) - cos(cos(exp(3))) * (-sin(exp(3))) * exp(3)</pre>
+<pre class="output">
+3.552713678800501e-15</pre>
+
+<p>And it is faster too:</p><pre class="sourceCode julia">@time prod([Sin(n*X) for n in 1:100])'(1/10) # 0.021830 </pre>
+<pre class="output">
+-2.5913297117126114e-29</pre>
+
+<p>Against</p><pre class="sourceCode julia">using SymPy
+x = symbols("x")
+@time diff(prod([sin(n*x) for n in 1:100]), x)(x => 1/10) # 3.031204</pre>
+<div class="well well-sm">
+$$-2.59132971171261 \cdot 10^{-29}$$</div>
+
+
+  </div>
+</div>  
+
+</body>
+</html>
