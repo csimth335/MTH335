@@ -55,7 +55,7 @@ $$~
 We see the two errors that come in if this is done in floating point: the truncation error is the first term, the floating point error the second. Recall, typically $\delta \approx 10^{-16}$, so if $c=1$ and $x=1$, say, we have the error in doing this in floating point is like:
 
 $$~
-error = d h + 10^{-16} h
+error = d h + \frac{10^{-16}}{h}
 ~$$
 
 Making the error as small as possible has to balance of both errors, as choosing $h$ too small runs into floating point error and too big runs into truncation error.
@@ -65,7 +65,7 @@ Making the error as small as possible has to balance of both errors, as choosing
 
 Let's look at forming the derivative of the tangent.
 
-We have $f(x) = atan(x)$ and $c=\sqrt{2}$ (as in the book
+We have $f(x) = \atan(x)$ and $c=\sqrt{2}$ (as in the book
 
 ```
 f(x) = atan(x)
@@ -93,16 +93,16 @@ $$~
 Subtract and divide by $2h$ to get:
 
 $$~
-\frac{f(x+h) - f(x)}{2h} = f'(x) + \frac{h^2}{12}(f'''(\xi_1) + f'''(xi_2)).
+\frac{f(x+h) - f(x)}{2h} = f'(x) + \frac{h^2}{12}(f'''(\xi_1) + f'''(\xi_2)).
 ~$$
 
-We we too assume $f'''$ is continuous, then we could replace $ (f'''(\xi_1) + f'''(xi_2))$ with $2f'''(\xi_3)$, so the error is basically
+We we too assume $f'''$ is continuous, then we could replace $ (f'''(\xi_1) + f'''(\xi_2))$ with $2f'''(\xi_3)$, so the error is basically
 
 $$~
 \frac{h^2}{6} f'''(\xi)
 ~$$
 
-(The above is similar to a test question to find an approximate second derivative using $f(x+h)- 2f(x) + f(x-h)$...
+
 
 ### Relate to polynomial
 
@@ -193,8 +193,9 @@ import Base: *, +,-,  ^
 -(F::DFunction, G::DFunction) = DFunction(x->F.f(x) - G.f(x), x -> F.fp(x) - G.fp(x))
 (*)(F::DFunction, G::DFunction) = DFunction(x->F.f(x) * G.f(x), x -> F.fp(x) * G.f(x) + F.f(x) * G.fp(x))
 ^(F::DFunction, n) = DFunction(x->F.f(x) ^ n, x -> n * F.f(x)^(n-1) * F.fp(x) )
-Base.call(F::DFunction, G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
-Base.call(F::DFunction, x::Real) = F.f(x)
+
+(F::DFunction)(G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
+(F::DFunction)(x::Real) = F.f(x)
 Base.ctranspose(F::DFunction) = x->F.fp(x) ## does '
 ```
 
@@ -224,3 +225,8 @@ using SymPy
 x = symbols("x")
 @time diff(prod([sin(n*x) for n in 1:100]), x)(x => 1/10) # 3.031204
 ```
+
+
+Julia has several packages for computing automatic derivatives including
+`ForwardDiff` and `ReverseDiff`. (The difference is one is better with
+many inputs, the other with many outputs.)

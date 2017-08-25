@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -30,10 +29,12 @@ pre {display: block;}
 
 <style></style>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 
+<!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -44,6 +45,7 @@ MathJax.Hub.Config({
   displayIndent: "5%"
 });
 </script>
+
 
 <script type="text/javascript">
 $( document ).ready(function() {
@@ -101,7 +103,41 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Bisection Method</h1><blockquote><p>The Intermediate Value Theorem: Let $f(x)$ be a <em>continuous</em> function on $[a,b]$ with the property that $f(a)$ and $f(b)$ have a different sign ($[a,b]$ is a bracket). Then there exists a value $c$ in $[a,b]$ with $f(c) = 0$. </p></blockquote><p>This gives us a guarantee that under some assumptions the equation $f(x) = 0$ has a solution in the interval.</p><p>But it does not tell us what a value of $c$ is.</p><h2>A recipe to find $c$</h2><p>Consider the following algorithm starting with $[a,b]$ and $f$ as in the IVT and, say, $f(a) < 0$.</p><ul><li>compute the midpoint $c = (a+b)/2$</li></ul><ul><li>compute $f(c)$</li></ul><p>––</p><p>- If $f(c) == 0$ we are done</p><p>- If $f(c) < 0$ then our <em>new</em> interval is $[c,b]$</p><p>- If $f(c) > 0$ our <em>new</em> interval is $[a,c]$</p><p><a href="http://calculuswithjulia.github.io/limits/intermediate_value_theorem.html#Bolzanoandthebisectionmethod">Repeat</a>.</p><p>What does this algorithm produce? At each step we get a value of $c$. To distinguish, call them $c_i$. Then we have two possibilities:</p><p>- $f(c_i) = 0$ for some $i$ and we are done</p><p>- $f(c_i) \neq 0$ for all $i$.</p><p>In the latter case, what to do?</p><p>Let $c = \lim_i c_i$. This exists as the sequence is clearly Cauchy ($|x_n - x_{n+m}| \leq C2^{-n}$). Then:</p><p>- $c$ exists! - $f(c) = 0$.</p><p>Why? Split the values $c_i$ into those that have $f(c_i) < 0$ and those that have $f(c_i) > 0$. Call these sequences $l_i$ and $u_i$.</p><p>If a sequence is infinite, it must converge to $c$. If both are infinite, then one limit is less than or equal to $0$, the other greater than or equal to $0$, so must be $0$.</p><p>If a sub-sequence is finite, say terminating at $N$. The $c_i, i \geq N$ has $f(c_i)$ all of the same sign. So in the choice which endpoint to replace $[a,b]$ one is always chosen. Say $f(a) > 0$ and $f(c_i) < 0$ for all $i > N$. It must be that $c_i$ converges to $a$, so we have $f(c_i)$ converges to $f(a)$ which is positive, but each $f(c_i)$ is negative. So this can't happen.</p><h2>Bisection method in floating point</h2><p>The above is true mathematically, but can it be true in floating point?</p><p>- The $c_i$ in any algorithm are necessarily finite in number, so they can't take on any value, just machine numbers. Since machine numbers are rational numbers in binary, numbers like $\sqrt{2}$ can not be represented exactly, so the value of $c$ is not guaranteed!</p><p>- Even the simple statement $c = (a+b)/2$ has problems! $x+y$ can overflow, It isn't even guaranteed that $fl((x+y)/2)$ is in $[x,y]$ with some rounding modes! </p><h3>What to do</h3><p>Use thresholds:</p><p>Stop the algorithm if</p><p>- $|f(c_i)| < \epsilon$</p><p>- $|b_i - a_i| < \delta$.</p><h2>An algorithm (take 1)</h2><pre class="sourceCode julia">function bisectme(f, a, b)
+<h1>Bisection Method</h1><blockquote>
+<p>The Intermediate Value Theorem: Let $f(x)$ be a <em>continuous</em> function on $[a,b]$ with the property that $f(a)$ and $f(b)$ have a different sign ($[a,b]$ is a bracket). Then there exists a value $c$ in $[a,b]$ with $f(c) = 0$.</p>
+</blockquote><p>This gives us a guarantee that under some assumptions the equation $f(x) = 0$ has a solution in the interval.</p><p>But it does not tell us what a value of $c$ is.</p><h2>A recipe to find $c$</h2><p>Consider the following algorithm starting with $[a,b]$ and $f$ as in the IVT and, say, $f(a) < 0$.</p><ul>
+<li><p>compute the midpoint $c = (a+b)/2$</p>
+</li>
+<li><p>compute $f(c)$</p>
+</li>
+</ul><hr /><ul>
+<li><p>If $f(c) == 0$ we are done</p>
+</li>
+<li><p>If $f(c) < 0$ then our <em>new</em> interval is $[c,b]$</p>
+</li>
+<li><p>If $f(c) > 0$ our <em>new</em> interval is $[a,c]$</p>
+</li>
+</ul><p><a href="http://calculuswithjulia.github.io/limits/intermediate_value_theorem.html#Bolzanoandthebisectionmethod">Repeat</a>.</p><h3></h3><p>What does this algorithm produce? At each step we get a value of $c$. To distinguish, call them $c_i$. Then:</p><ul>
+<li><p>we have $f(c_i) = 0$ for some $i$ and we are done; or</p>
+</li>
+<li><p>we have $f(c_i) \neq 0$ for all $i$.</p>
+</li>
+</ul><p>In the latter case, what to do?</p><h3></h3><p>Let $c = \lim_i c_i$. This exists as the sequence is clearly Cauchy ($|x_n - x_{n+m}| \leq C2^{-n}$). Then:</p><ul>
+<li><p>it must be that $c$ exists! <em>And</em></p>
+</li>
+<li><p>the value satisfies: $f(c) = 0$.</p>
+</li>
+</ul><p>Why? Split the values $c_i$ into those that have $f(c_i) < 0$ and those that have $f(c_i) > 0$. Call these sequences $l_i$ and $u_i$.</p><p>If a sequence is infinite, it must converge to $c$. If both are infinite, then one limit is less than or equal to $0$, the other greater than or equal to $0$, so must be $0$.</p><p>If a sub-sequence is finite, say terminating at $N$. The $c_i, i \geq N$ has $f(c_i)$ all of the same sign. So in the choice which endpoint to replace $[a,b]$ one is always chosen. Say $f(a) > 0$ and $f(c_i) < 0$ for all $i > N$. It must be that $c_i$ converges to $a$, so we have $f(c_i)$ converges to $f(a)$ which is positive, but each $f(c_i)$ is negative. So this can't happen.</p><h2>Bisection method in floating point</h2><p>The above is true mathematically, but can it be true in floating point?</p><ul>
+<li><p>The $c_i$ in any algorithm are necessarily finite in number, so they can't take on any value, just machine numbers. Since machine numbers are rational numbers in binary, numbers like $\sqrt{2}$ can not be represented exactly, so the value of $c$ is not guaranteed!</p>
+</li>
+<li><p>Even the simple statement $c = (a+b)/2$ has problems! $x+y$ can overflow, It isn't even guaranteed that $fl((x+y)/2)$ is in $[x,y]$ with some rounding modes!</p>
+</li>
+</ul><h3>What to do</h3><p>Use thresholds:</p><p>Stop the algorithm if</p><ul>
+<li><p>either $|f(c_i)| < \epsilon$</p>
+</li>
+<li><p>or $|b_i - a_i| < \delta$.</p>
+</li>
+</ul><h2>An algorithm (take 1)</h2><pre class="sourceCode julia">function bisectme(f, a, b)
     delta, epsilon=4eps(), 1e-12
 	@assert f(a) * f(b) < 0  # check bracket
     c = (a + b)/2
@@ -115,67 +151,91 @@ end</pre>
 <pre class="output">
 bisectme (generic function with 1 method)</pre>
 
-<p>Solve $f(x) = e^x - \sin(x) = 0$ in the interval $[-4, -3]$:</p><pre class="sourceCode julia">f(x) = exp(x) - sin(x)
+<h3></h3><p>Solve $f(x) = e^x - \sin(x) = 0$ in the interval $[-4, -3]$:</p><pre class="sourceCode julia">f(x) = exp(x) - sin(x)
 xstar = bisectme(f, -4, -3)
 xstar, f(xstar)</pre>
 <pre class="output">
-(-3.1830630119329726,4.0688286073731206e-13)</pre>
+(-3.1830630119329726, 4.0688286073731206e-13)</pre>
 
-<h2>How fast does this converge?</h2><p>Theoretically, at each step we have $a_i < c_i < b_i$. Let $c$ be a solution. Then how big is $|c - c_i|$?</p><p>$$ |c - c_i| \leq \frac{1}{2} (b_i - a_i) $$</p><p>But:</p><p>$$ b_i - a_i = (1/2)(b_{i-1} - a_{i-1}) = (1/2)^2 (b_{i-2} - a_{i-2}) = \cdots = 2^{i}(b_0 - a_0). $$ </p><p>So,</p><p>$$ |c - c_i| \leq \frac{1}{2^{i+1}} (b_0 - a_0). $$</p><h3>Example</h3><p>If we have $a_0, b_0 = -4, -3$, how many steps to get $|c - c_i| < 10^{-15}$?</p><p>We'd need to solve for the smallest $i$ so that:</p><p>$$ \frac{1}{2^{i+1}} (b_0 - a_0) = \frac{1}{2^{i+1}} < 10^{-15} $$</p><pre class="sourceCode julia">ceil(log2(1e-15) - 1)</pre>
+<h2>How fast does this converge?</h2><p>Theoretically, at each step we have $a_i < c_i < b_i$. Let $c$ be a solution. Then how big is $|c - c_i|$?</p>$$~
+|c - c_i| \leq \frac{1}{2} (b_i - a_i)
+~$$
+<p>But:</p>$$~
+b_i - a_i = (1/2)(b_{i-1} - a_{i-1}) = (1/2)^2 (b_{i-2} - a_{i-2}) = \cdots = 2^{i}(b_0 - a_0).
+~$$
+<p>So,</p>$$~
+|c - c_i| \leq \frac{1}{2^{i+1}} (b_0 - a_0).
+~$$
+<h3>Example</h3><p>If we have $a_0, b_0 = -4, -3$, how many steps to get $|c - c_i| < 10^{-15}$?</p><p>We'd need to solve for the smallest $i$ so that:</p>$$~
+\frac{1}{2^{i+1}} (b_0 - a_0) = \frac{1}{2^{i+1}} < 10^{-15}
+~$$
+<pre class="sourceCode julia">ceil(log2(1e-15) - 1)</pre>
 <pre class="output">
 -50.0</pre>
 
-<h2>Can we do better?</h2><p>Mathematically, we can always subdivide $[a,b]$ via $c=(a+b)/2$. Not so with the computer.</p><p>We said that using <code>c = (a+b)/2</code> has issues (overflow, loss of low bits, magnified errors...)</p><p>We avoid some of that with <code>c = a + (b-a)/2</code></p><p>Or we could have tried <code>c = a + b/2 - a/2</code></p><p>These aren't all the same:</p><pre class="sourceCode julia">a, b = prevfloat(0.0), nextfloat(0.0)
+<h2>Can we do better?</h2><p>Mathematically, we can always subdivide $[a,b]$ via $c=(a+b)/2$. Not so with the computer.</p><p>We said that using <code>c &#61; &#40;a&#43;b&#41;/2</code> has issues (overflow, loss of low bits, magnified errors...)</p><p>We avoid some of that with <code>c &#61; a &#43; &#40;b-a&#41;/2</code></p><p>Or we could have tried <code>c &#61; a &#43; b/2 - a/2</code></p><p>These aren't all the same:</p><pre class="sourceCode julia">a, b = prevfloat(0.0), nextfloat(0.0)
 (a + b)/2, a + (b-a)/2, a + b/2 - a/2</pre>
 <pre class="output">
-(0.0,0.0,-5.0e-324)</pre>
+(0.0, 0.0, -5.0e-324)</pre>
 
 <pre class="sourceCode julia">b = prevfloat(Inf)
 a = prevfloat(prevfloat(b))
 (a + b)/2, a + (b-a)/2, a + b/2 - a/2</pre>
 <pre class="output">
-(Inf,1.7976931348623155e308,Inf)</pre>
+(Inf, 1.7976931348623155e308, Inf)</pre>
 
-<p>The problem is studied in <a href="https://hal.archives-ouvertes.fr/hal-00576641v1/document">this paper</a>.</p><p>Without care, the following two properties of $m(I)$ are not guaranteed:</p><ul><li>$m(I) \in I$</li><li>for all machine numbers $v$, $|c - v| \geq |c - M(I)|$ for $c = (a + b)/2 \in R$.</li></ul><p>That is, we can't be sure that this will stop appropriately</p><pre class="sourceCode julia">c = (a + b)/2
+<h3></h3><p>The problem is studied in <a href="https://hal.archives-ouvertes.fr/hal-00576641v1/document">this paper</a>.</p><p>Without care, the following two properties of $m(I)$ are not guaranteed:</p><ul>
+<li><p>that $m(I) \in I$, or</p>
+</li>
+<li><p>for all machine numbers $v$, $|c - v| \geq |c - M(I)|$ for $c = (a + b)/2 \in R$.</p>
+</li>
+</ul><p>That is, we can't be sure that this will stop appropriately</p><pre class="sourceCode julia">c = (a + b)/2
 if a < c < b
    ....
 end
-</pre><h3>One solution</h3><p>In <code>Julia</code>'s <code>Roots</code> package they use something different by Jason <a href="http://squishythinking.com/2014/02/22/bisecting-floats/">Merrill</a></p><p>We can see the following:</p><pre class="sourceCode julia">x1_int = reinterpret(Uint64, abs(x1))
-x2_int = reinterpret(Uint64, abs(x2))
+</pre><h3>One solution</h3><p>In <code>Julia</code>'s <code>Roots</code> package they use something different by Jason <a href="http://squishythinking.com/2014/02/22/bisecting-floats/">Merrill</a></p><p>We can see the following:</p><pre class="sourceCode julia">x1_int = reinterpret(UInt64, abs(x1))
+x2_int = reinterpret(UInt64, abs(x2))
 unsigned = reinterpret(Float64, (x1_int + x2_int) >> 1)
 </pre><h3>What does reinterpret do...</h3><p>In practice this converts the (positive) floating point numbers into an ordered set of integers:</p><pre class="sourceCode julia">as = rand(1)
 for i in 1:9
   push!(as, nextfloat(as[end]))
 end
-map(x -> bits(reinterpret(Uint64, x)), as)</pre>
+map(x -> bits(reinterpret(UInt64, x)), as)</pre>
 <pre class="output">
-10-element Array{ASCIIString,1}:
- "0011111111101111011011100010110000111000011001011000110011000010"
- "0011111111101111011011100010110000111000011001011000110011000011"
- "0011111111101111011011100010110000111000011001011000110011000100"
- "0011111111101111011011100010110000111000011001011000110011000101"
- "0011111111101111011011100010110000111000011001011000110011000110"
- "0011111111101111011011100010110000111000011001011000110011000111"
- "0011111111101111011011100010110000111000011001011000110011001000"
- "0011111111101111011011100010110000111000011001011000110011001001"
- "0011111111101111011011100010110000111000011001011000110011001010"
- "0011111111101111011011100010110000111000011001011000110011001011"</pre>
+10-element Array{String,1}:
+ "0011111111101101011010011010000010011000111001010000011011010100"
+ "0011111111101101011010011010000010011000111001010000011011010101"
+ "0011111111101101011010011010000010011000111001010000011011010110"
+ "0011111111101101011010011010000010011000111001010000011011010111"
+ "0011111111101101011010011010000010011000111001010000011011011000"
+ "0011111111101101011010011010000010011000111001010000011011011001"
+ "0011111111101101011010011010000010011000111001010000011011011010"
+ "0011111111101101011010011010000010011000111001010000011011011011"
+ "0011111111101101011010011010000010011000111001010000011011011100"
+ "0011111111101101011010011010000010011000111001010000011011011101"</pre>
 
-<p>Using this for finding the midpoint (suitably configured to handle mixed signs) means that in no more than 64 steps this process is guaranteed to converge. This means we can skip the check on the size of $f(x_n)$ to look something like:</p><pre class="sourceCode julia">while a < midpoint(a,b) < b
+<h3></h3><p>Using this for finding the midpoint (suitably configured to handle mixed signs) means that in no more than 64 steps this process is guaranteed to converge. This means we can skip the check on the size of $f(x_n)$ to look something like:</p><pre class="sourceCode julia">while a < midpoint(a,b) < b
   do something...
 end
-</pre><p>What happens at each step: we must have:</p><p>- <code>f(c) == 0</code> (exactly), or</p><p>- either <code>f(c) * f(a) < 0</code> or <code>f(c) * f(b) < 0</code></p><p>So if the answer is not exact, we guarantee that this condition holds for the returned value of <code>c</code></p><blockquote><p>It must be that <code>f(prevfloat(c)) * f(nextfloat(c)) <= 0</code>. </p></blockquote><p>(Even without IVT).</p><h3>the Roots package</h3><pre class="sourceCode julia">using Roots
+</pre><p>What happens at each step: we must have:</p><ul>
+<li><p>either <code>f&#40;c&#41; &#61;&#61; 0</code> (exactly), </p>
+</li>
+<li><p>one of <code>f&#40;c&#41; * f&#40;a&#41; &lt; 0</code> or <code>f&#40;c&#41; * f&#40;b&#41; &lt; 0</code></p>
+</li>
+</ul><p>So if the answer is not exact, we guarantee that this condition holds for the returned value of <code>c</code></p><blockquote>
+<p>It must be that <code>f&#40;prevfloat&#40;c&#41;&#41; * f&#40;nextfloat&#40;c&#41;&#41; &lt;&#61; 0</code>.</p>
+</blockquote><p>(Even without IVT).</p><h3>the Roots package</h3><pre class="sourceCode julia">using Roots
 f(x) = sin(x)
 c = fzero(f, [3,4])
 c, f(c), sign(f(prevfloat(c))) * sign(f(nextfloat(c)))</pre>
 <pre class="output">
-(3.141592653589793,1.2246467991473532e-16,-1.0)</pre>
+(3.141592653589793, 1.2246467991473532e-16, -1.0)</pre>
 
-<p>What about $f(x) = 1/x$? It has no zero, but it does have a zero crossing at $0$ which will get picked up:</p><pre class="sourceCode julia">f(x) = 1/x
+<h3></h3><p>What about $f(x) = 1/x$? It has no zero, but it does have a zero crossing at $0$ which will get picked up:</p><pre class="sourceCode julia">f(x) = 1/x
 c = fzero(f, [-1, 1])
 c, f(c), sign(f(prevfloat(c))) * sign(f(nextfloat(c)))</pre>
 <pre class="output">
-(0.0,Inf,-1.0)</pre>
+(-0.0, -Inf, -1.0)</pre>
 
 
   </div>

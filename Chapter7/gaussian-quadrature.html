@@ -29,10 +29,12 @@ pre {display: block;}
 
 <style></style>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 
+<!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -43,6 +45,7 @@ MathJax.Hub.Config({
   displayIndent: "5%"
 });
 </script>
+
 
 <script type="text/javascript">
 $( document ).ready(function() {
@@ -100,17 +103,22 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Gaussian Quadrature</h1><p>Our goal: approximate the definite integral of &#36;f&#36; over &#36;&#91;a,b&#93;&#36; by a sum:</p>$$~
+<h1>Gaussian Quadrature</h1><p>Our goal: approximate the definite integral of $f$ over $[a,b]$ by a sum:</p>$$~
 \int_a^b f(x) dx = \sum_{i=0}^n f(x_i) A_i.
-~$$<p>In fact, we generalize this to include a positive <em>weight</em> function, &#36;w&#40;x&#41;&#36;:</p>$$~
+~$$
+<p>In fact, we generalize this to include a positive <em>weight</em> function, $w(x)$:</p>$$~
 \int_a^b f(x) w*x( dx = \sum_{i=0}^n f(x_i) A_i.
-~$$<p>With &#36;f&#40;x&#41;&#36; interpolated by the polynomial &#36;\sum f&#40;x_i&#41; l_i&#40;x&#41;&#36;, we have</p>$$~
+~$$
+<p>With $f(x)$ interpolated by the polynomial $\sum f(x_i) l_i(x)$, we have</p>$$~
 A_i = \int_a^b w(x) \prod_{j=0, j \neq i}^n \frac{x-x_j}{x_i - x_j} dx
-~$$<p>.</p><p>Goal: can we choose the weights in such a way that this is exact for polynomials of a certain degree?</p><h2>Orthogonal</h2><p>Let &#36;\Pi_n&#36; be the polynomials of degree &#36;n&#36;.</p><p>Say a function &#36;q&#36; is &#36;w&#36;-orthoganal to &#36;\Pi_n&#36; if for any &#36;p \in \Pi_n&#36;</p>$$~
+~$$
+<p>.</p><p>Goal: can we choose the weights in such a way that this is exact for polynomials of a certain degree?</p><h2>Orthogonal</h2><p>Let $\Pi_n$ be the polynomials of degree $n$.</p><p>Say a function $q$ is $w$-orthoganal to $\Pi_n$ if for any $p \in \Pi_n$</p>$$~
 \int_a^b q(x) p(x) w(x) dx = 0
-~$$<h3>Example: Legendre polynomials</h3><p>Let &#36;P_0&#40;x&#41; &#61; 1&#36; and &#36;P_1&#40;x&#41; &#61; x&#36;. Define recursively &#36;P_n&#40;x&#41;&#36; by:</p>$$~
+~$$
+<h3>Example: Legendre polynomials</h3><p>Let $P_0(x) = 1$ and $P_1(x) = x$. Define recursively $P_n(x)$ by:</p>$$~
 (n+1)P_{n+1}(x) = (2n + 1) x P_n(x)  - n P_{n-1}(x).
-~$$<p>There are the <a href="https://en.wikipedia.org/wiki/Legendre_polynomials">Legendre polynomials</a>. Here are the first few:</p><pre class="sourceCode julia">using SymPy
+~$$
+<p>There are the <a href="https://en.wikipedia.org/wiki/Legendre_polynomials">Legendre polynomials</a>. Here are the first few:</p><pre class="sourceCode julia">using SymPy
 x = symbols("x")
 ps = Sym[1, x]
 for n = 1:5
@@ -122,31 +130,26 @@ ps</pre>
 <div class="well well-sm">
 \begin{bmatrix}1\\x\\\frac{3 x^{2}}{2} - \frac{1}{2}\\\frac{x}{2} \left(5 x^{2} - 3\right)\\\frac{35 x^{4}}{8} - \frac{15 x^{2}}{4} + \frac{3}{8}\\\frac{x}{8} \left(63 x^{4} - 70 x^{2} + 15\right)\\\frac{231 x^{6}}{16} - \frac{315 x^{4}}{16} + \frac{105 x^{2}}{16} - \frac{5}{16}\end{bmatrix}</div>
 
-<p>Now, take &#36;a&#61;-1&#36;, &#36;b&#61;1&#36; and &#36;w&#40;x&#41; &#61; 1&#36;. Are these orthogonal? That is, do we have:</p>$$~
+<p>Now, take $a=-1$, $b=1$ and $w(x) = 1$. Are these orthogonal? That is, do we have:</p>$$~
 \int_a^b p_i(x) p_j(x) w(x) dx = \int_{-1}^1 p_i(x) p_j(x) dx = 0?
-~$$<p>We can check. For example,</p><pre class="sourceCode julia">[integrate(ps[end] * ps[i], (x, -1, 1)) for i in 1:length(ps)-1]</pre>
-<pre class="output">
-6-element Array{Any,1}:
- 0
- 0
- 0
- 0
- 0
- 0</pre>
+~$$
+<p>We can check. For example,</p><pre class="sourceCode julia">[integrate(ps[end] * ps[i], (x, -1, 1)) for i in 1:length(ps)-1]</pre>
+<div class="well well-sm">
+\begin{bmatrix}0\\0\\0\\0\\0\\0\end{bmatrix}</div>
 
-<p>So &#36;p_i&#36; is orthogonal to any linear combination of the &#36;p_j, j &lt; i&#36;. But these polynomials span the space of polynomials of degree &#36;i-1&#36;. So they are &#36;w&#36;-orthogonal.</p><h3>Gaussian quadrature theorem</h3><blockquote>
-<p>(p 493) If &#36;q&#40;x&#41;&#36; is a non-zero polynomial of degree &#36;n&#43;1&#36;, &#36;w&#36;-orthogonal to &#36;\Pi_n&#36; and &#36;x_0, x_1, \dots, x_n&#36; are the <em>zeros</em> of &#36;q&#36;, then the quadrature formula will be exact for all functions in &#36;\Pi_&#123;2n&#43;1&#125;&#36;.</p>
-</blockquote><p>Before seeing why, let's see that it works with &#36;P_4&#36;:</p><pre class="sourceCode julia">p4 = ps[5] # 1/8 *(35x^4 - 30x^2+3)
+<p>So $p_i$ is orthogonal to any linear combination of the $p_j, j < i$. But these polynomials span the space of polynomials of degree $i-1$. So they are $w$-orthogonal.</p><h3>Gaussian quadrature theorem</h3><blockquote>
+<p>(p 493) If $q(x)$ is a non-zero polynomial of degree $n+1$, $w$-orthogonal to $\Pi_n$ and $x_0, x_1, \dots, x_n$ are the <em>zeros</em> of $q$, then the quadrature formula will be exact for all functions in $\Pi_{2n+1}$.</p>
+</blockquote><p>Before seeing why, let's see that it works with $P_4$:</p><pre class="sourceCode julia">p4 = ps[5] # 1/8 *(35x^4 - 30x^2+3)
 xis = collect(keys(polyroots(ps[5])))
 map(N, xis)</pre>
 <pre class="output">
-4-element Array{Any,1}:
+4-element Array{Float64,1}:
   0.339981
  -0.861136
  -0.339981
   0.861136</pre>
 
-<p>We define &#36;l_i&#36; via:</p><pre class="sourceCode julia">function l(i)
+<p>We define $l_i$ via:</p><pre class="sourceCode julia">function l(i)
 out = 1
 n = length(xis)-1 # 0, ..., n => 1, ..., n+1
 for j in 0:n
@@ -159,80 +162,88 @@ end</pre>
 <pre class="output">
 l (generic function with 1 method)</pre>
 
-<p>With these, we define &#36;A_i&#36; via:</p><pre class="sourceCode julia">Ais = [integrate(l(i), (x, -1,1)) for i in 0:3]</pre>
-<pre class="output">
-4-element Array{Any,1}:
-  sqrt(30)/36 + 1/2
- -sqrt(30)/36 + 1/2
-  sqrt(30)/36 + 1/2
- -sqrt(30)/36 + 1/2</pre>
+<p>With these, we define $A_i$ via:</p><pre class="sourceCode julia">Ais = [integrate(l(i), (x, -1,1)) for i in 0:3]</pre>
+<div class="well well-sm">
+\begin{bmatrix}\frac{\sqrt{30}}{36} + \frac{1}{2}\\- \frac{\sqrt{30}}{36} + \frac{1}{2}\\\frac{\sqrt{30}}{36} + \frac{1}{2}\\- \frac{\sqrt{30}}{36} + \frac{1}{2}\end{bmatrix}</div>
 
-<p>Then the claim is &#36;\sum f&#40;x_i&#41; A_i&#36; will be exactly the integral &#36;\int f&#40;x&#41; dx&#36; for any &#36;7&#36;th degree polynomial or less. Let's try a polynomial:</p><pre class="sourceCode julia">f(x) = 5x^5 - 4x^4
+<p>Then the claim is $\sum f(x_i) A_i$ will be exactly the integral $\int f(x) dx$ for any $7$th degree polynomial or less. Let's try a polynomial:</p><pre class="sourceCode julia">f(x) = 5x^5 - 4x^4
 integrate(f(x), (x, -1, 1))</pre>
 <div class="well well-sm">
-$$- \frac{8}{5}$$</div>
+-8/5</div>
 
 <p>And compare with:</p><pre class="sourceCode julia">sum([f(xi) * Ais[i] for (i,xi) in enumerate(xis)])</pre>
 <div class="well well-sm">
-$$\left(- \frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 5 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}} - 4 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2}\right) + \left(\frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 4 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2} - 5 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}}\right) + \left(\frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 4 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2} + 5 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}}\right) + \left(- \frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 4 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2} + 5 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}}\right)$$</div>
+(-sqrt(30)/36 + 1/2)*(-5*(2*sqrt(30)/35 + 3/7)^(5/2) - 4*(2*sqrt(30)/35 + 3/7)^2) + (sqrt(30)/36 + 1/2)*(-4*(-2*sqrt(30)/35 + 3/7)^2 - 5*(-2*sqrt(30)/35 + 3/7)^(5/2)) + (sqrt(30)/36 + 1/2)*(-4*(-2*sqrt(30)/35 + 3/7)^2 + 5*(-2*sqrt(30)/35 + 3/7)^(5/2)) + (-sqrt(30)/36 + 1/2)*(-4*(2*sqrt(30)/35 + 3/7)^2 + 5*(2*sqrt(30)/35 + 3/7)^(5/2))</div>
 
 <p>Wow, not even close. But let's simplify:</p><pre class="sourceCode julia">sum([f(xi) * Ais[i] for (i,xi) in enumerate(xis)]) |> simplify</pre>
 <div class="well well-sm">
-$$- \frac{8}{5}$$</div>
+-8/5</div>
 
 <p>Now let's try for some "arbitrary" polynomial:</p><pre class="sourceCode julia">f(x) = exp(x)
 p = series(f(x), x, n=8) |> removeO # 7th degree poly</pre>
 <div class="well well-sm">
-$$\frac{x^{7}}{5040} + \frac{x^{6}}{720} + \frac{x^{5}}{120} + \frac{x^{4}}{24} + \frac{x^{3}}{6} + \frac{x^{2}}{2} + x + 1$$</div>
+x^7/5040 + x^6/720 + x^5/120 + x^4/24 + x^3/6 + x^2/2 + x + 1</div>
 
 <pre class="sourceCode julia">integrate(p, (x, -1, 1))</pre>
 <div class="well well-sm">
-$$\frac{5923}{2520}$$</div>
+5923/2520</div>
 
 <p>And compare with:</p><pre class="sourceCode julia">sum([subs(p,x,xi) * Ais[i] for (i,xi) in enumerate(xis)]) |> simplify</pre>
 <div class="well well-sm">
-$$\frac{5923}{2520}$$</div>
+5923/2520</div>
 
 <p>The theorem does <em>not</em> guarantee this is true for 8th degree polynomials:</p><pre class="sourceCode julia">p = series(f(x), x, n=9) |> removeO
 integrate(p, (x, -1,1))</pre>
 <div class="well well-sm">
-$$\frac{426457}{181440}$$</div>
+426457/181440</div>
 
 <p>Compare with</p><pre class="sourceCode julia">sum([subs(p,x,xi) * Ais[i] for (i,xi) in enumerate(xis)]) |> simplify</pre>
 <div class="well well-sm">
-$$\frac{58045529}{24696000}$$</div>
+58045529/24696000</div>
 
-<h3>Proof</h3><p>We have &#36;q&#36; given. Take &#36;f&#36;  a polynomial of degree &#36;2n&#43;1&#36; or less. Then we can do polynomial long division to write:</p>$$~
+<h3>Proof</h3><p>We have $q$ given. Take $f$  a polynomial of degree $2n+1$ or less. Then we can do polynomial long division to write:</p>$$~
 f(x) = q(x) p(x) + r(x)
-~$$<p>Where the degree of &#36;r&#40;x&#41;&#36; is less than that of &#36;q&#40;x&#41; &#61; n&#43;1&#36;. We can evaluation at &#36;x_i&#36; to see that:</p>$$~
+~$$
+<p>Where the degree of $r(x)$ is less than that of $q(x) = n+1$. We can evaluation at $x_i$ to see that:</p>$$~
 f(x_i) = q(x_i) p(x_i) + r(x_i) = 0 \cdot p(x_i) + r(x_i) = r(x_i).
-~$$<p>So we get:</p>$$~
+~$$
+<p>So we get:</p>$$~
 \int_a^b f(x) w(x) dx = \int_a^b [(q(x)p(x)w(x)) + (r(x) w(x)) ] dx = \int_a^b r(x) w(x) dx.
-~$$<p>And</p>$$~
+~$$
+<p>And</p>$$~
 \sum_{i=0}^n A_i f(x_i) = \sum_{i=0}^n A_i r(x_i).
-~$$<p>But, when &#36;A_i&#36; is defined as it is, it is known the sum is exact for &#36;n&#36;th degree polynomials. So we can equate the two things we just did to get:</p>$$~
+~$$
+<p>But, when $A_i$ is defined as it is, it is known the sum is exact for $n$th degree polynomials. So we can equate the two things we just did to get:</p>$$~
 \int_a^b f(x) w(x) dx  = \sum_{i=0}^n A_i f(x_i)
-~$$<p>Which is what was to be shown.</p><h3>Fact</h3><p>If &#36;q&#40;x&#41;&#36; is as assumed, it will have real, simple roots all inside &#36;&#40;a,b&#41;&#36;.</p><p>Why?</p><blockquote>
-<p>Thm. If &#36;q&#36; is &#36;w&#36;-orthogonal to &#36;\Pi_n&#36;, then it has at least &#36;n&#43;1&#36; sign changes on &#36;&#40;a,b&#41;&#36;.</p>
-</blockquote><p>First, &#36;1&#36; is in &#36;\Pi_n&#36; and &#36;\int q&#40;x&#41; 1 w&#40;x&#41; &#61;0&#36;, so &#36;q&#36; must change sign, as &#36;w &gt; 0&#36;.</p><p>Suppose, &#36;q&#36; changes sign only &#36;r&#36; times, &#36;r \leq n&#36;. Then one can partition &#36;&#40;a,b&#41;&#36; by &#36;t_0&#61;a &lt; t_1 &lt; \cdot &lt; t_r &lt; t_&#123;r&#43;1&#125; &#61; b&#36; so that &#36;q&#36; does not change sign on each partition.</p><p>Form the polynomial &#36;p&#40;x&#41; &#61; &#40;x-t_1&#41; \cdots &#40;x-t_r&#41;&#36;. Then &#36;p&#36; is in &#36;\Pi_n&#36;. and &#36;p&#36; does not change sign on &#36;&#40;t_i, t_&#123;i&#43;1&#125;&#41;&#36;. So</p>$$~
+~$$
+<p>Which is what was to be shown.</p><h3>Fact</h3><p>If $q(x)$ is as assumed, it will have real, simple roots all inside $(a,b)$.</p><p>Why?</p><blockquote>
+<p>Thm. If $q$ is $w$-orthogonal to $\Pi_n$, then it has at least $n+1$ sign changes on $(a,b)$.</p>
+</blockquote><p>First, $1$ is in $\Pi_n$ and $\int q(x) 1 w(x) =0$, so $q$ must change sign, as $w > 0$.</p><p>Suppose, $q$ changes sign only $r$ times, $r \leq n$. Then one can partition $(a,b)$ by $t_0=a < t_1 < \cdot < t_r < t_{r+1} = b$ so that $q$ does not change sign on each partition.</p><p>Form the polynomial $p(x) = (x-t_1) \cdots (x-t_r)$. Then $p$ is in $\Pi_n$. and $p$ does not change sign on $(t_i, t_{i+1})$. So</p>$$~
 \int_a^b q(x) p(x) w(x) dx \neq 0
-~$$<p>But by orthogonality, this isn't the case, so there is a contradiction and there are more sign changes thatn assumed.</p><h2>Error</h2><blockquote>
+~$$
+<p>But by orthogonality, this isn't the case, so there is a contradiction and there are more sign changes thatn assumed.</p><h2>Error</h2><blockquote>
 <p>Theorem 4 (p497)</p>
-</blockquote><p>Let &#36;E&#36; be the error:</p>$$~
+</blockquote><p>Let $E$ be the error:</p>$$~
 E = \int_a^b f(x) dx - \sum_{i=1}^{n-1} A_i f(x_i).
-~$$<p>Where &#36;f&#36; is &#36;C^&#123;2n&#125;&#36;. Then the error term can be represented as:</p>$$~
+~$$
+<p>Where $f$ is $C^{2n}$. Then the error term can be represented as:</p>$$~
 E = \frac{f^{2n}(\xi)}{(2n)!} \int_a^b \prod_{i=0}^{n-1}(x-x^i)^2 w(x) dx.
-~$$<p>(For polynomials of degree &#36;\leq 2n-1&#36; it is clear that &#36;f^&#123;2n&#125;&#40;\xi&#41; &#61; 0&#36; and so &#36;E&#61;0&#36;.)</p><h2>The FastGaussQuadrature package illustrates this</h2><p><a href="https://github.com/ajt60gaibb/FastGaussQuadrature.jl">FastGaussQuadrature</a></p><h2>The quadgk function</h2><p>In <code>Julia</code>, the <a href="https://github.com/JuliaLang/julia/blob/master/base/quadgk.jl">quadgk</a> is a built-in function  provided to compute one-dimensional integrals. We have:</p><ul>
-<li><code>quad</code> is for quadrature, an old-term now meaning integrals</li>
-<li><code>g</code> is Gauss</li>
-<li><code>k</code> is Kronrod</li>
-</ul><p>The <a href="https://en.wikipedia.org/wiki/Gauss&#37;E2&#37;80&#37;93Kronrod_quadrature_formula">Kronrod</a> part is a modification to the choice of Gauss points.</p><p>The <code>quadgk</code> function is adaptive, in that it compute an estimated integral over a region. If the error is not small enough, it subdivides that region and tries again on each subdivision. The Kronrod part makes the computation over subdivisions more efficient.</p><p>The function returns <em>both</em> an answer and an error estimate:</p><pre class="sourceCode julia">quadgk(sin, 0, pi)</pre>
+~$$
+<p>(For polynomials of degree $\leq 2n-1$ it is clear that $f^{2n}(\xi) = 0$ and so $E=0$.)</p><h2>The FastGaussQuadrature package illustrates this</h2><p><a href="https://github.com/ajt60gaibb/FastGaussQuadrature.jl">FastGaussQuadrature</a></p><h2>The quadgk function</h2><p>In <code>Julia</code>, the <a href="https://github.com/JuliaLang/julia/blob/master/base/quadgk.jl">quadgk</a> is a function in the <code>QuadGK</code> package  provided to compute one-dimensional integrals. We have:</p><ul>
+<li><p><code>quad</code> is for quadrature, an old-term now meaning integrals</p>
+</li>
+<li><p><code>g</code> is Gauss</p>
+</li>
+<li><p><code>k</code> is Kronrod</p>
+</li>
+</ul><p>The <a href="https://en.wikipedia.org/wiki/Gauss&#37;E2&#37;80&#37;93Kronrod_quadrature_formula">Kronrod</a> part is a modification to the choice of Gauss points.</p><p>The <code>quadgk</code> function is adaptive, in that it compute an estimated integral over a region. If the error is not small enough, it subdivides that region and tries again on each subdivision. The Kronrod part makes the computation over subdivisions more efficient.</p><p>The function returns <em>both</em> an answer and an error estimate:</p><pre class="sourceCode julia">using QuadGK
+QuadGK.quadgk(sin, 0, pi)</pre>
 <pre class="output">
-(2.0,1.7905676941154525e-12)</pre>
+(2.0, 1.7905676941154525e-12)</pre>
 
-<p>Here the <em>exact</em>  answer of &#36;2&#36; is found, but the algorithm used estimates the error by <code>1e-12</code>. (As the error is 0, this is a good bound, though larger than needed.)</p><p>Other integrals are possible:</p><pre class="sourceCode julia">quadgk(x->exp(x^2), -1, 1)</pre>
+<p>Here the <em>exact</em>  answer of $2$ is found, but the algorithm used estimates the error by <code>1e-12</code>. (As the error is 0, this is a good bound, though larger than needed.)</p><p>Other integrals are possible:</p><pre class="sourceCode julia">QuadGK.quadgk(x->exp(x^2), -1, 1)</pre>
 <pre class="output">
-(2.925303491814363,2.177147351289932e-11)</pre>
+(2.925303491814363, 2.177147351289932e-11)</pre>
 
 
   </div>

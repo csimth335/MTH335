@@ -13,29 +13,30 @@ As not every number is a machine number, numbers are rounded to machine numbers.
 ### For example,...
 
 ```
-with_rounding(Float32, RoundUp) do 
-       .1 + .2 + .3
-end
+current_rounding_mode = rounding(Float32)
+setrounding(Float32, RoundUp)
+.1 + .2 + .3
 ```
 
 ```
-with_rounding(Float32, RoundDown) do 
-       .1 + .2 + .3
-end
+setrounding(Float32, RoundDown)
+.1 + .2 + .3
 ```	   
 
 ```
-with_rounding(Float32, RoundDown) do 
-    -.1 - .2 - .3
-end
+setrounding(Float32, RoundDown)
+-.1 - .2 - .3
 ```
 
 and
 
 ```
-with_rounding(Float32, RoundToZero) do 
-       -.1 - .2 - .3
-end
+setrounding(Float32, RoundToZero) 
+-.1 - .2 - .3
+```
+
+```
+setrounding(Float32, current_rounding_mode)
 ```
 
 ### A more realistic problem
@@ -43,9 +44,16 @@ end
 ```
 xs = rand(10^7) - 0.5
 ys = big(xs)
-rup = with_rounding(() -> sum(xs), Float64, RoundUp)
-rdown = with_rounding(() -> sum(xs), Float64, RoundDown)
-ex = convert(Float64, sum(ys))
+current_rounding_mode = rounding(Float64)
+setrounding(Float64, RoundUp)
+rup = sum(xs)
+
+setrounding(Float64, RoundDown)
+rdown = sum(xs)
+
+setrounding(Float64, current_rounding_mode)
+
+ex = convert(Float64, sum(ys))  # exact sum converted
 
 ex - sum(xs), ex - rup, ex - rdown
 ```
@@ -60,15 +68,15 @@ At most the *error* is $1/2 \cdot 2^{-p}\cdot 2^m$.
 
 Write $fl(x)$ to be the machine number that $x$ rounds to. Then
 
-$$
+$$~
 e = |x - fl(x)| \leq 1/2 \cdot 2^{-p}\cdot  2^m
-$$
+~$$
 
 The *relative error* of rounding $x$ is at most
 
-$$
+$$~
 |\frac{x - fl(x)}{x}| = |\frac{e}{x}| = \frac{1/2 \cdot 2^{-p}\cdot 2^m}{q 2^m} \leq 1/2 \cdot 2^{-p}
-$$
+~$$
 
 (With just chopping there would be no $1/2$.)
 
@@ -78,9 +86,9 @@ If $\delta$ is the relative error, then we have $fl(x) = x (1 + \delta)$ and $|\
 
 Suppose $x = 1.a_1a_2 \cdot a_p \cdot 2^m$ is a machine number with precision $p$. What is the relative size of the next largest number? This would be
 
-$$
+$$~
 x' = (1.a_1a_2 \cdot a_p + 2^{-p}) \cdot  2^m
-$$
+~$$
 
 The absolute difference being $2^{m-p}$. So if $m$ is larger, the difference is larger -- bigger gaps. The *relative difference* is basically a constant: $2^{-p}2^m/(q 2^m) \leq 2^{-p}$.
 
@@ -88,9 +96,9 @@ The absolute difference being $2^{m-p}$. So if $m$ is larger, the difference is 
 
 What is the next number after 1? This would be
 
-$$
+$$~
 1+ = 1.0000 \cdots 0000 1 \cdot 2^0
-$$
+~$$
 
 The difference $1^+ - 1 = 2^{-52}$ or
 
@@ -158,42 +166,50 @@ If $\odot$ is any of the above operations, what is $fl(x \odot y)$?
 
 We know for $x$ that $fl(x) = x(1 + \delta)$ where $\delta$ is small ($\leq 2^{-p}$) and depends on $x$. So,
 
-$$
+$$~
 fl(x \odot y) = fl(fl(x) \odot fl(y)) = ((x(1+\delta)) \odot (y(1 + \delta)))(1 + \delta)
-$$
+~$$
 
 Each $\delta$ is small and possibly different.
 
 Well, how much off are we? Let's quickly check:
 
 ```
-ENV["PYTHONHOME"] = "/Users/verzani/anaconda/"
 using SymPy
 ```
 
 ###
 
 ```
-x,y,d1,d2,d3 = symbols("x,y,d1,d2,d3", real=true)
+@vars x y delta_1 delta_2 delta_3 real=true
 op = *
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
+( op(x*(1+delta_1), y*(1+delta_2)) * (1 + delta_3) - op(x,y))/op(x,y) |> expand
 ```
+
+So multiplication is like $3\delta$. What about division?
 
 ```
 op = /
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
+( op(x*(1+delta_1), y*(1+delta_2)) * (1 + delta_3) - op(x,y))/op(x,y)|> expand |> simplify
 ```
 
-But...
+It too is like $3\delta$. But what about subtraction?
+
 
 ```
-op = +
-( op(x*(1+d1), y*(1+d2)) * (1 + d3) - op(x,y))/op(x,y) |> expand
+op = -
+( op(x*(1+delta_1), y*(1+delta_2)) * (1 + delta_3) - op(x,y))/op(x,y) |> expand|>simplify
 ```
+
+This has $x-y$ in the denominator! Something to think about.
+
 
 ## A Leaky abstraction
 
-Floating point is a [leaky](http://www.johndcook.com/blog/2009/04/06/numbers-are-a-leaky-abstraction/) abstraction for the real numbers. Certain mathematical facts aren't true for floating point operations!
+Floating point is a
+[leaky](http://www.johndcook.com/blog/2009/04/06/numbers-are-a-leaky-abstraction/)
+abstraction for the real numbers. Certain mathematical facts aren't
+*quite* true for floating point operations!
 
 Here are some "gotchas"
 
@@ -208,25 +224,25 @@ Consider again the case of subtracting two numbers that are close by.
 
 We saw
 
-$$
+$$~
 fl(fl(x) - fl(y)) - (x-y) = \frac{1}{x-y}(x (\delta_1 + \delta_3 + \delta_1 \delta_3) + y((\delta_2 + \delta_3 + \delta_2 \delta_3))).
-$$
+~$$
 
 If $x$ and $y$ are close, then this can be quite large.
 
 In the book, we have Theorem 1 of section 2.2
 
 > If $x$ and $y$ are binary floating point numbers with $x > y > 0$ with
-> $$2^{-q} \leq 1 - y/x \leq 2^{-p}$$
+> $2^{-q} \leq 1 - y/x \leq 2^{-p}$
 > Then at most $q$ and *at least* $p$ significant binary bits are lost in the substraction $x-y$.
 
 ### Idea
 
 Suppose we  are in decimal and we have $4$ digits of precision. Consider subtracting $22/7 = 3.142857142857143$ from $\pi = 3.1415926535897...$. We have
 
-$$
+$$~
 fl(\pi) - fl(22/7) = 3.142 - 3.143 = -0.001 = -1.000 \cdot 10^{-3}.
-$$
+~$$
 
 The actual answer is $-0.0012644892...$ rounded to  $-1.264\cdot 10^{-3}$. Where did the extra zeros come from in the answer above? They are just added on as there is no obvious alternative when shifted to normalized scientific notation. So we lost 3 digits of accuracy and we have $10^{-3} \leq 1 - \pi/(22/7) \leq 10^{-4}$. 
 
@@ -236,15 +252,15 @@ The lower bound:
 
 Say $x = r \cdot 2^n$ and $y=s\cdot 2^m$ with $m \leq n$ and here $1/2 \leq r, s < 1$. Then to "line up the decimal points" we may write $y = s \cdot 2^{m-n} \cdot 2^n$.
 
-$$
+$$~
 x - y = (r - s\cdot 2^{m-n}) \cdot 2^n
-$$
+~$$
 
 The significand then satisfies:
 
-$$
+$$~
 r - s \cdot 2^{m-n} = r(1 - \frac{s\cdot 2^m}{r \cdot 2^n}) = r(1 - y/x) < 2^{-p}
-$$
+~$$
 
 To put into normalized floating point, the significand must be shifted (there are leading $0$s) and the (at least) $p$ terms added are spurious, so accuracy is lost.
 
@@ -308,12 +324,12 @@ Moral: need to be careful when trying to say two things are exactly equal: Not o
 
 Let $a$, $b$ and $c$ be machine numbers. Then we have $fl(a+b) = (a+b)(1+\delta)$, where delta may be $0$, is small, but may not be $0$ and depends on $a$ and $b$. So:
 
-$$
+$$~
 \begin{align}
 fl((a+b)+c) &= ((a+b)(1+\delta_1)+c)(1+\delta_2) = (a+b)(1+\delta_1)(1+\delta_2) + c(1+\delta_2)\\
 fl((a+(b +c) &= (a+ (b+c)(1+\delta_3))(1+\delta_4) =  a(1+\delta_4) + (b+c)(1+\delta_3)(1+\delta_4)
 \end{align}
-$$
+~$$
 
 Are these equal? Add smaller first?
 
@@ -341,9 +357,9 @@ point numbers to machine numbers can be a source of loss of accuracy.
 
 In an example in the book (p76) a formula to find the midpoint -- the point halfway between $a$ and $b$ -- is given:
 
-$$
+$$~
 a + \frac{b-a}{2}
-$$
+~$$
 
 And not $(a+b)/2$. Why?
 
@@ -362,29 +378,26 @@ Their general strategem is:
 Polynomial evaluation can be sensitive to numeric issues. Problem 3 on
 page 62 considers a polynomial evaluated 3 ways:
 
-$$
+$$~
 \begin{align}
 h(x) &= (x-1)^8 \\
 f(x) &= x^8 - 8x^7 + 28x^6 - 56x^5 + 70x^4 - 56x^3 + 28x^2 - 8x + 1 \\
 g(x) &= (((((((x-8)x + 28)x - 56)x + 70)x -56)x + 28) - 8)x + 1
 \end{align}
-$$
+~$$
 
 ###
 
 They are interested in values near $1$ (101 values between 0.99 and 1.01 in fact). Let's see the differences
 
 ```
-using Gadfly
+using Plots
 h(x) = (x-1.0)^8
 f(x) = x^8 - 8x^7 + 28x^6 - 56x^5 + 70x^4 - 56x^3 + 28x^2 - 8x + 1
 g(x) = (((((((x-8)*x + 28)*x - 56)*x + 70)*x -56)*x + 28)*x - 8)*x + 1
-xs = linspace(0.99, 1.01, 101)
-hs = map(h, xs); fs = map(f, xs); gs = map(g, xs)
-plot(layer(x=xs, y=hs, Geom.line, Theme(default_color=color("red"))),
-layer(x=xs, y=fs, Geom.line, Theme(default_color=color("blue"))),
-layer(x=xs, y=gs, Geom.line,Theme(default_color=color("green")))
-)
+plot(h, 0.99, 1.01)
+plot!(f)
+plot!(g)
 ```
 
 ###
@@ -393,8 +406,8 @@ The red one is the most exact, as we would expect. It is basically 8 operations.
 
 The blue has *more* variability than the green. Why? More operations:
 
-* $g$ has only $7$ multiplications -- $f$ has $9 + 8 + 7 + 6 + 5 + \dots + 2$.
-* $f$ has large numbers $x^8$ with small numbers $1$ being added. This can cause loss of precision.
+* The function $g$ has only $7$ multiplications -- $f$ has $9 + 8 + 7 + 6 + 5 + \dots + 2 = 44$.
+* The function $f$ has large numbers $x^8$ with small numbers $1$ being added. This can cause loss of precision.
 
 Moral $g$ is "better."
 
@@ -483,22 +496,22 @@ Let $S_{k+1} = x_{k+1} + S_k$ be the partial sum and
 $T_{k+1} = fl(x_{k+1} + T_k) = (x_{k+1}+ T_k)(1+\delta)$
 be the floating point partial sum. What is the relative difference?
 
-$$
+$$~
 \begin{align}
 \frac{S_{k+1} - T_{k+1}}{S_{k+1}} &=
 \frac{S_{k+1}(1+\delta) - T_{k+1} - S_{k+1}\delta}{S_{k+1}}\\
 &= \frac{(S_k + x_{k+1})(1+\delta) - (T_k + x_{k+1})(1+\delta) - S_{k+1}\delta}{S_{k+1}}\\
 &= (1 + \delta)\frac{S_k - T_k}{S_k} \cdot \frac{S_k}{S_{k+1}} - \delta
 \end{align}
-$$
+~$$
 
 
 Let $\rho_k$ be the absolute value. Since $|\delta| \leq \epsilon$, it follows that
 with $\rho_0 = 0$:
 
-$$
+$$~
 \rho_{k+1} \leq \rho_k(1+\epsilon) + \epsilon.
-$$ 
+~$$ 
 
 This can be solved to yield: $\rho_n \leq (1 + \epsilon)^n - 1$.
 
@@ -520,15 +533,15 @@ summation is used. This has relative error given by $\epsilon
 
 Numbers may be approximate, so after applying a function the error can propagate. How much? Suppose $x$ is the real value and $\bar{x}$ is a machine approximation. Further, assume our function $f$ is perfectly defined and $C^1$. Then [why?]:
 
-$$
+$$~
 f(x) - f(\bar{x}) = f'(\xi)(x - \bar{x}).
-$$
+~$$
 
 The relative error divides this difference by $f(x)$ to get:
 
-$$
+$$~
 |\frac{f(x) - f(\bar{x})}{f(x)}| = |x|\frac{f'(\xi)}{f(x)} \cdot |\frac{x - \bar{x}}{x}|.
-$$
+~$$
 
 (Written to emphasize a factor times the relative error in the approximation to the number $x$.
 
@@ -547,12 +560,12 @@ For `log1p` [Cook](http://www.johndcook.com/blog/2010/06/07/math-library-functio
 
 In [What Every ...](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.22.6768&rep=rep1&type=pdf) there is a theorem that this function
 
-$$
+$$~
 \begin{cases}
 x & \text{if } 1 \oplus x = 1\\
 \frac{x \log(1+x)}{(1+x) - 1}& \text{ otherwise}
 \end{cases}
-$$
+~$$
 
 has relative error less than $5\epsilon$ when $0 \leq x \leq 3/4$ and ... (guard digit, $\log$ computed to within 1/2 ulp).
 
@@ -663,12 +676,12 @@ Lg7 = 1.479819860511658591e-01;  /* 3FC2F112 DF3E5244 */
 
 The book gives an example of an iterative sequence:
 
-$$
+$$~
 \begin{cases}
 x_0 = 1, x_1=1/3&\\
 x_{n+1} = 13/3 x_n - 4/3 x_{n-1} & (n \geq 1)
 \end{cases}
-$$
+~$$
 
 What happens as $n$ gets larger:
 
@@ -751,9 +764,9 @@ Yet the "error" is large.
 
 Consider the case of computing $I_n = \int_0^1 x^n e^{-x}$. (Attributed to Forsythe, Malcom and Moler 1977). Using integration by parts gives:
 
-$$
+$$~
 I_n = n I_{n-1} - 1/e
-$$
+~$$
 
 Or reversing $I_{n-1} = 1/n (I_n + 1/e)$.
 
@@ -817,26 +830,26 @@ Suppose our "algorithm" is just $x \rightarrow f(x)$.
 
 What is $f(x+h)$ for small $h$ *compared* with $f(x)$?
 
-$$
+$$~
 \text{error} = f(x+h) - f(x) = f'(\xi) h, \quad \xi \text{ between $x$ and $x+h$}.
-$$
+~$$
 
 The *relative error* is then
 
-$$
+$$~
 \begin{align}
 \text{relative error} &= \frac{f(x+h) - f(x)}{f(x)}\\
 &= \frac{f'(\xi)h}{f(x)} \approx \frac{xf'(x)}{f(x)} \frac{h}{x}.
 \end{align}
-$$
+~$$
 
 ### Example.
 
 What is the condition number when evaluating $\sqrt(x)$ near $1/2$?
 
-$$
+$$~
 \frac{x f'(x)}{f(x)} = \frac{x \cdot 1/\sqrt{x}}{\sqrt{x}} = 1
-$$
+~$$
 
 So small.
 
@@ -846,21 +859,21 @@ Think about a polynomial with floating point coefficients -- there is rounding.
 
 Let $f(x)$ have a root $r$ and suppose $F(x) = f(x) + \epsilon g(x)$. Then suppose $F$ has a root $r+h$ (nearby, but effected by $\epsilon$. What is $h$? Assume both $f$ and $g$ have Taylor series so that:
 
-$$
+$$~
 0 = F(r +h) = f(r) + f'(r)h + \mathcal(O)(h^2) + \epsilon \left( g(r) + g'(r)h + \mathcal(O)(h^2) \right)
-$$
+~$$
 
 Dropping the big $\mathcal{O}$ term and using $f(r)=0$, gives:
 
-$$
+$$~
 0 \approx f'(r)h + \epsilon g(r)  + \epsilon g'(r)g
-$$
+~$$
 
 Or
 
-$$
+$$~
 h \approx -\epsilon \frac{g(r)}{f'(r) + \epsilon g'(r)} \approx -\epsilon \frac{g(r)}{f'(r)}.
-$$
+~$$
 
 ### Wilkinson example
 
@@ -869,9 +882,9 @@ The Wilkinson polynomial is $f(x) = (x-1)(x-2) \cdots (x-20)$. Suppose, the coef
 We have $g(20) = 20^{20}$. What is $f'(20)$? It is $(20-1)(20-2)
 \cdots (20-19) = 19!$. (Why?) And so the condition number is
 
-$$
+$$~
 -\epsilon \frac{20^{20}}{19!}
-$$
+~$$
 
 With $\epsilon=10^{-4}$ this is:
 
@@ -884,9 +897,40 @@ That is almost $10^5$! So a small perturbation in this problem *could* lead to d
 ###
 
 ```
-using Roots
+using Polynomials
 p(x) = prod([x-i for i in 1:20])
-roots(p) 
+x = variable() 
+rts = roots(p(x)) 
+```
+
+
+```
+scatter(real.(rts), imag.(rts), markersize=5)
+scatter!(collect(1:20), 0*collect(1:20), color=:blue)
+```
+
+
+Other alogorithms can give different errors:
+
+```nocode
+using Iterators
+```
+
+```
+using PolynomialZeros
+rts = poly_roots(p, Over.C, method=:PolynomialRoots)
+scatter(real.(rts), imag.(rts), markersize=5)
+scatter!(collect(1:20), 0*collect(1:20), color=:blue)
+```
+
+and
+
+
+```
+using PolynomialZeros
+rts = poly_roots(p, Over.C, method=:AMVW)
+scatter(real.(rts), imag.(rts), markersize=5)
+scatter!(collect(1:20), 0*collect(1:20), color=:blue)
 ```
 
 

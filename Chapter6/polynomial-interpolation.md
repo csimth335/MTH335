@@ -20,16 +20,17 @@ For existence, we can use induction.
 
 For $n=0$ we just have a constant $p_0(x) = y_1$ and then $p_0(x_1) = y_1$ too.
 
-$n=1$. Then we have two points and we can make the line between them. The point slope form is helpful, it would look like:
+For $n=1$: we have two points and we can make the line between them. The point slope form is helpful, it would look like:
 
 $$~
 p_1(x) = x_0 + \frac{y_1 - y_0}{x_1 - x_0} (x - x_0).
 ~$$
 
+----
 
 Assuming that the statement is true for $k$, can we show it is true for $k+1$.
 
-First form $p_{k-1}$ with degree $\leq k-1$ from the first $k-1$ points. Then we write the following formally:
+First from $p_{k-1}$ with degree $\leq k-1$ from the first $k-1$ points. Then we write the following formally:
 
 $$~
 p_k = p_{k-1}(x) + c(x-x_0)(x-x_1)\cdots (x - x_{k-1})
@@ -37,7 +38,8 @@ p_k = p_{k-1}(x) + c(x-x_0)(x-x_1)\cdots (x - x_{k-1})
 
 For some $c$ we will show that this polynomial has degree $\leq k$ and $p_k(x_i) =y_i$ for all $i$ between $0$ and $k$.
 
-The term added is an $k$th degree polynomial. So $p_k$ is a polynomial of degree $\leq k$.
+The term added is an $k$th degree polynomial. So $p_k$ is a polynomial
+of degree $\leq k$ and degree of $p_{k-1}$.
 
 The term added is $0$ at each of $x_0, \dots, x_{k-1}$, so for these values
 
@@ -127,7 +129,7 @@ For $k=0$ we had $p_0(x) = f(x_0)$
 
 For $k=1$ we hade $p_1(x) = f(x_0)  + (f(x_1) - f(x_0)) / (x_1 - x_0) (x - x_0)$.
 
-Letting $f[x_0] = f(x_0)$ and $f[x_0, x_1] =  (f(x_1) - f(x_0)) / (x_1 - x_0) $.
+Letting $f[x_0] = f(x_0)$ and $f[x_0, x_1] =  (f(x_1) - f(x_0)) / (x_1 - x_0)$.
 
 Then these become
 
@@ -207,8 +209,8 @@ To visualize we try:
 
 ```
 using Plots
-backend(:gadfly)
-plot([f, p4], 0, pi/2)
+plot(f, 0, pi/2)
+plot!(p4)
 ```
 
 Not too illuminating, so we try this:
@@ -218,7 +220,8 @@ plot(x -> f(x) - p4(x), 0, pi/2)
 ```
 
 
-So the actual difference is not as large as is possible $0.079$.
+So the actual difference is at most $0.002$, which is nowhere near as
+large as is possible ($0.079$).
 
 
 ## The errors can grow!
@@ -227,7 +230,7 @@ The bound on the error depends on the derivatives of the function. For some func
 
 > p319: "The surprising state of affairs is that for most continuous functions the quantity will not converge to 0"
 
-Example, (Runge 1901). Let $f(x) = 1/(x^2+1)$ and $[a,b] = [-5,5]$. We will use *evenly* space points and have a look:
+Example, (Runge 1901). Let $f(x) = 1/(x^2+1)$ and $[a,b] = [-5,5]$. We will use *evenly* spaced points and have a look:
 
 ```
 f(x) = 1/(x^2 + 1)
@@ -238,8 +241,9 @@ function show_n(n)
   xs = linspace(a, b, n + 1 + 2)[2:end-1]
 
   ip(x)  = f(xs[1]) + sum( [ dd(f, xs[1:(k+1)]) * prodk(x, k, xs) for k in 1:n])
-  Gadfly.plot([f,ip], a, b)
-  end
+  plot(f, a, b)
+  plot!(ip)
+end
 
 show_n(2)
 ```

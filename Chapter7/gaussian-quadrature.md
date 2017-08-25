@@ -227,7 +227,9 @@ E = \frac{f^{2n}(\xi)}{(2n)!} \int_a^b \prod_{i=0}^{n-1}(x-x^i)^2 w(x) dx.
 
 ## The quadgk function
 
-In `Julia`, the [quadgk](https://github.com/JuliaLang/julia/blob/master/base/quadgk.jl) is a built-in function  provided to compute one-dimensional integrals. We have:
+In `Julia`, the
+[quadgk](https://github.com/JuliaLang/julia/blob/master/base/quadgk.jl)
+is a function in the `QuadGK` package  provided to compute one-dimensional integrals. We have:
 
 * `quad` is for quadrature, an old-term now meaning integrals
 * `g` is Gauss
@@ -240,7 +242,8 @@ The `quadgk` function is adaptive, in that it compute an estimated integral over
 The function returns *both* an answer and an error estimate:
 
 ```
-quadgk(sin, 0, pi)
+using QuadGK
+QuadGK.quadgk(sin, 0, pi)
 ```
 
 Here the *exact*  answer of $2$ is found, but the algorithm used estimates the error by `1e-12`. (As the error is 0, this is a good bound, though larger than needed.)
@@ -248,6 +251,6 @@ Here the *exact*  answer of $2$ is found, but the algorithm used estimates the e
 Other integrals are possible:
 
 ```
-quadgk(x->exp(x^2), -1, 1)
+QuadGK.quadgk(x->exp(x^2), -1, 1)
 ```
 

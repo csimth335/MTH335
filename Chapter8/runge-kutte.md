@@ -104,7 +104,6 @@ To visualize, we have:
 
 ```
 using Plots
-backend(:gadfly)
 plot(ts, es, color=:blue)
 plot!(ts, mes, color=:red)
 plot!(t -> exp(-t) *sin(pi*t), 0, 1, color=:green)

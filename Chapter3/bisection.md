@@ -26,11 +26,11 @@ Consider the following algorithm starting with $[a,b]$ and $f$ as in the IVT and
 
 ###
 
-What does this algorithm produce? At each step we get a value of $c$. To distinguish, call them $c_i$. Then we have two possibilities:
+What does this algorithm produce? At each step we get a value of $c$. To distinguish, call them $c_i$. Then:
 
-- $f(c_i) = 0$ for some $i$ and we are done
+* we have $f(c_i) = 0$ for some $i$ and we are done; or
 
-- $f(c_i) \neq 0$ for all $i$.
+* we have $f(c_i) \neq 0$ for all $i$.
 
 In the latter case, what to do?
 
@@ -38,8 +38,8 @@ In the latter case, what to do?
 
 Let $c = \lim_i c_i$. This exists as the sequence is clearly Cauchy ($|x_n - x_{n+m}| \leq C2^{-n}$). Then:
 
-- $c$ exists!
-- $f(c) = 0$.
+* it must be that $c$ exists! *And*
+* the value satisfies: $f(c) = 0$.
 
 Why? Split the values $c_i$ into those that have $f(c_i) < 0$ and those that have $f(c_i) > 0$. Call these sequences $l_i$ and $u_i$.
 
@@ -51,9 +51,14 @@ If a sub-sequence is finite, say terminating at $N$. The $c_i, i \geq N$ has $f(
 
 The above is true mathematically, but can it be true in floating point?
 
-- The $c_i$ in any algorithm are necessarily finite in number, so they can't take on any value, just machine numbers. Since machine numbers are rational numbers in binary, numbers like $\sqrt{2}$ can not be represented exactly, so the value of $c$ is not guaranteed!
+* The $c_i$ in any algorithm are necessarily finite in number, so they
+  can't take on any value, just machine numbers. Since machine numbers
+  are rational numbers in binary, numbers like $\sqrt{2}$ can not be
+  represented exactly, so the value of $c$ is not guaranteed!
 
-- Even the simple statement $c = (a+b)/2$ has problems! $x+y$ can overflow, It isn't even guaranteed that $fl((x+y)/2)$ is in $[x,y]$ with some rounding modes! 
+* Even the simple statement $c = (a+b)/2$ has problems! $x+y$ can
+  overflow, It isn't even guaranteed that $fl((x+y)/2)$ is in $[x,y]$
+  with some rounding modes!
 
 ### What to do
 
@@ -61,9 +66,9 @@ Use thresholds:
 
 Stop the algorithm if
 
-- $|f(c_i)| < \epsilon$
+* either $|f(c_i)| < \epsilon$
 
-- $|b_i - a_i| < \delta$.
+* or $|b_i - a_i| < \delta$.
 
 ## An algorithm (take 1)
 
@@ -95,21 +100,21 @@ xstar, f(xstar)
 
 Theoretically, at each step we have $a_i < c_i < b_i$. Let $c$ be a solution. Then how big is $|c - c_i|$?
 
-$$
+$$~
 |c - c_i| \leq \frac{1}{2} (b_i - a_i)
-$$
+~$$
 
 But:
 
-$$
+$$~
 b_i - a_i = (1/2)(b_{i-1} - a_{i-1}) = (1/2)^2 (b_{i-2} - a_{i-2}) = \cdots = 2^{i}(b_0 - a_0).
-$$ 
+~$$ 
 
 So,
 
-$$
+$$~
 |c - c_i| \leq \frac{1}{2^{i+1}} (b_0 - a_0).
-$$
+~$$
 
 ### Example
 
@@ -117,9 +122,9 @@ If we have $a_0, b_0 = -4, -3$, how many steps to get $|c - c_i| < 10^{-15}$?
 
 We'd need to solve for the smallest $i$ so that:
 
-$$
+$$~
 \frac{1}{2^{i+1}} (b_0 - a_0) = \frac{1}{2^{i+1}} < 10^{-15}
-$$
+~$$
 
 ```
 ceil(log2(1e-15) - 1)
@@ -156,7 +161,7 @@ The problem is studied in [this paper](https://hal.archives-ouvertes.fr/hal-0057
 
 Without care, the following two properties of $m(I)$ are not guaranteed:
 
-* $m(I) \in I$
+* that $m(I) \in I$, or
 * for all machine numbers $v$, $|c - v| \geq |c - M(I)|$ for $c = (a + b)/2 \in R$.
 
 
@@ -180,8 +185,8 @@ We can see the following:
 
 ```
 Verbatim("""
-x1_int = reinterpret(Uint64, abs(x1))
-x2_int = reinterpret(Uint64, abs(x2))
+x1_int = reinterpret(UInt64, abs(x1))
+x2_int = reinterpret(UInt64, abs(x2))
 unsigned = reinterpret(Float64, (x1_int + x2_int) >> 1)
 """)
 ```
@@ -196,7 +201,7 @@ as = rand(1)
 for i in 1:9
   push!(as, nextfloat(as[end]))
 end
-map(x -> bits(reinterpret(Uint64, x)), as)
+map(x -> bits(reinterpret(UInt64, x)), as)
 ```
 
 ###
@@ -213,9 +218,9 @@ end
 
 What happens at each step: we must have:
 
-- `f(c) == 0` (exactly), or
+* either `f(c) == 0` (exactly), 
 
-- either `f(c) * f(a) < 0` or `f(c) * f(b) < 0`
+- one of `f(c) * f(a) < 0` or `f(c) * f(b) < 0`
 
 So if the answer is not exact, we guarantee that this condition holds for the returned value of `c`
 
@@ -228,7 +233,7 @@ So if the answer is not exact, we guarantee that this condition holds for the re
 ```
 using Roots
 f(x) = sin(x)
-c = fzero(f, [3,4])
+c = fzero(f, 3, 4)
 c, f(c), sign(f(prevfloat(c))) * sign(f(nextfloat(c)))
 ```
 
@@ -238,6 +243,6 @@ What about $f(x) = 1/x$? It has no zero, but it does have a zero crossing at $0$
 
 ```
 f(x) = 1/x
-c = fzero(f, [-1, 1])
+c = fzero(f, -1, 1)
 c, f(c), sign(f(prevfloat(c))) * sign(f(nextfloat(c)))
 ```

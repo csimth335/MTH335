@@ -118,7 +118,7 @@ B = \left[\begin{array}{cc}
 ~$$
 
 
-Solving $A=[1, 2]$ we get
+Solving $Ax=[1, 2]$ we get
 
 $$~
 \begin{align}
@@ -164,9 +164,9 @@ There are different ways that pivot rows can be selected:
 
 * **partial pivoting**: at step $i$ choose the row with the largest value of $|a_{li|}$, where $l$ runs over the rows that have *not* been used to pivot. 
 
-* **complete pivoting** consider the largest of all value values in rows not used for pivoting
+* **complete pivoting** consider the largest of all  values in rows not used for pivoting
 
-* **scaled row pivoting**. Defing the scale of a row by:
+* **scaled row pivoting**. Defining the scale of a row by:
 
 
 $$~
@@ -266,7 +266,7 @@ A = copy(Aorig)
 We begin by finding the scale for each row:
 
 ```
-s = mapslices(x->maximum(abs(x)), A, 2) # mapslices does all rows at once
+s = mapslices(x->maximum(abs.(x)), A, 2) # mapslices does all rows at once
 ```
 
 Then we divide column 1 to find the largest:
@@ -422,7 +422,7 @@ xs = linspace(0, 1, n)
 
 ```
 f(x) = sin(x)
-fs = map(f, xs)
+fs = f.(xs)
 ```
 
 ```
@@ -450,7 +450,9 @@ for i in 2:n
   A[i-1, i] = 1
 end
 h = (1-0)/n
-(A * fs) / h^2 + fs
+out = (A * fs) / h^2 + fs
+## look at first 10:
+out[1:10]
 ```
 
 But our focus here is on the special shape of $A$ -- it is tridiagonal. that is $a_{ij} = 0$ if $|i-j| > 1$. For this system -- which does not need pivoting -- then number of `ops` is dramatically reduced, as each row is done with $2$ `ops`, so to get the $LU$ factorization can be done quite quickly.

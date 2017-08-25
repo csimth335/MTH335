@@ -68,7 +68,7 @@ Here are two main problems in linear algebra that repeat themselves all the time
 
 * Solve for $x$ in $Ax = b$. Also, somewhat related, if $Ax = b$ has no solutions, can we find "best" solutions?
 
-* Solve for the $\lambda$ for which $Ax = \lambda x$ has non zero solutions
+* Solve for the $\lambda$ for which $Ax = \lambda x$ has non-zero solutions
 
 
 
@@ -226,7 +226,7 @@ We don't have "division" defined for matrices. There are for some *square* matri
 There is a built in function like division `\`. The expression `A \ b` will be a solution, `x` to `Ax =b`:
 
 ```
-A * (A \ b)  # should be b = [1,2,3]
+A * (A \ b)  - b
 ```
 
 ### The transpose
@@ -236,7 +236,7 @@ $$~
 A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
 ~$$
 
-On the computer we see easily using `'` for transpose:
+On the computer we see easily using `.'` for transpose:
 
 Here is $A$:
 
@@ -247,14 +247,25 @@ A
 and its transpose
 
 ```
-A'
+A.'
 ```
 
 The transpose is an *involution* -- meaning do it twice and you haven't changed anything:
 
 ```
-(A')'
+(A.').'
 ```
+
+Without a "dot" the conjugate transpose is performed. For real-valued
+matrices the two are identical:
+
+```
+A'
+```
+
+----
+
+
 
 A matrix is *symmetric* if $A^T = A$. This means $A$ needs to be square and have symmetry along its main diagonal.
 
@@ -339,11 +350,15 @@ We return to system of equations. There we know a few basic facts:
 
 The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?
 
-Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, for $E'_j = -E_j$ and add this to $E'_i$ to get $E''_i = E'_i + E'_j = E_i + E_j - E_j = E_i$ and so the original set of equations will have the same solutions if we replace $E_i$ as specified.
+Well, if our solutions solved $E_i$ and $E_j$, then it would also
+solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, the
+solution makes *both* $E'_i$ and $E_j$ $0$, so $-E_j$ is $0$, and then
+so is $E_i = $E'_i - E_j$.
+
 
 ### Matrix equivalence
 
-We have systems of linear equations lend them selves to matrices, so elementary operations lend themselves to matrix operations.
+As systems of linear equations lend them selves to matrices, so to do elementary operations lend themselves to matrix operations.
 
 To illustrate:
 
@@ -387,14 +402,14 @@ A^{-1}A = (E_m E_{m-1} \cdots E_2 E_1 \cdot I) A
 
 For an $n \times n$ matrix $A$, all of these are equivalent:
 
-* $A$ is nonsingular
-* the *determinant* of $A$ is non-zero
+* The matrix $A$ is nonsingular
+* The *determinant* of $A$ is non-zero
 * The rows of $A$ for a basis for $R^n$
 * The columns of $A$ for a basis for $R^n$
 * The equation $Ax=0$ is only satisfied by $x=0$.
 * The equation $Ax=b$ has only one solution, $x$.
-* A is a product of elementary matrices
-* $0$ is not an eigenvalue of $A$.
+* The matrix $A$ is a product of elementary matrices
+* The value $0$ is not an eigenvalue of $A$.
 
 ## Block multiplication
 
@@ -405,10 +420,11 @@ B = [1 2; 3 4]
 C = [5 6; 6 5]
 O = [0 0; 0 0]
 I = [1 0; 0 1]
+
 A = [B C; O I]
 ```
 
-Problem 7 has one show that $A^k$ is also a block matrix with Blocks $B^k$ and $(B^k-I)(B-I)^{-1}C$ to go with O and I. Let's see with k = 2:
+Problem 7 has one show that $A^k$ is also a block matrix with blocks $B^k$ and $(B^k-I)(B-I)^{-1}C$ to go with O and I. Let's see with k = 2:
 
 We need $B-I$ to have an inverse. We check:
 

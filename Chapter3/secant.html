@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -30,10 +29,12 @@ pre {display: block;}
 
 <style></style>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 
+<!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -44,6 +45,7 @@ MathJax.Hub.Config({
   displayIndent: "5%"
 });
 </script>
+
 
 <script type="text/javascript">
 $( document ).ready(function() {
@@ -101,7 +103,12 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Secant Method</h1><blockquote><p>The secant method can be thought of as a finite difference approximation of Newton's method. However, the method was developed independently of Newton's method, and predated the latter by over 3,000 years <a href="https://en.wikipedia.org/wiki/Secant_method">Wikipedia</a>. </p></blockquote><p>What is it? We start with two points $x_0$ and $x_1$ (not the same). Then instead of the tangent line at $(x_1, f(x_1))$, we use the secant line.</p><p>Solving for when it intersects the $x$ axis yields:</p><p>$$ x_{n+1} = x_n - \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \cdot f(x_n) $$</p><p>Basically use the slope of the tangent line instead of $f'(x_n)$. Hence the advantage, each step only requires one function evaluation $f(x_n)$, not two (the other being $f'(x_n)$).</p><h3>Example</h3><p>Let $f(x) = \sin(x)$, $x_0=3$, $x_1=4$ and what do we get?</p><pre class="sourceCode julia">f(x) = sin(x)
+<h1>Secant Method</h1><blockquote>
+<p>The secant method can be thought of as a finite difference approximation of Newton's method. However, the method was developed independently of Newton's method, and predated the latter by over 3,000 years <a href="https://en.wikipedia.org/wiki/Secant_method">Wikipedia</a>.</p>
+</blockquote><p>What is it? We start with two points $x_0$ and $x_1$ (not the same). Then instead of the tangent line at $(x_1, f(x_1))$, we use the secant line.</p><p>Solving for when it intersects the $x$ axis yields:</p>$$~
+x_{n+1} = x_n - \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \cdot f(x_n)
+~$$
+<p>Basically use the slope of a secant line instead of $f'(x_n)$, the slope of the tangent. Hence the advantage, each step only requires one function evaluation $f(x_n)$, not  (the other being $f'(x_n)$).</p><h3>Example</h3><p>Let $f(x) = \sin(x)$, $x_0=3$, $x_1=4$ and what do we get?</p><pre class="sourceCode julia">f(x) = sin(x)
 x = [3.0, 4.0]
 push!(x, x[end] - (x[end] - x[end-1]) / (f(x[end]) - f(x[end-1])) * f(x[end]))</pre>
 <pre class="output">
@@ -133,19 +140,63 @@ push!(x, x[end] - (x[end] - x[end-1]) / (f(x[end]) - f(x[end-1])) * f(x[end]))</
 f(x) = x^3 - sinh(x) + 4x^2 + 6x + 9
 xstar = secant_method(f, 7.0, 8.0, verbose=true)</pre>
 <pre class="output">
-7.113063429254094</pre>
+7.113063429254095</pre>
 
 <p>And we see</p><pre class="sourceCode julia">f(xstar)</pre>
 <pre class="output">
-2.6290081223123707e-13</pre>
+-2.1316282072803006e-13</pre>
 
-<h2>Error analysis.</h2><p>For Newton's method, we found</p><p>$$ e_{n+1} = \frac{1}{2} \frac{f''(\xi)}{f'(x_n)} e_n^2. $$</p><p>With the secant  method we have (p96)</p><p>$$ e_{n+1} \approx \frac{1}{2}\frac{f''(r)}{f'(r)} e_n e_{n-1}  $$</p><p>Not quite the same, but similar</p><h3>Order of convergence</h3><p>Suppose we expect convergence with order $\alpha$, that is we suppose</p><p>$$ |e_{n+1}| \approx A |e_n|^\alpha $$</p><p>($\alpha=2$ for Newton). Then from the above can write:</p><p>$$ \begin{align} |e_{n+1}| &\approx A|e_n|^\alpha \text{ and }\\ |e_{n-1}| &\approx (A^{-1}|e_n|)^{1/\alpha}. \end{align} $$</p><p>The latter comes from solving for $e_n$. We use both to get</p><p>$$ A |e_n|^\alpha \approx |C| |e_n| (A^{-1}|e_n|)^{1/\alpha} $$</p><p>Solving gives</p><p>$$ A^{1 + 1/\alpha} |C|^{-1} \approx |e_n|^{1 - \alpha + 1/\alpha}. $$</p><p>The left side is constant, so the right side exponent should be $0$.</p><pre class="sourceCode julia">using SymPy
+<h2>Error analysis.</h2><p>For Newton's method, we found</p>$$~
+e_{n+1} = \frac{1}{2} \frac{f''(\xi)}{f'(x_n)} e_n^2.
+~$$
+<p>With the secant  method we have (p96)</p>$$~
+e_{n+1} \approx \frac{1}{2}\frac{f''(r)}{f'(r)} e_n e_{n-1} 
+~$$
+<p>Not quite the same, but similar</p><h3>Order of convergence</h3><p>Suppose we expect convergence with order $\alpha$, that is we suppose</p>$$~
+|e_{n+1}| \approx A |e_n|^\alpha
+~$$
+<p>($\alpha=2$ for Newton). Then from the above can write:</p>$$~
+\begin{align}
+|e_{n+1}| &\approx A|e_n|^\alpha \text{ and }\\
+|e_{n-1}| &\approx (A^{-1}|e_n|)^{1/\alpha}.
+\end{align}
+~$$
+<p>The latter comes from solving for $e_n$. We use both to get</p>$$~
+A |e_n|^\alpha \approx |C| |e_n| (A^{-1}|e_n|)^{1/\alpha}
+~$$
+<p>Solving gives</p>$$~
+A^{1 + 1/\alpha} |C|^{-1} \approx |e_n|^{1 - \alpha + 1/\alpha}.
+~$$
+<p>The left side is constant, so the right side exponent should be $0$.</p><pre class="sourceCode julia">using SymPy
 alpha = symbols("alpha")
 solve(1 - alpha + 1/alpha, alpha)</pre>
-<div class="well well-sm">
-\begin{bmatrix}\frac{1}{2} + \frac{\sqrt{5}}{2}\\- \frac{\sqrt{5}}{2} + \frac{1}{2}\end{bmatrix}</div>
-
-<p>Taking the positive root gives the rate, roughly 1.61803.</p><h3>Robust</h3><p>Two steps of the secant method would have a rate twice that, which is more than quadratic. There is more compuation, but the same number of function calls as Newton's method. So in some cases the secant method is "faster."</p><p>However, the secant method requieres more work – two guesses, not one; and is more sensitive to the quality of the initial guess.</p><h3>Proof of error</h3><p>This follows the book</p><p>$$ \begin{align} e_{n+1} &= x_{n+1} - r\\ &= x_n - f(x_n)(x_n - x_{n-1})/(f(x_n) - f(x_{n-1})) - r\\ &= \frac{f(x_n)x_{n-1} - f(x_{n-1})x_n}{f(x_n) - f(x_{n-1})} - r\\ &= \frac{f(x_n)e_{n-1} - f(x_{n-1})e_n}{f(x_n) - f(x_{n-1})}\\ &= \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \cdot \frac{f(x_n)/e_n - f(x_{n-1})/e_{n-1}}{x_n - x_{n-1}} \cdot e_n e_{n-1}\\ &= A \cdot B \cdot e_n e_{n-1}. \end{align} $$</p><p>It hopefully is clear that</p><p>$$ A \approx 1/f'(r). $$</p><p>To work at B,  Taylor's theorem has</p><p>$$ f(x) = f(r) + f'(r) (x-r) + (1/2)f''(r)(x-r)^2 + \mathcal{O}((x-r)^3) $$</p><p>Taking $x=x_n$ and using $(x-r) = (x_n-r) = e_n$ makes this:</p><p>$$ f(x_n)/e_n = f'(r) + (1/2)e_n f''(r) +  \mathcal{O}(e_n^2) $$</p><p>And taking $x=x_{n-1}$ is similar:</p><p>$$ f(x_{n-1})/e_{n-1} = f'(r) + (1/2)e_{n-1} f''(r) +  \mathcal{O}(e_{n-1}^2) $$</p><p>The difference is then $1/2 \cdot (e_n - e_{n-1})f''(r) + \mathcal{O}(e_{n-1}^2)$. Using $x_n - x_{n-1} = e_n - e_{n-1}$ means that $B \approx 1/2 \cdot f''(r)$. Combining, we get the result.</p><h2>Steffensen</h2><p>A modification of the secant method that has better convergence is <a href="http://tinyurl.com/o5q2xz6">Steffensen's</a> method.</p><p>Here, the derivative is replaced by</p><p>$$ \frac{f(x + f(x)) - f(x)}{f(x)}. $$</p><p>An eyeful, but basically $h=f(x)$, so we assume $f(x)$ is close to zero – we need a good guess.</p><h2>Modern extensions</h2><p><a href="http://article.sapub.org/pdf/10.5923.j.ajcam.20120203.08.pdf">Here</a> is a link to a pdf of a 16 order method. How much can we read? </p>
+<p>Taking the positive root gives the rate, roughly 1.61803.</p><h3>Robust</h3><p>Two steps of the secant method would have a rate twice that, which is more than quadratic. There is more compuation, but the same number of function calls as Newton's method. So in some cases the secant method is "faster."</p><p>However, the secant method requieres more work – two guesses, not one; and is more sensitive to the quality of the initial guess.</p><h3>Proof of error</h3><p>This follows the book</p>$$~
+\begin{align}
+e_{n+1}
+&= x_{n+1} - r\\
+&= x_n - f(x_n)(x_n - x_{n-1})/(f(x_n) - f(x_{n-1})) - r\\
+&= \frac{f(x_n)x_{n-1} - f(x_{n-1})x_n}{f(x_n) - f(x_{n-1})} - r\\
+&= \frac{f(x_n)e_{n-1} - f(x_{n-1})e_n}{f(x_n) - f(x_{n-1})}\\
+&= \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \cdot \frac{f(x_n)/e_n - f(x_{n-1})/e_{n-1}}{x_n - x_{n-1}} \cdot e_n e_{n-1}\\
+&= A \cdot B \cdot e_n e_{n-1}.
+\end{align}
+~$$
+<p>It hopefully is clear that</p>$$~
+A \approx 1/f'(r).
+~$$
+<p>To work at B,  Taylor's theorem has</p>$$~
+f(x) = f(r) + f'(r) (x-r) + (1/2)f''(r)(x-r)^2 + \mathcal{O}((x-r)^3)
+~$$
+<p>Taking $x=x_n$ and using $(x-r) = (x_n-r) = e_n$ makes this:</p>$$~
+f(x_n)/e_n = f'(r) + (1/2)e_n f''(r) +  \mathcal{O}(e_n^2)
+~$$
+<p>And taking $x=x_{n-1}$ is similar:</p>$$~
+f(x_{n-1})/e_{n-1} = f'(r) + (1/2)e_{n-1} f''(r) +  \mathcal{O}(e_{n-1}^2)
+~$$
+<p>The difference is then $1/2 \cdot (e_n - e_{n-1})f''(r) + \mathcal{O}(e_{n-1}^2)$. Using $x_n - x_{n-1} = e_n - e_{n-1}$ means that $B \approx 1/2 \cdot f''(r)$. Combining, we get the result.</p><h2>Steffensen</h2><p>A modification of the secant method that has better convergence is <a href="http://tinyurl.com/o5q2xz6">Steffensen's</a> method.</p><p>Here, the derivative is replaced by</p>$$~
+\frac{f(x + f(x)) - f(x)}{f(x)}.
+~$$
+<p>An eyeful, but basically $h=f(x)$, so we assume $f(x)$ is close to zero – we need a good guess.</p><h2>Modern extensions</h2><p><a href="http://article.sapub.org/pdf/10.5923.j.ajcam.20120203.08.pdf">Here</a> is a link to a pdf of a 16 order method. How much can we read?</p>
   </div>
 </div>  
 

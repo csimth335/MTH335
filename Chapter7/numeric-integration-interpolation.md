@@ -32,7 +32,6 @@ Not so close!
 
 ```noout, nocode
 using Plots
-backend(:gadfly)
 ```
 
 The Taylor series isn't the best approximation over an interval, rather it is good near a point, in this case $c=0$.
@@ -206,14 +205,14 @@ x_i = \cos(\frac{(i+1)\pi}{n+2}), \quad 0 \leq i \leq n.
 Let's investigate:
 
 ```verbatim
-using Interact, Gadfly
+using Interact, Plots, QuadGK
 
 xs = linspace(-1,1, 251)
 f(xs) =  x -> prod([abs(x-xi) for xi in xs])
 
 @manipulate for x0=xs, x1=xs, x2=xs, x3=xs
 vs = [x0,x1,x2,x3]
-v = quadgk(f(vs), -1, 1)[1]
+v = QuadGK.quadgk(f(vs), -1, 1)[1]
 plot(f(vs), -1, 1)
 title!(string(v))
 end
@@ -225,7 +224,7 @@ How to compare:
 ```
 n = 3
 i = 0:n
-cos((i+1)*pi/(n+2))
+cos.((i+1)*pi/(n+2))
 ```
 
 These values are the zeros of the function

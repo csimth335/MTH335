@@ -29,10 +29,12 @@ pre {display: block;}
 
 <style></style>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 
+<!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -43,6 +45,7 @@ MathJax.Hub.Config({
   displayIndent: "5%"
 });
 </script>
+
 
 <script type="text/javascript">
 $( document ).ready(function() {
@@ -102,23 +105,29 @@ $( document ).ready(function() {
   <div class="span10 offset1">
 <h1>Existence and Uniqueness</h1><p>The basic model we have is a initial value problem of the type:</p>$$~
 x'(t) = f(t, x), \quad x(t_0) = x_0$.
-~$$<p>Example,</p>$$~
+~$$
+<p>Example,</p>$$~
 x'(t) = a.
-~$$<p>Here &#36;f&#40;t,x&#41; &#61; a&#36; for some constant &#36;a&#36;. We know that we can "integrate" to get &#36;x&#40;t&#41; &#61; at&#36;. The formula for the velocity when acceleration is constant.</p><p>What about when there is a drag:</p>$$~
+~$$
+<p>Here $f(t,x) = a$ for some constant $a$. We know that we can "integrate" to get $x(t) = at$. The formula for the velocity when acceleration is constant.</p><p>What about when there is a drag:</p>$$~
 x'(t) = a - cx(t)
-~$$<p>Then &#36;f&#40;t,x&#41; &#61; a-cx&#36;. Is there a simple solution?</p><p>Fact: not all initial-value problems will have a solution.</p><p>Fact: even if there are solutions, they may blow up.</p><p>Example from the book:</p>$$~
+~$$
+<p>Then $f(t,x) = a-cx$. Is there a simple solution?</p><p>Fact: not all initial-value problems will have a solution.</p><p>Fact: even if there are solutions, they may blow up.</p><p>Example from the book:</p>$$~
 x' = 1 + x^2, \quad x(0) = 0
-~$$<p>This has solution &#36;\tan&#40;x&#41;&#36; on &#36;&#40;0,\pi/2&#41;&#36;, but blows up at &#36;\pi/2&#36;></p><h3>Existence</h3><blockquote>
+~$$
+<p>This has solution $\tan(x)$ on $(0,\pi/2)$, but blows up at $\pi/2$></p><h3>Existence</h3><blockquote>
 <p>Thm 1. Existence theorem</p>
-</blockquote><p>If &#36;f&#36; is <em>continuous</em> on a rectangle centered at &#36;&#40;t_0, x_0&#41;&#36;, say:</p>$$~
+</blockquote><p>If $f$ is <em>continuous</em> on a rectangle centered at $(t_0, x_0)$, say:</p>$$~
 R = \{ (t,x) : |t - t_0| \leq \alpha, |x - x_0| \leq \beta \}.
-~$$<p>Then the inital value problem has a solution &#36;x&#40;t&#41;&#36; for &#36;|t - t_0| \leq min&#40;\alpha, \beta/M&#41;&#36; where &#36;M&#36; maximizes &#36;|f|&#36; in &#36;R&#36;.</p><p>Example: &#36;f&#40;t,x&#41; &#61; 1 &#43; x^2&#36;. This is continuous everywhere. On an interval of the form &#36;R_&#123;\alpha,\beta&#125;&#36; centered at &#36;&#40;0,0&#41;&#36;, the maximum value of &#36;f&#36; will be &#36;1 &#43; \beta^2&#36;. So &#36;\beta/M &#61; \beta/&#40;1 &#43; beta^2&#41;&#36; This is largest at &#36;beta&#61;1&#36; or &#36;M&#61;1/2&#36;. So this guarantee only guarantees existence through &#36;-1/2, 1/2&#36; for &#36;t&#36;, but it is wider.</p><h3>Uniqueness</h3><blockquote>
-<p>Thm 2 (p526). If both &#36;f&#36; and &#36;\partial f/\partial x&#36; are <em>continuous</em> in R, then there is a unique solution for &#36;|t - t_0| \leq min&#40;\alpha, \beta/M&#41;&#36;</p>
+~$$
+<p>Then the inital value problem has a solution $x(t)$ for $|t - t_0| \leq min(\alpha, \beta/M)$ where $M$ maximizes $|f|$ in $R$.</p><p>Example: $f(t,x) = 1 + x^2$. This is continuous everywhere. On an interval of the form $R_{\alpha,\beta}$ centered at $(0,0)$, the maximum value of $f$ will be $1 + \beta^2$. So $\beta/M = \beta/(1 + beta^2)$ This is largest at $beta=1$ or $M=1/2$. So this guarantee only guarantees existence through $-1/2, 1/2$ for $t$, but it is wider.</p><h3>Uniqueness</h3><blockquote>
+<p>Thm 2 (p526). If both $f$ and $\partial f/\partial x$ are <em>continuous</em> in R, then there is a unique solution for $|t - t_0| \leq min(\alpha, \beta/M)$</p>
 </blockquote><h3>Existence and uniqueness</h3><blockquote>
 <p>Thm 3 If f is Lipshitz then the intial value problem will have a unique solution in some interval.</p>
-</blockquote><p>Precisely, if &#36;f&#36; is continuous on the strip &#36;a \leq t\leq b&#36; and &#36;x \in &#40;-\infy, \infty&#41;&#36; <em>and</em> satisfies the inequality for a fixed &#36;L&#36;:</p>$$~
+</blockquote><p>Precisely, if $f$ is continuous on the strip $a \leq t\leq b$ and $x \in (-\infy, \infty)$ <em>and</em> satisfies the inequality for a fixed $L$:</p>$$~
 | f(t,x_1) - f(t, x_2) | \leq L | x_1 - x_2|
-~$$<p>then the solution exists on the interval &#36;&#91;a,b&#93;&#36;.</p>
+~$$
+<p>then the solution exists on the interval $[a,b]$.</p>
   </div>
 </div>  
 

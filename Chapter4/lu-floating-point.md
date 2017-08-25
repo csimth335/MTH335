@@ -74,7 +74,7 @@ $$~
 |\Delta_{ij}| \leq \frac{6}{5}(n+1) \epsilon |l_{ij}|.
 ~$$
 
-A similar theorem applies for solving $Uy=b$, though the bound is includes $|u_{ij}|$ terms.
+A similar theorem applies for solving $Uy=b$, though the bound  includes $|u_{ij}|$ terms.
 
 ### But with our pivoting...
 
@@ -165,7 +165,7 @@ $$~
 The $\kappa$ is the condition number. This is for a slightly different definition of the growth number, but using ours we have:
 
 ```
-growth(A,U=lu(A)[2]) = maximum(abs(U)) / maximum(abs(A))
+growth(A,U=lu(A)[2]) = maximum(abs.(U)) / maximum(abs.(A))
 bound(A) = 4*size(A)[1] * growth(A) * cond(A, Inf) * eps()
 ```
 

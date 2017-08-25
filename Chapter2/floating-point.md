@@ -42,7 +42,7 @@ Here is some code:
 
 ```
 x = "1101101100"
-out = [ parseint(x[length(x) - i])* 2^i for i in 0:(length(x) - 1)]
+out = [ parse(Int, x[length(x) - i])* 2^i for i in 0:(length(x) - 1)]
 ```
 
 and we just add
@@ -83,7 +83,7 @@ and check:
 
 ```
 x = "11011"
-sum([parseint(x[length(x) - i])* 2^i for i in 0:(length(x) - 1)])
+sum( parse(Int, x[length(x) - i])* 2^i for i in 0:(length(x) - 1) )
 ```
 
 
@@ -123,7 +123,7 @@ Verbatim("""
 How are negative numbers stored?
 
 ```
-bits(convert(Uint8, 5)),  bits(convert(Uint8, -5))
+bits(convert(Int8, 5)),  bits(convert(UInt8, -5))
 ```
 
 They are quite different!
@@ -142,7 +142,7 @@ format. $-x$ ($x>0$) is stored as $2^n-x$.
 
 
 ```
-bits(convert(Uint8, 5)),  bits(convert(Uint8, -5))
+bits(convert(Int8, 5)),  bits(convert(Int8, -5))  
 ```
 
 
@@ -210,16 +210,24 @@ bits(typemax(Int64))
 Which is $2^{63} - 1$.
 
 
-Integers are stored exactly -- as possible. But that has limitations. With 64 bit numbers, the largest integer is $2^{63}-1$.
+Integers are stored exactly -- as possible. But that has
+limitations. With 64 bit numbers, the largest integer is $2^{63}-1 =
+1 + 2 + \cdots + 2^{62}$:
 
 ```
-2^63 - 1
+sum(2^i for i in 0:62) |> bits
 ```
 
-but not `2^64`:
+but not `2^63`:
 
 ```
-2^64
+2^63
+```
+
+Though this works:
+
+```
+bits(2^63-1)
 ```
 
 What happens:
@@ -259,27 +267,27 @@ On a calculator there is one basic number type: floating point. This is primaril
 
 In mathematics we primarily work with *decimal numbers*
 
-$$
+$$~
 12.34 = 1 \cdot 10^2 + 2 \cdot 10^1 + 3\cdot 10^{-1} + 4 \cdot 10^{-2}
-$$
+~$$
 
 ### Scientific notation
 
 We can write a real number in terms of powers of 10. For example:
 
-$$
+$$~
 1.234 = 1.234 \cdot 10^0 =  12.34 \cdot 10^{-1} =  .1234 \cdot 10^1 = \cdots
-$$
+~$$
 
 We can use normalized scientific notation to say that we can express $x$ by three quantities:
 
-$$
+$$~
 x = \pm r \cdot 10^n
-$$
+~$$
 
-* $\pm$ is $+1$ or $-1$ records the sign of $x$
-* $r$ is a number in $0.1 \leq r < 1.0$
-* $n$ is an integer, possible negative, or zero.
+* The $\pm$ is $+1$ or $-1$ and records the sign of $x$
+* the $r$ is a number in $0.1 \leq r < 1.0$
+* the $n$ is an integer, possibly negative, or zero.
 
 
 
@@ -288,9 +296,9 @@ $$
 
 We can use different bases in scientific notation. A number would be represented with
 
-$$
+$$~
 x = \pm q \cdot \beta^m
-$$
+~$$
 
 We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.
 
@@ -353,17 +361,17 @@ Floating point is a representation of numbers using scientific notation. Only th
 For example consider base $\beta=10$, $p=3$ and $e_{min}=-1$ and $e_{max}=2$. Then the possible values are limited to
 $-9.99 \cdot 10^{-1}$ to $9.99 \cdot 10^2$. How many are there?
 
-$$
+$$~
 2 \cdot ((\beta-1)\cdot\beta^{p-1}) \cdot (e_{max} - e_{min})
-$$
+~$$
 
 ## Binary floating point
 
 For binary floating point, things are similar. For *simplicity* let's look at 16-bit floating point where
 
-- 1 bit is the sign bit `0` = $+1$, `1` is $-1$
-- $q$ is represented with $10$ bits (the *precision* is 10)
-- $m$ is represented with $5$ bits.
+* 1 bit is the sign bit `0` = $+1$, `1` is $-1$
+* the $q$ is represented with $10$ bits (the *precision* is 10)
+* the $m$ is represented with $5$ bits.
 
 There is nothing to represent the *sign* of $m$. The trick is offset the value by subtracting and using  $m -15$.
 
@@ -371,9 +379,9 @@ With this, can we represent some numbers:
 
 What is $1$? It is $+1 \cdot 1.0 \cdot 10^{15 - 15}$. So we should have
 
-- sign is `0`
-- $q$ is `0000000000`
-- $m$ is `01111`
+* the sign is `0`
+* the $q$ is `0000000000`
+* the $m$ is `01111`
 
 Checking we have
 
@@ -388,7 +396,7 @@ Kinda hard to see: Let's wrap this in a function:
 ```
 function seebits(x)
   b = bits(convert(Float16,x))
-  b[1], b[2:6], b[7:end]
+  b[1:1], b[2:6], b[7:end]
 end
 ```
   
@@ -429,19 +437,19 @@ Wait a minute -- if we insist on the significand being $1.dddd...$ we can't repr
 
 Some values in floating point are special:
 
-* $0$: how to write $0$ in $1.dddd \cdot 2^m$? Can't do it. So it is coded:
+* What is $0$? how to write $0$ in $1.dddd \cdot 2^m$? Can't do it. So it is coded:
 
 ```
-bits(0.0)
+bits(zero(Float16))
 ```
 
 (The code uses the *smallest* possible exponent, and $0$ for the significand)
 
-* $-0$: By flipping the sign bit, we could code $-0$ naturally. Is it done?
+* What is $-0$? By flipping the sign bit, we could code $-0$ naturally. Is it done?
 
 
 ```
-bits(-0.0)   ## why??
+bits(-zero(Float16))   ## why??
 ```
 
 ### "Infinity": Inf
@@ -451,13 +459,13 @@ Infinity. [Why](http://www.cs.berkeley.edu/~wkahan/Infinity.pdf)?
 This value is deemed valuable to have supported at the hardware level. It is coded by reserving the *largest* possible value of $m$ and $0$ for the significand.
 
 ```
-bits(Inf)  # see bits(Inf)[2:12]
+bits(Inf16)  
 ```
 
 There is room for $-\infty$ and it too is defined:
 
 ```
-bits(-Inf)
+bits(-Inf16)
 ```
 
 ### Not a number: NaN
@@ -477,13 +485,13 @@ These are related to limit problems (indeterminate), though not all forms are in
 How is `NaN` coded:
 
 ```
-bits(NaN)
+bits(NaN16)
 ```
 
 This is *very* similar to `Inf`, but the value of $q$ is non-zero!
 
 ```
-bits(NaN)[13:end], bits(Inf)[13:end]
+seebits(NaN16), seebits(Inf16)
 ```
 
 `NaN` semantics are a bit [controversial](https://github.com/JuliaLang/julia/issues/7866).
@@ -519,7 +527,7 @@ sum([1/2^i for i in 0:10])
 Altogether we have:
 
 ```
-sum([1/2^i for i in 0:10]) * 2^15
+sum([1//2^i for i in 0:10]) * 2^15
 ```
 
 Is this right?
@@ -656,7 +664,7 @@ For example
 
 ```
 b = bits(2^2 + 2^0 + 1/2 + 1/8) ## 101.101 = 1.01101 * 2^2
-b[1], b[2:12], b[13:end]
+b[1:1], b[2:12], b[13:end]
 ```
 
 Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the first $1$ implicit.
@@ -665,7 +673,7 @@ Here $m = 2^{10} + 1 - (2^{10} - 1)$ and we can see that $q=1.01101$ with the fi
 
 The numbers that can be represented **exactly** in floating point are called *machine numbers*.
 
-<li> There aren't very many compared to the **infinite** number of floating point values.
+| There aren't very many compared to the **infinite** number of floating point values.
 
 Let's visualize in a *hypothetical* Float8 mode with 1 sign bit, 3 exponent bits and 4 bits for the mantissa.
 
@@ -687,8 +695,8 @@ vals = [q * 2.0^m for q in qs, m in ms] |> vec
 We can plot these points:
 
 ```
-using Gadfly
-plot(x = vals, y = 0*vals, Geom.point)
+using Plots
+scatter(vals, 0*vals)
 ```
 
 We notice:

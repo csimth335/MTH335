@@ -49,7 +49,7 @@ n = 20; (4/3)^n * A^n * [1,0]
 
 > Claim: $\sum A_k$ exists.
 
-Such sums are callend [Neumann Series](https://en.wikipedia.org/wiki/Neumann_series).
+Such sums are called [Neumann Series](https://en.wikipedia.org/wiki/Neumann_series).
 
 We see that $\| A_k \|$ looks like $(3/4)^k$, so the sum should exist, as:
 
@@ -215,7 +215,7 @@ This says $x^{k+1} - x^k$ is $x^0 - (BA)x^k$
 
 
 
-If $B$ is close to $A^{-1}$, then we should have $\| I - BA\| < 1$. So we can express $A^{-1}$ in iterms of $B$ via the previous formulas.
+If $B$ is close to $A^{-1}$, then we should have $\| I - BA\| < 1$. So we can express $A^{-1}$ in terms of $B$ via the previous formulas.
 
 > Thm (P202). If $\| I - AB \| < 1$ then we have for $m \geq 0$:
 
@@ -251,7 +251,8 @@ x^{m+1}
 
 We are again discussing indirect, iterative solutions to $Ax=b$.
 
-Suppose now $B$ is not an approximate inverse, but just some matrix. Called $Q$ in the book and given thename a splitting matrix. Then adding $Qx$ to both sides of $Ax =b$ gives:
+Suppose now $B$ is not an approximate inverse, but just some
+matrix. Called $Q$ in the book and given the name a splitting matrix. Then adding $Qx$ to both sides of $Ax =b$ gives:
 
 $$~
 Qx = (Q-A)x + b
@@ -411,7 +412,7 @@ For this method, called *Jacobi iteration* the solving part is trivial, as $Q$ i
 
 If we let $Q$ be the lower triangular part of $A$ we get the *Gauss-Seidel* method. Let's see that this converges as well:
 
-For our same A, we know define $Q$ by:
+For our same A, we now define $Q$ by:
 
 ```
 Q = tril(A)
@@ -423,9 +424,9 @@ We have
 norm(I - inv(Q)*A)
 ```
 
-so convergence should occure.
+so convergence should occur.
 
-With a starting point at $x=[0,0,0]$ we dash off 25 iterations:
+With a starting point at $x=[0,0,0]$ we dash off $20$ iterations:
 
 ```
 x = [0,0,0]
@@ -487,10 +488,10 @@ Where $G$ is $n \times n$ and $c$ is a vector in $R^n$. What conditions will ens
 
 The answer will involve the *eigenvalues* of a matrix $A$.
 
-Recall, these are those $\lambda$ for which $det(A - \lambda I) = 0$, this being the characteristic equation of $A$ and is a polynomial. These values may be complex values. The *spectral* radius is defined as the largest eigenvalue in magnitude:
+Recall, these are those $\lambda$ for which $\det(A - \lambda I) = 0$, this being the characteristic equation of $A$ and is a polynomial. These values may be complex values. The *spectral* radius is defined as the largest eigenvalue in magnitude:
 
 $$~
-\rho(A)  = \max \{ |\lambda|: det(A - \lambda I) = 0\}
+\rho(A)  = \max \{ |\lambda|: \det(A - \lambda I) = 0\}
 ~$$
 
 
@@ -514,7 +515,7 @@ x^{k+1} =  Gx^k + c
 
 will produce a sequence converging to $(I-G)^{-1}c$ for any starting vector iff and only if $\rho(G) < 1$.
 
-Pf. We start by wrting
+Pf. We start by writing
 
 $$~
 x^k = G^k x^0 + \sum_{j=0}^{k-1} G^j c.

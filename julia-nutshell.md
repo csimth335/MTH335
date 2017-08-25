@@ -210,12 +210,14 @@ map(sin, 1:4)
 
 ## Plotting
 
-Plotting is *not* built-in to `Julia`, rather added through add-on packages, for example, `Julia`'s `Gadfly` package. For this package, there are three basic calling styles:
+Plotting is *not* built-in to `Julia`, rather added through add-on
+packages. We use, `Julia`'s `Plots` package, an interface to several
+different backends. For this package, there are three basic calling styles:
 
 Plotting a function by passing the function object by name. 
 
 ```
-using Gadfly      # needed just once per session
+using Plots      # needed just once per session
 plot(sin, 0, 2pi)
 ```
 
@@ -225,10 +227,12 @@ Plotting an *anonymous* function
 plot( x -> exp(-x/pi) * sin(x), 0, 2pi)
 ```
 
-Plotting more than one function over $[a,b]$:
+Plotting more than one function over $[a,b]$ using `plot!`:
 
 ```
-plot([sin, cos, zero], 0, 2pi)
+plot(sin, 0, 2pi)
+plot!(cos)
+plot!(zero)
 ```
 
 ## Matrices

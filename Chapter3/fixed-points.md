@@ -90,7 +90,7 @@ $$~
 
 Let $s = \lim x_n$. Then $F(s) = s$ by continuity (why is $F$ continuous).
 
-Is this fixed point unique? Suppose $s$ and $t$ are fixed points in $C$. Then
+Is this fixed point unique? Suppose $s$ and $t$ are different fixed points in $C$. Then
 
 $$~
 |s - t|  = |F(s) - F(t)| \leq \lambda |s-t| < |s -t|
@@ -100,7 +100,11 @@ A contradiction.
 
 ### Cauchy
 
-A Cauchy sequence is one where for any $\epsilon > 0$, there is an $N$ for which if $n,m \geq N$, then $|x_n - x_m| < \epsilon$. Cauchy sequences on the real line converge. Another way to prove the convergence would be to prove that the sequence is cauchy. The book shows (p103), that this could be found:
+A Cauchy sequence is one where for any $\epsilon > 0$, there is an $N$
+for which if $n,m \geq N$, then $|x_n - x_m| < \epsilon$. Cauchy
+sequences on the real line converge. Another way to prove the
+convergence would be to prove that the sequence is cauchy. The book
+shows (p103), that this bound could be found:
 
 $$~
 |x_n - x_m| \leq \lambda^N |x_1 - x_0| (1 - \lambda)^{-1}.
@@ -145,9 +149,10 @@ $$~
 e_{n+1} = x_{n+1} - s = F(x_n) - F(s) = F'(\xi_n) (x_n - s) = F'(\xi_n) e_n.
 ~$$
 
-Since $|F'(\xi_m)| < 1$, we must have the sequence $|e_n|$ decreasing. As $F'(\xi_n) \approx F'(s)$, if the latter is small converge should be rapid. If it is $0$ even more so.
+Since $|F'(\xi_m)| < 1$, we must have the sequence $|e_n|$
+decreasing. As $F'(\xi_n) \approx F'(s)$, if the latter is small the convergence should be rapid. If it is $0$ even more so.
 
-The book defines $q$ to be the first positive integer with $F^{(k)}(s) \neq 0$. With this, the Taylor series for $F$ about $s$ becomes:
+The book defines $q$ to be the first positive integer with $F^{(q)}(s) \neq 0$. With this, the Taylor series for $F$ about $s$ becomes:
 
 $$~
 \begin{align}
@@ -185,7 +190,6 @@ If we graph $F(x)$ and layer on the line $y=x$, we can see cobwebbing converges 
 
 ```
 using Plots
-backend(:gadfly)
 
 F(x) = x - sin(x)/cos(x)
 a,b = 2.0, 4.3
@@ -196,7 +200,7 @@ plot(F, a, b)
 plot!( x ->x, a, b)
 
 xs = [x0]
-ys = map(F, xs)
+ys = F.(xs)
 
 
 for i = 0:3
@@ -208,6 +212,6 @@ for i in 1:5
   append!(xs, [ys[end], ys[end]])
   append!(ys, [ys[end], F(ys[end])])
 end
-plot!(xs, ys)
+plot!(xs, ys, linewidth=5, alpha=0.5)
 
 ```

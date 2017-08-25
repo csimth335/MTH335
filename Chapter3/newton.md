@@ -20,35 +20,67 @@ However, ...
 
 See this [algorithm](http://calculuswithjulia.github.io/derivatives/newtons_method.html#Examples)
 
-Basic idea: approximate function by tangent line and find that intersection.
+
+
+
+Basic idea: approximate function by tangent line and find that
+intersection.
+
+```nocode
+using Plots, Roots
+function newtons_method_graph(n, f, a, b, c)
+
+    xstars = [c]
+    xs = [c]
+    ys = [0.0]
+
+    plt = plot(f, a, b, legend=false)
+    plot!(plt, [a, b], [0,0], color=:black)
+    
+
+    ts = linspace(a,b)
+    for i in 1:n
+        x0 = xs[end]
+        x1 = x0 - f(x0)/D(f)(x0)
+        push!(xstars, x1)
+            append!(xs, [x0, x1])
+        append!(ys, [f(x0), 0])
+    end
+    plot!(plt, xs, ys, color=:orange)
+    scatter!(plt, xstars, 0*xstars, color=:orange, markersize=5)
+    plt
+end
+newtons_method_graph(3, x->log(x) - 2, 1, 9, 1.5)
+```
+
 
 More formally, Let $r$ be a zero of $f(x)$.
 Further, suppose $r$ is a *simple* zero where $f'(r) \neq 0$.
 
 Suppose $x$ is an approximation to $r$. That is, suppose $r = x + h$ for some small $h$, then using Taylor's theorem about $x$, we have:
 
-$$
+$$~
 0 = f(r) = f(x+h) = f(x) + f'(x) \cdot h + \mathcal{O}(h^2)
-$$
+~$$
 
 ###
 
 If we were to just ignore the error term and solve for $h$, we would get:
 
-$$
+$$~
 h \approx -f(x)/f'(x)
-$$
+~$$
 
-So $r \approx x - f(x)/f'(x)$. (Not necessarily exactly, but this should be closer.)
+So $r = x + h \approx x - f(x)/f'(x)$. (Not necessarily exactly, but this should be closer.)
 
 ###
 
 
 Iterating the above process yields this algorithm:
 
-$$
+$$~
 x_{n+1} = x_n - f(x_n) / f'(x_n), \quad x_0 \text{ should be near answer}
-$$
+~$$
 
 ### Example
 
@@ -115,9 +147,9 @@ The book (p82) has these stopping criteria for converging:
 
 Either
 
-$$
+$$~
 |x_{n+1} - x_n| \leq \delta, \quad \text{ or } |f(x_{n+1})| \leq \epsilon
-$$
+~$$
 
 The first says stop if the `x`'s don't change much. This is what we see in the output. The second says stop if the function value is small.
 
@@ -135,7 +167,33 @@ have a third tolerance depending on $x$. For example, this check on convergence 
 
 >    `while E > abstol && E > reltol * nrm(I) && numevals < maxevals`
 
-`E` is the error and `numevals` the number of evaluations. The `nrm(I)` is *basically* $|x|$. So this checks that $E$ isn't small and $E$ is not small relative to $|x|$ and the number of evaluations is still small.
+`E` is the error and `numevals` the number of evaluations. The
+`nrm(I)` is *basically* $|x|$. So this checks that $E$ isn't small and
+$E$ is not small relative to $|x|$ and the number of evaluations is
+still small.
+
+
+### leading to...
+
+```
+function nm(f, fp, x; atol=eps(), rtol=1e-12, maxsteps=100)
+   cnt = 0
+   while cnt < maxsteps && norm(f(x)) >= atol + norm(x) * rtol
+     x = x - f(x) / fp(x)
+     cnt = cnt + 1
+  end
+
+  cnt == maxsteps && error("too many steps")
+  x
+end
+```
+
+```
+f(x) = x^5 - x - 1; fp(x) = 5x^4 - 1
+nm(f, fp, 1)
+```
+
+
 
 ### made for floating point not exact math
 
@@ -176,58 +234,58 @@ The floating point doesn't go crazy, the digits just get refined.
 
 The [Babylonian](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method) method is this algorithm:
 
-$$
+$$~
 x_{n+1} = \frac{1}{2}(x_n + \frac{S}{x_n}).
-$$
+~$$
 
 It converges to solutions of $x^2 - S = 0$:
 
-$$
+$$~
 x - \frac{x^2 - S}{2x} = x - \frac{x}{2} + \frac{S}{2x} = \frac{x}{2} + \frac{S}{2x} = \frac{1}{2}(x + \frac{S}{x})
-$$
+~$$
 
 ## Analysis
 
 Let $f(x)$ be our function and $r$ our root. Define $e_n = x_n - r$. We have the following expansion about $x_n$:
 
-$$
+$$~
 f(x) = f(x_n) + f'(x_n) \cdot (x - x_n) + f''(\xi)/2 \cdot (x - x_n)^2
-$$
+~$$
 
 Using $r$ for $x$ gives:
 
-$$
+$$~
 0 = f(r) = f(x_n) + f'(x_n) \cdot (r - x_n) + f''(\xi)/2 \cdot (r - x_n)^2 
-$$
+~$$
 
 Divide by $f'(x_n)$
 
-$$
+$$~
 0 = f(x_n)/f'(x_n) + (r - x_n) + \frac{1}{2}\frac{f''(\xi)}{f'(x_n)}(e_n)^2.
-$$
+~$$
 
 and rearrange:
 
-$$
+$$~
 x_n - f(x_n)/f'(x_n) -r = \frac{1}{2}\frac{f''(\xi)}{f'(x_n)}(e_n)^2.
-$$
+~$$
 
 
 
 
 But this is just
 
-$$
+$$~
 e_{n+1} = \frac{1}{2}\frac{f''(\xi)}{f'(x_n)}(e_n)^2.
-$$
+~$$
 
 ### Theorem 1 (p85)
 
 > Let $f$ be $C^2$ and $r$ be a simple zero of $f$, then there is a *neighborhood* of $r$ and a constant $C$ such that
 
-$$
+$$~
 |e_{n+1}| \leq C \cdot e_n^2.
-$$
+~$$
 
 ### Typical convergence
 
@@ -236,9 +294,9 @@ is bounded and $e_n$ goes to zero, we have *quadratic convergence*.
 
 We basically need:
 
-* $f''$ is not too big near $r$
-* $f'$ is not too small near $r$
-* $e_0$ not too far off.
+* the function $f''$ is not too big near $r$
+* the function $f'$ is not too small near $r$
+* the function $e_0$ not too far off.
 
 ### A function which has problems
 
@@ -252,6 +310,7 @@ So the Newton algorithm will have trouble
 
 ```
 using Roots
+Base.ctranspose(f) = x -> D(f)(x) # makes f'(x) work
 f(x) = x^20 - 1
 newton(f, 0.5)
 ```
@@ -259,7 +318,7 @@ newton(f, 0.5)
 If $x_0 = 0.5$ we have $C$ may be as big as: (Depends if $\xi$ is near $1$ or $0.5$.
 
 ```
-1/2 * D(f,2)(1) / D(f)(0.5)
+1/2 * f''(1) / f'(0.5)
 ```
 
 And after an iteraction, we have $x_n > 1$, so then the second
@@ -271,21 +330,21 @@ Suppose we have $f$ is $C^2$. If the above assumptions on $f$ are
 true, for $\delta > 0$, we have in the ball around $r$ of size
 $\delta$ (for some sufficiently small $\delta$ that
 
-$$
+$$~
 c(\delta) = \frac{1}{2} \max|f''(x)| / \min |f'(y)|
-$$
+~$$
 
 Satisfies $\delta \cdot c(\delta) = \rho < 1$. If we start within $\delta$ of $r$, then we have:
 
-$$
+$$~
 |e_1| = |\frac{1}{2}\frac{f''(\xi_1)}{f'(x_0)} e_0^2 \leq c(\delta) |e_0|^2 \leq c(\delta) \delta |e_0| < \rho |e_0|.
-$$
+~$$
 
 Iterating, we can get
 
-$$
+$$~
 |e_n| \leq \rho^n |e_0| \rightarrow 0
-$$.
+~$$.
 
 
 (Note all three things were used!)
@@ -316,24 +375,24 @@ non-zero. For a zero of multiplicity $k$, $f(r)$, $f'(r), \cdot f^{(k-1)}(r)$ ar
 
 Suppose for simplicity $g(x) = f(x)^k$, for some $k > 1$ where $f$ has a simple 0 at $r$. Then "Newton's method" for $g$ becomes:
 
-$$
+$$~
 x_{n+1} = x_n - \frac{1}{k}\frac{f(x_n)}{f'(x_n)}.
-$$
+~$$
 
 So, not the same. The expansion around $x_n$ does not cancel off the same way.
 
 ### Rather
 
-$$
+$$~
 x_{n+1} - r = (x_n - r) - \frac{1}{k}(x_n-r + \frac{f''(\xi)}{2f'(x_n)}(x_n-r)^2) =
 \frac{k-1}{k} (x_n-r) + \frac{f''(\xi)}{2kf'(x_n)}(x_n-r)^2.
-$$
+~$$
 
 That is
 
-$$
+$$~
 e_{n+1} = \frac{k-1}{k} e_n + \frac{f''(\xi)}{2f'(x_n)}e_n^2 = \mathcal{O}(e_n)
-$$
+~$$
 
 And not $\mathcal{O}(e_n^2)$.
 
@@ -370,9 +429,9 @@ Well suppose we have $q$, we could try to use Newton's method to find
 $1/q$, as it is a solution to $f(x) = x - 1/q$. The Newton update step
 simplifies to:
 
-$$
+$$~
 x - f(x) / f'(x) \quad\text{or}\quad x - (x - 1/q)/ 1 = 1/q
-$$ 
+~$$ 
 
 That doesn't really help, as Newton's method is just $x_{i+1} = 1/q$
 -- that is it just jumps to the answer, the one we want to compute by
@@ -383,19 +442,20 @@ some other means!
 Trying again, we simplify the update step for a related function:
 $f(x) = 1/x - q$ and then one step of the process is:
 
-$$
+$$~
 x_{i+1} = -qx^2_i + 2x_i.
-$$
+~$$
 
 Now for $q$ in the interval $[1/2, 1]$ we want to get a *good* initial
 guess. Here is a claim. We can use $x_0=48/17 - 32/17 \cdot q$. Let's check
 graphically that this is a reasonable initial approximation to $1/q$:
 
 ```
-using Gadfly
+using Plots
 g(q) = 1/q
 h(q) = 1/17 * (48 - 32q)
-plot([g,h], 1/2, 1)
+plot(g, 1/2, 1)
+plot!(h)
 ```
 
 ###
@@ -404,9 +464,9 @@ It can be shown that we have for any $q$ in $[1/2, 1]$ with initial
 guess $x_0 = 48/17 - 32/17\cdot q$ that Newton's method will converge
 to 16 digits in no more than this many steps:
 
-$$
+$$~
 \log_2(\frac{53 + 1}{\log_2(17)}).
-$$
+~$$
 
 ```
 a = log2((53 + 1)/log2(17))
@@ -419,16 +479,16 @@ That is 4 steps suffices.
 
 We can get a slightly bigger bound by estimating:
 
-$$
+$$~
 |e_{n+1}| \leq \frac{f''(\xi)}{2f'(x_n)} e_n^2 \leq \frac{4}{2\cdot 1} e_n^2
-$$
+~$$
 
 But $|e_0| \leq 1/17$, so we get
 
 ```
 e0 = 1/17
-e1 = 2*e0^2; e2 = 2*e1^2; e3=2*e2^2;e4=2*e3^2;e5=2*e4^2;
-(e1,e2,e3,e4,e5)
+e1 = 2*e0^2; e2 = 2*e1^2; e3 = 2*e2^2; e4 = 2*e3^2; e5 = 2*e4^2;
+e1, e2, e3, e4, e5
 ```
 
 So between 4 and 5 steps, so 5 steps would suffice.
@@ -448,5 +508,5 @@ x = -q*x*x + 2*x
 x = -q*x*x + 2*x
 ```
 
-Timing this shows the method to be slightly faster than a regular
+Timing this shows the method to be similar to  a regular
 division.

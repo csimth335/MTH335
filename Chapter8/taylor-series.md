@@ -39,7 +39,6 @@ And we can visualize the points:
 
 ```
 using Plots
-backend(:gadfly)
 plot(ts, xs)
 ```
 

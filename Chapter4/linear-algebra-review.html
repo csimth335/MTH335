@@ -29,10 +29,12 @@ pre {display: block;}
 
 <style></style>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 
+<!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -43,6 +45,7 @@ MathJax.Hub.Config({
   displayIndent: "5%"
 });
 </script>
+
 
 <script type="text/javascript">
 $( document ).ready(function() {
@@ -100,14 +103,15 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>linear algebra review</h1><h2>systems of equations and matrices</h2><p>In Chapter 3 our problem was methods to solve &#36;f&#40;x&#41; &#61; 0&#36; where &#36;f:R \rightarrow R&#36;. Of course, this also handles problems of the type &#36;f&#40;x&#41; &#61; g&#40;x&#41;&#36; and &#36;f&#40;x&#41; &#61; b&#36;.</p><p>In Chapter 4 we begin with <strong>linear</strong> systems of equations:</p>$$~
+<h1>linear algebra review</h1><h2>systems of equations and matrices</h2><p>In Chapter 3 our problem was methods to solve $f(x) = 0$ where $f:R \rightarrow R$. Of course, this also handles problems of the type $f(x) = g(x)$ and $f(x) = b$.</p><p>In Chapter 4 we begin with <strong>linear</strong> systems of equations:</p>$$~
 \begin{align}
 a_{11} x_1 + a_{12}x_2 + \cdots a_{1n} x_n &= b_1\\
 a_{21} x_1 + a_{22}x_2 + \cdots a_{2n} x_n &= b_2\\
 &\vdots\\
 a_{m1} x_1 + a_{m2}x_2 + \cdots a_{mn} x_n &= b_m
 \end{align}
-~$$<p>A solution is a set of values &#36;x_1, x_2, \dots, x_n&#36; so that each equation is true simultaneously.</p><h3>Matrix</h3><p>We see three sets of numbers: the &#36;a&#36;s, the &#36;b&#36;s and the &#36;x&#36;s. We represent these as matrices:</p>$$~
+~$$
+<p>A solution is a set of values $x_1, x_2, \dots, x_n$ so that each equation is true simultaneously.</p><h3>Matrix</h3><p>We see three sets of numbers: the $a$s, the $b$s and the $x$s. We represent these as matrices:</p>$$~
 A = \left(
 \begin{array}{cccc}
 a_{11} & a_{12} & \cdots & a_{1n}\\
@@ -116,7 +120,8 @@ a_{21} & a_{22} & \cdots & a_{2n}\\
 a_{m1} & a_{m2} & \cdots & a_{mn}\\
 \end{array}
 \right)
-~$$$$~
+~$$
+$$~
 x = \left(
 \begin{array}{c}
 x_1\\
@@ -125,7 +130,8 @@ x_2\\
 x_n
 \end{array}
 \right)
-~$$$$~
+~$$
+$$~
 b = \left(
 \begin{array}{c}
 b_1\\
@@ -134,23 +140,27 @@ b_2\\
 b_n
 \end{array}
 \right)
-~$$<h3>Why?</h3><p>This is because matrices have their own, nearly familar, algebra that allows us to represent the system of equations in terms of an equation:</p>$$~
+~$$
+<h3>Why?</h3><p>This is because matrices have their own, nearly familar, algebra that allows us to represent the system of equations in terms of an equation:</p>$$~
 Ax = b.
-~$$<p>Here are two main problems in linear algebra that repeat themselves all the time:</p><ul>
-<li>Solve for &#36;x&#36; in &#36;Ax &#61; b&#36;. Also, somewhat related, if &#36;Ax &#61; b&#36; has no solutions, can we find &quot;best&quot; solutions?</li>
-</ul><ul>
-<li>Solve for the &#36;\lambda&#36; for which &#36;Ax &#61; \lambda x&#36; has non zero solutions</li>
+~$$
+<p>Here are two main problems in linear algebra that repeat themselves all the time:</p><ul>
+<li><p>Solve for $x$ in $Ax = b$. Also, somewhat related, if $Ax = b$ has no solutions, can we find "best" solutions?</p>
+</li>
+<li><p>Solve for the $\lambda$ for which $Ax = \lambda x$ has non-zero solutions</p>
+</li>
 </ul><h2>Example:</h2><p>Consider the system of equations is</p>$$~
 \begin{align}
 1x_{11} + 2x_{12} + 3x_{13} &= 4\\
 5x_{21} + 6x_{22} + 7x_{23} &= 8\\
 9x_{31} + 10x_{32} + 11x_{33} &= 12
 \end{align}
-~$$<p>Then we can do the following:</p><pre class="sourceCode julia">A = [1 2 3; 5 6 7; 9 10 11]
+~$$
+<p>Then we can do the following:</p><pre class="sourceCode julia">A = [1 2 3; 5 6 7; 9 10 11]
 b = [4,8,12]
 A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1   2   3
  5   6   7
  9  10  11</pre>
@@ -164,20 +174,14 @@ A</pre>
 
 <p>To put in <em>variables</em> we can use symbolic math:</p><pre class="sourceCode julia">using SymPy
 x = [symbols("x$i") for i in 1:3]</pre>
-<pre class="output">
-3-element Array{Any,1}:
- x1
- x2
- x3</pre>
+<div class="well well-sm">
+\begin{bmatrix}x_{1}\\x_{2}\\x_{3}\end{bmatrix}</div>
 
 <p>And from here:</p><pre class="sourceCode julia">A*x - b</pre>
-<pre class="output">
-3-element Array{Any,1}:
-      x1 + 2*x2 + 3*x3 - 4
-    5*x1 + 6*x2 + 7*x3 - 8
- 9*x1 + 10*x2 + 11*x3 - 12</pre>
+<div class="well well-sm">
+\begin{bmatrix}x_{1} + 2 x_{2} + 3 x_{3} - 4\\5 x_{1} + 6 x_{2} + 7 x_{3} - 8\\9 x_{1} + 10 x_{2} + 11 x_{3} - 12\end{bmatrix}</div>
 
-<h3>Notation</h3><p>We saw &#36;A&#36; has &#36;m&#36; rows and &#36;n&#36; columns.</p><p>Here we can view &#36;x&#36; and &#36;b&#36; as <em>vectors</em> or as matrices with 1 column. This is an identification, they are not mathematically the same thing.</p><h4>A matrix is a vector&#33; A vector is not a matrix&#33;</h4><p>A basic matrix in <code>Julia</code> is stored in contiguous memory, so has an order. Here we can see what it is  by looking at the first 4 elements</p><pre class="sourceCode julia">A[1:4]</pre>
+<h3>Notation</h3><p>We saw $A$ has $m$ rows and $n$ columns.</p><p>Here we can view $x$ and $b$ as <em>vectors</em> or as matrices with 1 column. This is an identification, they are not mathematically the same thing.</p><h4>A matrix is a vector! A vector is not a matrix!</h4><p>A basic matrix in <code>Julia</code> is stored in contiguous memory, so has an order. Here we can see what it is  by looking at the first 4 elements</p><pre class="sourceCode julia">A[1:4]</pre>
 <pre class="output">
 4-element Array{Int64,1}:
  1
@@ -189,14 +193,16 @@ x = [symbols("x$i") for i in 1:3]</pre>
 <pre class="output">
 false</pre>
 
-<p>This is because <code>b</code> has only 1 dimension, a matrix has two. This is different from the &quot;row vector&quot; and &quot;column vector&quot;&quot;</p><pre class="sourceCode julia">A[1,:]</pre>
+<p>This is because <code>b</code> has only 1 dimension, a matrix has two. This is different from the "row vector" and "column vector""</p><pre class="sourceCode julia">A[1,:]</pre>
 <pre class="output">
-1x3 Array{Int64,2}:
- 1  2  3</pre>
+3-element Array{Int64,1}:
+ 1
+ 2
+ 3</pre>
 
 <pre class="sourceCode julia">A[:, 1:1]</pre>
 <pre class="output">
-3x1 Array{Int64,2}:
+3×1 Array{Int64,2}:
  1
  5
  9</pre>
@@ -208,215 +214,241 @@ false</pre>
  5
  9</pre>
 
-<h3>&#43;, -, *,/</h3><p>We can add and subtract matrices of the same size. The result is a matrix &#36;&#40;a_&#123;ij&#125; - b_&#123;ij&#125;&#41;&#36;.</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]
+<h3>+, -, *,/</h3><p>We can add and subtract matrices of the same size. The result is a matrix $(a_{ij} - b_{ij})$.</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]
 B = [1 4 7; 2 5 8; 3 6 9]
 A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  2  3
  4  5  6
  7  8  9</pre>
 
 <p>and</p><pre class="sourceCode julia">B</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  4  7
  2  5  8
  3  6  9</pre>
 
 <p>And here we have:</p><pre class="sourceCode julia">A-B</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  0  -2  -4
  2   0  -2
  4   2   0</pre>
 
 <pre class="sourceCode julia">B-A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
   0   2  4
  -2   0  2
  -4  -2  0</pre>
 
-<h4>Multiplication</h4><p>Multiplication is possible for matrices, but the size constraint is different: &#36;A B&#36; is defined if the number of columns of &#36;A&#36; matches the number of rows of &#36;B&#36;. That is if &#36;A&#36; is &#36;m \times n&#36; then &#36;B&#36; must be &#36;n \times p&#36; for some &#36;m&#36; and &#36;p&#36;.</p><p>The defintion is &#36;&#40;AB&#41;_&#123;ij&#125; &#61; a_&#123;i1&#125;b_&#123;1j&#125; &#43; a_&#123;i2&#125;b_&#123;2j&#125; &#43; \cdots &#43; a_&#123;in&#125;b_&#123;nj&#125;&#36;.</p><pre class="sourceCode julia">A * B</pre>
+<h4>Multiplication</h4><p>Multiplication is possible for matrices, but the size constraint is different: $A B$ is defined if the number of columns of $A$ matches the number of rows of $B$. That is if $A$ is $m \times n$ then $B$ must be $n \times p$ for some $m$ and $p$.</p><p>The defintion is $(AB)_{ij} = a_{i1}b_{1j} + a_{i2}b_{2j} + \cdots + a_{in}b_{nj}$.</p><pre class="sourceCode julia">A * B</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  14   32   50
  32   77  122
  50  122  194</pre>
 
-<p>If we think of &#36;A &#61; &#91;a_1; a_2; \cdots; a_m&#93;&#36; as comprised of <em>row</em> vectors and &#36;B &#61; &#91;b_1 b_2 \cdots b_p&#93;&#36; as <em>column</em> vectors, then we have the &#36;ij&#36; terms is the product &#36;a_i \cdot b_j&#36;. If we identify these row and column vectors as just vectors, this is the dot product.</p><pre class="sourceCode julia">A[1, :] * B[:, 2]</pre>
+<p>If we think of $A = [a_1; a_2; \cdots; a_m]$ as comprised of <em>row</em> vectors and $B = [b_1 b_2 \cdots b_p]$ as <em>column</em> vectors, then we have the $ij$ terms is the product $a_i \cdot b_j$. If we identify these row and column vectors as just vectors, this is the dot product.</p><pre class="sourceCode julia">A[1, :] * B[:, 2]</pre>
 <pre class="output">
-1-element Array{Int64,1}:
- 32</pre>
+DimensionMismatch("Cannot multiply two vectors")
+</pre>
 
 <pre class="sourceCode julia">(A*B)[1, 2]</pre>
 <pre class="output">
 32</pre>
 
-<p>Though matrix multiplication is defined and uses the same notation as multiplication of numbers, it doesn&#39;t have two key properties:</p><ul>
-<li>It is not – in general – commutative. That is &#36;AB \neq BA&#36; except in special cases:</li>
+<p>Though matrix multiplication is defined and uses the same notation as multiplication of numbers, it doesn't have two key properties:</p><ul>
+<li><p>It is not – in general – commutative. That is $AB \neq BA$ except in special cases:</p>
+</li>
 </ul><pre class="sourceCode julia">A*B - B*A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  -52  -46  -40
  -46  -16   14
  -40   14   68</pre>
 
 <ul>
-<li>There is no cancellation property. That is if &#36;A\cdot B&#61;0&#36; is need not be that &#36;B&#36; or &#36;A&#36; must be &#36;0&#36;.</li>
+<li><p>There is no cancellation property. That is if $A\cdot B=0$ is need not be that $B$ or $A$ must be $0$.</p>
+</li>
 </ul><pre class="sourceCode julia">C = [1 0 0;-2 0 0; 1 0 0]</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
   1  0  0
  -2  0  0
   1  0  0</pre>
 
-<p>So &#36;C&#36; is non-zero, &#36;A&#36; is non-zero, and yet:</p><pre class="sourceCode julia">A*C</pre>
+<p>So $C$ is non-zero, $A$ is non-zero, and yet:</p><pre class="sourceCode julia">A*C</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  0  0  0
  0  0  0
  0  0  0</pre>
 
-<h4>Division</h4><p>We don&#39;t have &quot;division&quot; defined for matrices. There are for some <em>square</em> matrices an analog, &#36;A^&#123;-1&#125;&#36; for which &#36;AA^&#123;-1&#125; &#61; I&#36;, the matrix with a one on the diagonal. This is sort of like &#36;a \cdot &#40;1/a&#41; &#61; 1&#36; when &#36;a \neq 0&#36;.</p><p>There is a built in function like division <code>\</code>. The expression <code>A \ b</code> will be a solution, <code>x</code> to <code>Ax &#61;b</code>:</p><pre class="sourceCode julia">A * (A \ b)  # should be b = [1,2,3]</pre>
+<h4>Division</h4><p>We don't have "division" defined for matrices. There are for some <em>square</em> matrices an analog, $A^{-1}$ for which $AA^{-1} = I$, the matrix with a one on the diagonal. This is sort of like $a \cdot (1/a) = 1$ when $a \neq 0$.</p><p>There is a built in function like division <code>\</code>. The expression <code>A \ b</code> will be a solution, <code>x</code> to <code>Ax &#61;b</code>:</p><pre class="sourceCode julia">A * (A \ b)  - b</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  4.0
-  8.0
- 12.0</pre>
+  0.0        
+ -8.88178e-16
+  0.0        </pre>
 
-<h3>The transpose</h3><p>The transpose of the matrix &#36;A&#61;&#40;a_&#123;ij&#125;&#41;_&#123;1 \leq i \leq m, 1 \leq j \leq n&#125;&#36; is found by swapping rows and columns:</p>$$~
+<h3>The transpose</h3><p>The transpose of the matrix $A=(a_{ij})_{1 \leq i \leq m, 1 \leq j \leq n}$ is found by swapping rows and columns:</p>$$~
 A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
-~$$<p>On the computer we see easily using <code>&#39;</code> for transpose:</p><p>Here is &#36;A&#36;:</p><pre class="sourceCode julia">A</pre>
+~$$
+<p>On the computer we see easily using <code>.&#39;</code> for transpose:</p><p>Here is $A$:</p><pre class="sourceCode julia">A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  2  3
  4  5  6
  7  8  9</pre>
 
-<p>and its transpose</p><pre class="sourceCode julia">A'</pre>
+<p>and its transpose</p><pre class="sourceCode julia">A.'</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  4  7
  2  5  8
  3  6  9</pre>
 
-<p>The transpose is an <em>involution</em> – meaning do it twice and you haven&#39;t changed anything:</p><pre class="sourceCode julia">(A')'</pre>
+<p>The transpose is an <em>involution</em> – meaning do it twice and you haven't changed anything:</p><pre class="sourceCode julia">(A.').'</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  2  3
  4  5  6
  7  8  9</pre>
 
-<p>A matrix is <em>symmetric</em> if &#36;A^T &#61; A&#36;. This means &#36;A&#36; needs to be square and have symmetry along its main diagonal.</p><p>Our example <code>A</code> is <em>not</em> symmetric:</p><pre class="sourceCode julia">A' - A</pre>
+<p>Without a "dot" the conjugate transpose is performed. For real-valued matrices the two are identical:</p><pre class="sourceCode julia">A'</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
+ 1  4  7
+ 2  5  8
+ 3  6  9</pre>
+
+<hr /><p>A matrix is <em>symmetric</em> if $A^T = A$. This means $A$ needs to be square and have symmetry along its main diagonal.</p><p>Our example <code>A</code> is <em>not</em> symmetric:</p><pre class="sourceCode julia">A' - A</pre>
+<pre class="output">
+3×3 Array{Int64,2}:
   0   2  4
  -2   0  2
  -4  -2  0</pre>
 
-<p>However, in general &#36;A^TA&#36; is symmetric:</p><pre class="sourceCode julia">B = A'*A</pre>
+<p>However, in general $A^TA$ is symmetric:</p><pre class="sourceCode julia">B = A'*A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  66   78   90
  78   93  108
  90  108  126</pre>
 
 <p>We could see visually, or confirm as follows</p><pre class="sourceCode julia">B' - B</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  0  0  0
  0  0  0
  0  0  0</pre>
 
-<h2>positive definite</h2><p>A matrix &#36;A&#36; is <em>positive definite</em> if for every nonzero vector &#36;x&#36;, &#36;x^T A x &gt; 0&#36;.</p><p>The example in the book is</p><pre class="sourceCode julia">A = [2 1; 1 2]</pre>
+<h2>positive definite</h2><p>A matrix $A$ is <em>positive definite</em> if for every nonzero vector $x$, $x^T A x > 0$.</p><p>The example in the book is</p><pre class="sourceCode julia">A = [2 1; 1 2]</pre>
 <pre class="output">
-2x2 Array{Int64,2}:
+2×2 Array{Int64,2}:
  2  1
  1  2</pre>
 
-<p>For which &#36;x^T A x &#61; &#40;x_1 &#43; x_2&#41;^2 &#43; x_1^2 &#43; x_2^2 &gt; 0&#36; &#40;if &#36;x \neq 0&#36;&#41;.</p><h2>Inverses</h2><p>Let &#36;I&#36; be an &#36;n \times n&#36; <em>identify matrix</em>,  that is &#36;I&#36; is all &#36;0&#36;s with &#36;1&#36;s on the diagonal:</p><p>Then&#36;AI &#61; A&#36; and  &#36;IA &#61; A&#36;, if defined. For example:</p>$$~
+<p>For which $x^T A x = (x_1 + x_2)^2 + x_1^2 + x_2^2 > 0$ (if $x \neq 0$).</p><h2>Inverses</h2><p>Let $I$ be an $n \times n$ <em>identify matrix</em>,  that is $I$ is all $0$s with $1$s on the diagonal:</p><p>Then$AI = A$ and  $IA = A$, if defined. For example:</p>$$~
 (AI)_{ij}
 = a_{i1} I_{1j} + \cdots+ a_{ij} I_{jj} + \cdots + a_{in} I_{nj}
 = a_{i1} 0+ \cdots+ a_{ij} 1+ \cdots + a_{in} 0
 = a_{ij}
-~$$<p>Let &#36;A&#36; be given &#40;and &#36;m \times n&#36;&#41; Then &#36;B&#36; is a <em>right inverse</em> if &#36;AB &#61; I&#36;.</p><blockquote>
-<p>Thm: A <em>square</em> matrix, &#36;A&#36;, can possess at most one right inverse.</p>
-</blockquote><p>Proof: a linear algebra proof that rests on a fact: a linear combination of a <em>basis</em> producing &#36;x&#36; is unique.</p><p>Suppose &#36;B&#36; is an inverse. We aim to show &#36;B&#36; is unique. The product</p>$$~
+~$$
+<p>Let $A$ be given (and $m \times n$) Then $B$ is a <em>right inverse</em> if $AB = I$.</p><blockquote>
+<p>Thm: A <em>square</em> matrix, $A$, can possess at most one right inverse.</p>
+</blockquote><p>Proof: a linear algebra proof that rests on a fact: a linear combination of a <em>basis</em> producing $x$ is unique.</p><p>Suppose $B$ is an inverse. We aim to show $B$ is unique. The product</p>$$~
 (AB)_{\cdot k} = \sum_l a_{\cdot l} b_{lk}
-~$$<p>So if we look at the &#36;k&#36;th column vector of a matrix and write this as &#36;A_&#123;:k&#125;&#36;, then:</p>$$~
+~$$
+<p>So if we look at the $k$th column vector of a matrix and write this as $A_{:k}$, then:</p>$$~
 I_{:k} = \sum_l b_{lk}A_{:l}
-~$$<p>So the &#36;k&#36;th column vector of &#36;I&#36; is a linear combination of the column vectors of &#36;A&#36;. This means the columns of &#36;A&#36; span the same space as the columns of &#36;I&#36;, which is &#36;R^n&#36;. So the columns of &#36;A&#36; form a basis for &#36;R^n&#36;, ans so the values &#36;b_&#123;lk&#125;&#36; are uniquely defined.</p><blockquote>
-<p>Theorem: If &#36;A&#36; and &#36;B&#36; are square matrices, then a right inverse is a left inverse.</p>
-</blockquote><p>Suppose &#36;B&#36; is a right inverse &#40;&#36;AB&#61;I&#36;&#41;. Then set &#36;C &#61; BA - I &#43; B&#36; and note: &#36;AC &#61; ABA - AI &#43; AB &#61; A&#40;BA&#41; - A &#43; I &#61; I&#36;, so &#36;C&#61;B&#36; and consequently &#36;BA &#61; I&#36; as well.</p><p>So, if a square matrix &#36;A&#36; has a &#36;n\times n&#36; right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written &#36;A^&#123;-1&#125;&#36;.</p><h3>How to find an inverse?</h3><p>We return to system of equations. There we know a few basic facts:</p><ul>
-<li>we could interchange the order in how we define our equations and we would have the same answers</li>
-<li>we could replace one equation by its multiple by a <strong>non</strong>-zero constant and would still have the same answers</li>
-<li>we could replace one equation by adding another to it and not effect the solutions.</li>
-</ul><p>The latter is on the only tricky one. If we use &#36;E&#39;_i &#61; E_i &#43; E_j&#36; instead, do we get a difference?</p><p>Well, if our solutions solved &#36;E_i&#36; and &#36;E_j&#36;, then it would also solve &#36;E&#39;_I&#36;, as &#36;0 &#43; 0&#36; is still &#36;0&#36;. To get the reverse, for &#36;E&#39;_j &#61; -E_j&#36; and add this to &#36;E&#39;_i&#36; to get &#36;E&#39;&#39;_i &#61; E&#39;_i &#43; E&#39;_j &#61; E_i &#43; E_j - E_j &#61; E_i&#36; and so the original set of equations will have the same solutions if we replace &#36;E_i&#36; as specified.</p><h3>Matrix equivalence</h3><p>We have systems of linear equations lend them selves to matrices, so elementary operations lend themselves to matrix operations.</p><p>To illustrate:</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]</pre>
+~$$
+<p>So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.</p><blockquote>
+<p>Theorem: If $A$ and $B$ are square matrices, then a right inverse is a left inverse.</p>
+</blockquote><p>Suppose $B$ is a right inverse ($AB=I$). Then set $C = BA - I + B$ and note: $AC = ABA - AI + AB = A(BA) - A + I = I$, so $C=B$ and consequently $BA = I$ as well.</p><p>So, if a square matrix $A$ has a $n\times n$ right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written $A^{-1}$.</p><h3>How to find an inverse?</h3><p>We return to system of equations. There we know a few basic facts:</p><ul>
+<li><p>we could interchange the order in how we define our equations and we would have the same answers</p>
+</li>
+<li><p>we could replace one equation by its multiple by a <strong>non</strong>-zero constant and would still have the same answers</p>
+</li>
+<li><p>we could replace one equation by adding another to it and not effect the solutions.</p>
+</li>
+</ul><p>The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?</p><p>Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, the solution makes <em>both</em> $E'_i$ and $E_j$ $0$, so $-E_j$ is $0$, and then so is $E_i = $E'_i - E_j$.</p><h3>Matrix equivalence</h3><p>As systems of linear equations lend them selves to matrices, so to do elementary operations lend themselves to matrix operations.</p><p>To illustrate:</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  2  3
  4  5  6
  7  8  9</pre>
 
-<p>We can switch rows 2 and 3 via let multiplication of the identity matrix with rows &#36;2&#36; and &#36;3&#36; swapped</p><pre class="sourceCode julia">[1 0 0; 0 0 1; 0 1 0] * A</pre>
+<p>We can switch rows 2 and 3 via let multiplication of the identity matrix with rows $2$ and $3$ swapped</p><pre class="sourceCode julia">[1 0 0; 0 0 1; 0 1 0] * A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
  1  2  3
  7  8  9
  4  5  6</pre>
 
 <p>We can multiply row 2 as follows:</p><pre class="sourceCode julia">[1 0 0; 0 pi 0; 0 0 1] * A</pre>
 <pre class="output">
-3x3 Array{Float64,2}:
+3×3 Array{Float64,2}:
   1.0      2.0     3.0   
  12.5664  15.708  18.8496
   7.0      8.0     9.0   </pre>
 
-<p>We can replace row &#36;2&#36; with row &#36;2&#36; plus row &#36;3&#36; via:</p><pre class="sourceCode julia">[1 0 0; 0 1 0; 0 1 1] * A</pre>
+<p>We can replace row $2$ with row $2$ plus row $3$ via:</p><pre class="sourceCode julia">[1 0 0; 0 1 0; 0 1 1] * A</pre>
 <pre class="output">
-3x3 Array{Int64,2}:
+3×3 Array{Int64,2}:
   1   2   3
   4   5   6
  11  13  15</pre>
 
-<p>If we think of these elementary operations in terms of left multiplication by an elementary matrix, we can write the transformed matrix as &#36;E_m E_&#123;m-1&#125; \cdots E_2 E_1 A&#36;.</p><blockquote>
-<p>Thm: If &#36;A&#36; is invertible, we can find &#36;A^&#123;-1&#125;&#36; from a sequence of elementary row operations.</p>
-</blockquote><p>Idea: If we can find a sequence such that &#36;E_m E_&#123;m-1&#125; \cdots E_2 E_1 A &#61; I&#36;, the &#36;E_m E_&#123;m-1&#125; \cdots E_2 E_1 \cdot I &#61; A^&#123;-1&#125;&#36;. Why?</p>$$~
+<p>If we think of these elementary operations in terms of left multiplication by an elementary matrix, we can write the transformed matrix as $E_m E_{m-1} \cdots E_2 E_1 A$.</p><blockquote>
+<p>Thm: If $A$ is invertible, we can find $A^{-1}$ from a sequence of elementary row operations.</p>
+</blockquote><p>Idea: If we can find a sequence such that $E_m E_{m-1} \cdots E_2 E_1 A = I$, the $E_m E_{m-1} \cdots E_2 E_1 \cdot I = A^{-1}$. Why?</p>$$~
 A^{-1}A = (E_m E_{m-1} \cdots E_2 E_1 \cdot I) A
 = E_m E_{m-1} \cdots E_2 E_1 (I \cdot A)
 = E_m E_{m-1} \cdots E_2 E_1 \cdot A
 = I.
-~$$<h3>Nonsingular matrix properties</h3><p>For an &#36;n \times n&#36; matrix &#36;A&#36;, all of these are equivalent:</p><ul>
-<li>&#36;A&#36; is nonsingular</li>
-<li>the <em>determinant</em> of &#36;A&#36; is non-zero</li>
-<li>The rows of &#36;A&#36; for a basis for &#36;R^n&#36;</li>
-<li>The columns of &#36;A&#36; for a basis for &#36;R^n&#36;</li>
-<li>The equation &#36;Ax&#61;0&#36; is only satisfied by &#36;x&#61;0&#36;.</li>
-<li>The equation &#36;Ax&#61;b&#36; has only one solution, &#36;x&#36;.</li>
-<li>A is a product of elementary matrices</li>
-<li>&#36;0&#36; is not an eigenvalue of &#36;A&#36;.</li>
+~$$
+<h3>Nonsingular matrix properties</h3><p>For an $n \times n$ matrix $A$, all of these are equivalent:</p><ul>
+<li><p>The matrix $A$ is nonsingular</p>
+</li>
+<li><p>The <em>determinant</em> of $A$ is non-zero</p>
+</li>
+<li><p>The rows of $A$ for a basis for $R^n$</p>
+</li>
+<li><p>The columns of $A$ for a basis for $R^n$</p>
+</li>
+<li><p>The equation $Ax=0$ is only satisfied by $x=0$.</p>
+</li>
+<li><p>The equation $Ax=b$ has only one solution, $x$.</p>
+</li>
+<li><p>The matrix $A$ is a product of elementary matrices</p>
+</li>
+<li><p>The value $0$ is not an eigenvalue of $A$.</p>
+</li>
 </ul><h2>Block multiplication</h2><p>Matrices can be partitioned into blocks. So for example:</p><pre class="sourceCode julia">B = [1 2; 3 4]
 C = [5 6; 6 5]
 O = [0 0; 0 0]
 I = [1 0; 0 1]
+
 A = [B C; O I]</pre>
 <pre class="output">
-4x4 Array{Int64,2}:
+4×4 Array{Int64,2}:
  1  2  5  6
  3  4  6  5
  0  0  1  0
  0  0  0  1</pre>
 
-<p>Problem 7 has one show that &#36;A^k&#36; is also a block matrix with Blocks &#36;B^k&#36; and &#36;&#40;B^k-I&#41;&#40;B-I&#41;^&#123;-1&#125;C&#36; to go with O and I. Let&#39;s see with k &#61; 2:</p><p>We need &#36;B-I&#36; to have an inverse. We check:</p><pre class="sourceCode julia">det(B-I)</pre>
+<p>Problem 7 has one show that $A^k$ is also a block matrix with blocks $B^k$ and $(B^k-I)(B-I)^{-1}C$ to go with O and I. Let's see with k = 2:</p><p>We need $B-I$ to have an inverse. We check:</p><pre class="sourceCode julia">det(B-I)</pre>
 <pre class="output">
 -6.0</pre>
 
-<p>Now let &#36;k&#61;3&#36;, we have</p><pre class="sourceCode julia">k = 3
+<p>Now let $k=3$, we have</p><pre class="sourceCode julia">k = 3
 out = A^k</pre>
 <pre class="output">
-4x4 Array{Int64,2}:
+4×4 Array{Int64,2}:
  37   54  117  114
  81  118  252  243
   0    0    1    0

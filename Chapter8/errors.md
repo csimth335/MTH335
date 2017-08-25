@@ -3,6 +3,7 @@
 We again consider multistep models:
 
 
+
 $$~
 a_k x_n + a_{k-1}x_{n-1} + \cdots + a_0 x_{n-k} =
 h( b_k f_n + f_{k-1} f_{n-1} + \cdots + b_0 f_{n-k}),

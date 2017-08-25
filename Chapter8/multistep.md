@@ -208,8 +208,7 @@ Some equations are problematic unless the step size is small. These are called *
 An example comes from [wikipedia](https://en.wikipedia.org/wiki/Stiff_equation):
 
 $$~
-x'(t) = -15x
-x(0) = 1
+x'(t) = -15x, \quad x(0) = 1
 ~$$
 
 We can easily solve this for $t \geq 0$ to be $e^{-15t}$ -- a rapidly decaying function.
@@ -242,7 +241,6 @@ Wow, way off. What happened?
 
 ```
 using Plots
-gadfly()
 plot(ts, xs)
 plot!(t -> exp(-15t), 0, 1, color=:red)
 ```
