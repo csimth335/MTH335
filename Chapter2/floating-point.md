@@ -123,7 +123,7 @@ Verbatim("""
 How are negative numbers stored?
 
 ```
-bits(convert(Int8, 5)),  bits(convert(UInt8, -5))
+bits(convert(Int8, 5)),  bits(convert(Int8, -5))
 ```
 
 They are quite different!
@@ -300,9 +300,11 @@ $$~
 x = \pm q \cdot \beta^m
 ~$$
 
-We can normalize the number by insisting $q=d.ddddd...$ where the leading term of $q$ is between $1$ and $q-1$.
+We can normalize the number by insisting $q=0.ddddd...$ where the
+leading term is non-zero.
 
-A special case would be $\beta =2$ or base 2, which forces the leading term to be 1.
+A special case would be $\beta =2$ or base 2, which forces the leading
+term to be 1. In that case, a special case could be $q=1.dddddd...$.
 
 ### Converting decimal to binary
 

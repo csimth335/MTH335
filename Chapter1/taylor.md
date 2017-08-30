@@ -33,7 +33,7 @@ $$~
 
 The function is differentiable on $I=(a,b)$ provided it has a derivative at each $c$ in $I$.
 
-A function which is differentiable on $I=(a,b)$ it is continuous on $I$. (Why???)
+A function which is differentiable on $I=(a,b)$  is continuous on $I$. (Why???)
 
 ### Example
 
@@ -51,15 +51,15 @@ Since $f'(x)$ is also a function, it too may have a derivative. This would be th
 
 Of course, we can repeat to talk about the $k$th derivative, $f^{(k)}$.
 
-## The space of function C, C^1, C^2, ...
+## The space of functions C, C^1, C^2, ...
 
 A differentiable function is continuous, but not vice versa. There are some common function spaces:
 
-* The space $C([a,b])$: the set of all continuous functions on $[a,b]$
+* The space $C((a,b))$: the set of all continuous functions on $(a,b)$
 
-* The space $C^1([a,b])$: the set of all functions on $[a,b]$ that have a *continuous* derivative on $[a,b]$.
+* The space $C^1((a,b))$: the set of all functions on $[a,b]$ that have a *continuous* derivative on $(a,b)$.
 
-* The space $C^k([a,b])$: the set of all functions on $[a,b]$ that have a *continuous* $k$-th derivative on $[a,b]$.
+* The space $C^k((a,b))$: the set of all functions on $[a,b]$ that have a *continuous* $k$-th derivative on $(a,b)$.
 
 ### Example
 
@@ -71,9 +71,14 @@ The *first* [fundamental](https://en.wikipedia.org/wiki/Fundamental_theorem_of_c
 
 So $F$ is in $C^1$ (of what interval).
 
+
+(If $f$ is *not* continuous, but only Riemann integrable, this is not
+so, as then we are only assured that $F$ will be *continuous$---but it
+may not be differentiable.)
+
 ## Taylor's theorem
 
-Suppose $f(x)$ is in $C^n([a,b]$ *and* suppose that $f^{(n+1)}$ exists in $(a,b)$. (Why is it not $C^{n+1}$?) For $c$ and $x$ in $I$, we set
+Suppose $f(x)$ is in $C^n((a,b)$ *and* suppose that $f^{(n+1)}$ exists in $(a,b)$. (Why is it not $C^{n+1}$?) For $c$ and $x$ in $I$, we set
 
 $$~
 T_n(x) = f(c) + f'(c) (x-c) + \frac{f''(c)}{2!}(x-c)^2 + \cdots + \frac{f^{n}(c)}{n!}(x-c)^n.

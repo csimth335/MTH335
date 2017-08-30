@@ -2,6 +2,36 @@
 
 A quick overview of some `Julia` commands and constructs.
 
+## Getting Started
+
+You can download and install `Julia` on your computer -- it is freely
+available. However, you can also use it through the web at
+`juliabox.com`. This is easy and gives the convenient `Jupyter`
+interface, we we will assume.
+
+To use `juliabox.com`:
+
+* have handy a gmail account
+* proceed to `juliabox.com` and log in with your gmail credentials
+* Under the "new" dropdown on the right side, open a new "Julia 0.6.0"
+notebook. (As of writing, this is the latest release)
+* We will enter two commands to install some additional software. Copy
+and paste the following into a cell, then press the "play" button:
+
+```
+Pkg.clone("https://github.com/mth229/MTH229.jl")
+using MTH229
+```
+
+Wait... while waiting, learn that the first line downloads a bunch of external
+packages that can be convenient. To access these packages during a
+session, the second line must be executed.
+
+Now that that is done, you can type commands in a cell and hit the
+play button of "shift+enter" to execute them. Their output fills in
+below the cell.
+
+
 ## Commands
 
 Commands are typed at the REPL prompt or in a `IJulia` cell. New commands are separated by a new line or a semicolon.
