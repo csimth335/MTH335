@@ -14,9 +14,9 @@ To use `juliabox.com`:
 * have handy a gmail account
 * proceed to `juliabox.com` and log in with your gmail credentials
 * Under the "new" dropdown on the right side, open a new "Julia 0.6.0"
-notebook. (As of writing, this is the latest release)
+  notebook. (As of writing, this is the latest release)
 * We will enter two commands to install some additional software. Copy
-and paste the following into a cell, then press the "play" button:
+  and paste the following into a cell, then press the "play" button:
 
 ```
 Pkg.clone("https://github.com/mth229/MTH229.jl")
@@ -224,6 +224,32 @@ These are useful when passing a function to another function.
 our_abs(x) = (x < 0) ? -x : x
 ```
 
+Trying it:
+
+```
+our_abs(-5)
+```
+
+
+The traditional form would look like:
+
+```
+function our_abs2(x)
+    if x < 0
+        -x
+    else
+        x
+    end
+end
+```
+
+And:
+
+```
+out_abs2(5), our_abs2(-5)
+```
+
+
 ## Looping
 
 Iterating over a collection can be done with the traditional `for` loop. However, there are list comprehensions to mimic the definition of a set:
@@ -237,6 +263,37 @@ And `map` to apply a function over a collection:
 ```
 map(sin, 1:4)
 ```
+
+More conveniently, the "dot" notation can be used to *broadcast* a
+function over its (possibly) vectorized arguments:
+
+```
+log.([2,3,10], [10, 3, 2])  # log(2,10), log(3,3), log(10, 2)...
+```
+
+### Fibonacci numbers
+
+What is some code to create the first 15 Fibonacci numbers?
+
+```
+```
+
+
+What is some code to create *all* the Fibonacci numbers less than 100?
+
+```
+```
+
+What is some code to make change? That is given an amount find the
+most efficient usage of quarters, dimes, nickels and pennies to equal
+the amount:
+
+```
+```
+
+
+
+
 
 ## Plotting
 
@@ -296,7 +353,8 @@ The above is a bit cumbersome. The `[]` function does both:
 ```
 
 ```
-v = [1,2,3]; w = [4,5,6] # vertical vectors
+v = [1, 2, 3]
+w = [4, 5, 6]   # vertical vectors
 [v w]           # horizontally concatenate
 ```
 
@@ -390,7 +448,7 @@ For even faster math, some programs will work by manipulating bits.
 
 Translating pseudo code into an algorithm with `Julia` is usually pretty straightforward. Consider this code for the bisection method:
 
-$$
+$$~
 \begin{align}
 &\textbf{input } a, b, M, \delta, \epsilon\\
 &u \leftarrow f(a)\\
@@ -411,7 +469,7 @@ $$
 &\quad \textbf{end if}     \\
 &\textbf{end do}     \\
 \end{align}
-$$
+~$$
 
 The bold text are commands. Here is a `julia` translation:
 
