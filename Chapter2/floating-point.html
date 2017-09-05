@@ -123,32 +123,32 @@ out = [ parse(Int, x[length(x) - i])* 2^i for i in 0:(length(x) - 1)]</pre>
  512</pre>
 
 <p>and we just add</p><pre class="sourceCode julia">sum(out)</pre>
-<div class="well well-sm">
-876</div>
+<pre class="output">
+876</pre>
 
 <h3>Converting decimal in integer to binary</h3><p>Start with an integer $n$. we generate the value of <code>x</code> from left to right. Suppose $n\geq 2$.</p><p>First find $p$ with $2^p \leq n < 2^{p+1}$. The number will have $p+1$ digits, and the left most one will be $1$.</p><p>Then consider $n = n - 2^p$. Apply the same to this. Repeat.</p><pre class="sourceCode julia">n = 27
 log2(n) # 4. So x = 1XXXX</pre>
-<div class="well well-sm">
-4.754887502163468</div>
+<pre class="output">
+4.754887502163468</pre>
 
 <pre class="sourceCode julia">n = n - 2^4
 log2(n) # 3. So x = 11XXX</pre>
-<div class="well well-sm">
-3.4594316186372973</div>
+<pre class="output">
+3.4594316186372973</pre>
 
 <pre class="sourceCode julia">n = n - 2^3
 log2(n) # 1 So x = 1101X</pre>
-<div class="well well-sm">
-1.584962500721156</div>
+<pre class="output">
+1.584962500721156</pre>
 
 <pre class="sourceCode julia">n = n - 2^1 ## smaller than 2, so clearly x = 11011</pre>
-<div class="well well-sm">
-1</div>
+<pre class="output">
+1</pre>
 
 <p>and check:</p><pre class="sourceCode julia">x = "11011"
 sum( parse(Int, x[length(x) - i])* 2^i for i in 0:(length(x) - 1) )</pre>
-<div class="well well-sm">
-27</div>
+<pre class="output">
+27</pre>
 
 <h3>Math with binary numbers</h3><p>Adding two binary numbers follows the usual algorithm with carrying:</p><pre class="sourceCode julia">  1101
 + 1011
@@ -209,8 +209,8 @@ sum( parse(Int, x[length(x) - i])* 2^i for i in 0:(length(x) - 1) )</pre>
 0111111111111111111111111111111111111111111111111111111111111111</div>
 
 <p>but not <code>2^63</code>:</p><pre class="sourceCode julia">2^63</pre>
-<div class="well well-sm">
--9223372036854775808</div>
+<pre class="output">
+-9223372036854775808</pre>
 
 <p>Though this works:</p><pre class="sourceCode julia">bits(2^63-1)</pre>
 <div class="well well-sm">
@@ -261,26 +261,26 @@ x = \pm q \cdot \beta^m
 ~$$
 <p>We can normalize the number by insisting $q=0.ddddd...$ where the leading term is non-zero.</p><p>A special case would be $\beta =2$ or base 2, which forces the leading term to be 1. In that case, a special case could be $q=1.dddddd...$.</p><h3>Converting decimal to binary</h3><p>We can convert decimal numbers to binary. The same simple algorithm for integers works with some modification. Start with $x$. We want to produce digits $ddd.ddd...$ where $d$ are either $0$ or $1$.</p><p>First, take the log base 2:</p><pre class="sourceCode julia">x = 12.1
 log2(x) |> floor</pre>
-<div class="well well-sm">
-3.0</div>
+<pre class="output">
+3.0</pre>
 
 <p>This says $2^3 \leq x < 2^4$. Remember $3$, then subtract $2^3$ and repeat:</p><pre class="sourceCode julia">ds = [3]
 x = x - 2.0^ds[end]
 n = log2(x) |> floor</pre>
-<div class="well well-sm">
-2.0</div>
+<pre class="output">
+2.0</pre>
 
 <p>Remember 2 and then subtract $2^2$ and repeat:</p><pre class="sourceCode julia">push!(ds, n)
 x = x - 2.0^ds[end]
 n = log2(x) |> floor</pre>
-<div class="well well-sm">
--4.0</div>
+<pre class="output">
+-4.0</pre>
 
 <p>Remember $-4$ and repeat</p><pre class="sourceCode julia">push!(ds, n)
 x = x - 2.0^ds[end]
 n = log2(x) |> floor</pre>
-<div class="well well-sm">
--5.0</div>
+<pre class="output">
+-5.0</pre>
 
 <p>etc.</p><p>The <code>ds</code> will tell us there is a 1 in position 3,2,-4, -5, 8,9... So <code>1100.000110011...</code></p><p>One thing to note: what numbers terminate in decimal are generally different than what numbers will terminate in binary.</p><h2>Floating point numbers</h2><p>Floating point is a representation of numbers using scientific notation. Only there are constraints on the sizes:</p><ul>
 <li><p>The value $q$, the significand, has $p$ digits. (The precision)</p>
@@ -385,24 +385,24 @@ seebits (generic function with 1 method)</pre>
 <li><p>invalid number (such as <code>0 * Inf</code>)</p>
 </li>
 </ul><p>(Whether something like <code>sqrt&#40;-1.0&#41;</code> is an error or <code>NaN</code> is not specified.)</p><h3>Range of numbers</h3><p>What is the range of the numbers that can be represented? Let's check with Float16.</p><p>The largest <em>positive</em> value would have $m$ coded with <code>11110</code> or ($2 + 4 + 8 + 16 - 15 = 15$) (The value <code>11111</code> is saved for <code>Inf</code> and <code>NaN</code>.)</p><p>The largest value for $q$ would be <code>1111111111</code>, or</p><pre class="sourceCode julia">sum([1/2^i for i in 0:10])</pre>
-<div class="well well-sm">
-1.9990234375</div>
+<pre class="output">
+1.9990234375</pre>
 
 <p>Altogether we have:</p><pre class="sourceCode julia">sum([1//2^i for i in 0:10]) * 2^15</pre>
-<div class="well well-sm">
-65504//1</div>
+<pre class="output">
+65504//1</pre>
 
 <p>Is this right?</p><pre class="sourceCode julia">prevfloat(typemax(Float16))</pre>
-<div class="well well-sm">
-6.55e4</div>
+<pre class="output">
+Float16(6.55e4)</pre>
 
 <p>For the smallest <em>positive</em> number, the smallest exponent is code <code>00000</code> or $0 - 15 = -15$. So the value should be:</p><pre class="sourceCode julia">1/2^15</pre>
-<div class="well well-sm">
-3.0517578125e-5</div>
+<pre class="output">
+3.0517578125e-5</pre>
 
 <p>But this isn't actually the case:</p><pre class="sourceCode julia">nextfloat(convert(Float16, 0))</pre>
-<div class="well well-sm">
-6.0e-8</div>
+<pre class="output">
+Float16(6.0e-8)</pre>
 
 <p>(As there are tricks to get smaller numbers called subnormal numbers)</p><p>For double precision numbers (Float64) the values are given by:</p><pre class="sourceCode julia">prevfloat(Inf), nextfloat(0.0)</pre>
 <pre class="output">
@@ -424,24 +424,24 @@ round(x,1), round(x,2), round(x,4)</pre>
 (1.2, 1.23, 1.2346)</pre>
 
 <h3>Rounding in floating point</h3><p>When converting from decimal to floating point, even simple decimal numbers get rounded!</p><pre class="sourceCode julia">convert(Float16, 0.1)</pre>
-<div class="well well-sm">
-0.1</div>
+<pre class="output">
+Float16(0.1)</pre>
 
 <pre class="sourceCode julia">seebits(0.1)</pre>
 <pre class="output">
 ("0", "01011", "1001100110")</pre>
 
 <p>"1001100110" becomes:</p><pre class="sourceCode julia">q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )</pre>
-<div class="well well-sm">
-1.599609375</div>
+<pre class="output">
+1.599609375</pre>
 
-<h3></h3><p>And <code>01011</code> for $m$ becomes</p><pre class="sourceCode julia">m = 2.0^(1 + 2 + 8 - 15)</pre>
-<div class="well well-sm">
-0.0625</div>
+<h3></h3><p>And <code>01011</code> for $m$ becomes</p><pre class="sourceCode julia">m = 1 + 2 + 8 - 15</pre>
+<pre class="output">
+-4</pre>
 
-<pre class="sourceCode julia">1 * q * 2^m</pre>
-<div class="well well-sm">
-1.6704301324376012</div>
+<pre class="sourceCode julia">1 * q * 2.0^m</pre>
+<pre class="output">
+0.0999755859375</pre>
 
 <p>Notice the number $0.1$ is necessarily approximated.</p><h3>Error bound</h3><p>Let $x$ be the number and $\tilde{x}$ be its rounded value. How big is the difference when $x$ is rounded to $n$ decimal places?</p><p>We consider the value of the $n+1$st decimal number.</p><ul>
 <li><p>If it is in 0,1,2,3,4 then we round down and the error is $i \cdot 10^{-(n+1)}$</p>
@@ -480,26 +480,10 @@ b[1:1], b[2:12], b[13:end]</pre>
  1.875 
  1.9375</pre>
 
-<p>The values for the exponents are $-3, -2, -1, 0, 1, 2, 3$. So all our values are given by</p><pre class="sourceCode julia">ms = (-3):3
+<p>The values for the exponents are $-2, -1, 0, 1, 2, 3$. So all our values are given by</p><pre class="sourceCode julia">ms = (-2):3
 vals = [q * 2.0^m for q in qs, m in ms] |> vec</pre>
 <pre class="output">
-112-element Array{Float64,1}:
-  0.125   
-  0.132813
-  0.140625
-  0.148438
-  0.15625 
-  0.164063
-  0.171875
-  0.179688
-  0.1875  
-  0.195313
-  0.203125
-  0.210938
-  0.21875 
-  0.226563
-  0.234375
-  0.242188
+96-element Array{Float64,1}:
   0.25    
   0.265625
   0.28125 
@@ -599,10 +583,10 @@ vals = [q * 2.0^m for q in qs, m in ms] |> vec</pre>
 
 <h3>Plotting the machine numbers</h3><p>We can plot these points:</p><pre class="sourceCode julia">using Plots
 scatter(vals, 0*vals)</pre>
-    <div id="0d373328-831a-40ce-9002-37fd14cee580" style="width:600px;height:400px;"></div>
+    <div id="5ea4483b-913a-4a2c-b0b5-95af2ee615a1" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('0d373328-831a-40ce-9002-37fd14cee580');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"markers","xaxis":"x","colorbar":{"title":""},"marker":{"symbol":"circle","color":"rgba(0, 154, 250, 1.000)","line":{"color":"rgba(0, 0, 0, 1.000)","width":1},"size":8},"y":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"type":"scatter","name":"y1","yaxis":"y","x":[0.125,0.1328125,0.140625,0.1484375,0.15625,0.1640625,0.171875,0.1796875,0.1875,0.1953125,0.203125,0.2109375,0.21875,0.2265625,0.234375,0.2421875,0.25,0.265625,0.28125,0.296875,0.3125,0.328125,0.34375,0.359375,0.375,0.390625,0.40625,0.421875,0.4375,0.453125,0.46875,0.484375,0.5,0.53125,0.5625,0.59375,0.625,0.65625,0.6875,0.71875,0.75,0.78125,0.8125,0.84375,0.875,0.90625,0.9375,0.96875,1.0,1.0625,1.125,1.1875,1.25,1.3125,1.375,1.4375,1.5,1.5625,1.625,1.6875,1.75,1.8125,1.875,1.9375,2.0,2.125,2.25,2.375,2.5,2.625,2.75,2.875,3.0,3.125,3.25,3.375,3.5,3.625,3.75,3.875,4.0,4.25,4.5,4.75,5.0,5.25,5.5,5.75,6.0,6.25,6.5,6.75,7.0,7.25,7.5,7.75,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0,15.5]}], {"showlegend":true,"xaxis":{"gridwidth":0.5,"tickvals":[0.0,5.0,10.0,15.0],"ticks":"inside","tickmode":"array","domain":[0.05100612423447069,0.9934383202099737],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["0","5","10","15"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"gridwidth":0.5,"tickvals":[0.0,0.5,1.0],"ticks":"inside","tickmode":"array","domain":[0.03762029746281716,0.9901574803149606],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["0.0","0.5","1.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('5ea4483b-913a-4a2c-b0b5-95af2ee615a1');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"markers","xaxis":"x","colorbar":{"title":""},"marker":{"symbol":"circle","color":"rgba(0, 154, 250, 1.000)","line":{"color":"rgba(0, 0, 0, 1.000)","width":1},"size":8},"y":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"type":"scatter","name":"y1","yaxis":"y","x":[0.25,0.265625,0.28125,0.296875,0.3125,0.328125,0.34375,0.359375,0.375,0.390625,0.40625,0.421875,0.4375,0.453125,0.46875,0.484375,0.5,0.53125,0.5625,0.59375,0.625,0.65625,0.6875,0.71875,0.75,0.78125,0.8125,0.84375,0.875,0.90625,0.9375,0.96875,1.0,1.0625,1.125,1.1875,1.25,1.3125,1.375,1.4375,1.5,1.5625,1.625,1.6875,1.75,1.8125,1.875,1.9375,2.0,2.125,2.25,2.375,2.5,2.625,2.75,2.875,3.0,3.125,3.25,3.375,3.5,3.625,3.75,3.875,4.0,4.25,4.5,4.75,5.0,5.25,5.5,5.75,6.0,6.25,6.5,6.75,7.0,7.25,7.5,7.75,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0,15.5]}], {"showlegend":true,"xaxis":{"gridwidth":0.5,"tickvals":[0.0,5.0,10.0,15.0],"ticks":"inside","tickmode":"array","domain":[0.05100612423447069,0.9934383202099737],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["0","5","10","15"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"gridwidth":0.5,"tickvals":[0.0,0.5,1.0],"ticks":"inside","tickmode":"array","domain":[0.03762029746281716,0.9901574803149606],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["0.0","0.5","1.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>We notice:</p><ul>
 <li><p>they are definitely finite</p>
@@ -618,12 +602,12 @@ scatter(vals, 0*vals)</pre>
 (1.0000000000000002, 2.220446049250313e-16)</pre>
 
 <p>This is sometimes called <em>machine precision</em> and in <code>Julia</code> is returned by <code>eps&#40;&#41;</code>:</p><pre class="sourceCode julia">eps()</pre>
-<div class="well well-sm">
-2.220446049250313e-16</div>
+<pre class="output">
+2.220446049250313e-16</pre>
 
 <pre class="sourceCode julia">eps(Float16)</pre>
-<div class="well well-sm">
-0.000977</div>
+<pre class="output">
+Float16(0.000977)</pre>
 
 
   </div>

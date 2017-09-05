@@ -613,11 +613,11 @@ q = (1 + 1/2 + 1/16 + 1/32 + 1/256 + 1/512 )
 And `01011` for $m$ becomes
 
 ```
-m = 2.0^(1 + 2 + 8 - 15)
+m = 1 + 2 + 8 - 15
 ```
 
 ```
-1 * q * 2^m
+1 * q * 2.0^m
 ```
 
 Notice the number $0.1$ is necessarily approximated.
@@ -685,10 +685,10 @@ The possible *positive* values are
 qs = [1 + i/2 + j/4 + k/8 + l/16 for i in 0:1, j in 0:1, k in 0:1, l in 0:1] |> vec |> sort
 ```
 
-The values for the exponents are $-3, -2, -1, 0, 1, 2, 3$. So all our values are given by
+The values for the exponents are $-2, -1, 0, 1, 2, 3$. So all our values are given by
 
 ```
-ms = (-3):3
+ms = (-2):3
 vals = [q * 2.0^m for q in qs, m in ms] |> vec
 ```
 

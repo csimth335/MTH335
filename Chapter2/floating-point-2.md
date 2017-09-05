@@ -162,7 +162,20 @@ Let's assume (contrary to above) that the operations on floating point
 are correctly done and *then* rounded to a machine number. (This can
 be arranged by using more bits for intermediate computations).
 
-If $\odot$ is any of the above operations, what is $fl(x \odot y)$?
+
+In notation, if $x$ and $y$ are *machine numbers* and $\odot$ is one
+of the 4 basic operations, then we have
+
+$$~
+fl(x \odot y) = (x \odot y) \cdot (1 + \delta)
+~$$
+
+The error coming from rounding.
+
+
+
+If $\odot$ is any of the above operations, what is $fl(x \odot y)$ --
+**when** $x$ and $y$ are not machine numbers?
 
 We know for $x$ that $fl(x) = x(1 + \delta)$ where $\delta$ is small ($\leq 2^{-p}$) and depends on $x$. So,
 
