@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<p>In a paper of Kahan (https://people.eecs.berkeley.edu/~wkahan/Qdrtcs.pdf) the issue of computing the quadratic equation arises.</p><p>Kahan write as $ax^2 + 2bx + c$ so the critical computation is the discriminant $b^2 - a \cdot c$. The issue comes from large enough values that the subtraction masks the low bits influence.</p><p>Here is an example in the paper, which should be 1.0 – not 2.0</p><pre class="sourceCode julia">a,b,c = 94906266.375, 94906267.375, 94906268.375
+b^2 - a * c</pre>
+<div class="well well-sm">
+2.0</div>
+
+<p>Dekker shows a way to split numbers into a high and low part:</p><pre class="sourceCode julia">function dekker_break(x)
+    bigx = x * 134217729.0  # 2^27-1
+    y = x - bigx
+    xh = y + bigx
+    xl = x - xh
+    xh, xl
+end</pre>
+<pre class="output">
+dekker_break (generic function with 1 method)</pre>
+
+<p>We have</p><pre class="sourceCode julia">dekker_break(a)</pre>
+<pre class="output">
+(9.4906266e7, 0.375)</pre>
+
+<p>Then we can compute <code>b^2</code> with:</p><pre class="sourceCode julia">bh, bl = dekker_break(b)
+p = b*b
+dp = ((bh * bh - p) + 2bh * bl) + bl * bl
+p, dp</pre>
+<pre class="output">
+(9.00719958705499e15, -0.609375)</pre>
+
+<p>And <code>a*c</code> is similar:</p><pre class="sourceCode julia">ah,al = dekker_break(a)
+ch,cl = dekker_break(c)
+q = a*c; dq = ((ah*ch - q) + (ah*cl + al*ch)) + al*cl
+q, dq</pre>
+<pre class="output">
+(9.007199587054988e15, 0.390625)</pre>
+
+<p>Here <code>p-q</code> gives the simple answer, the correction <code>dp-dq</code> carries the bits that were lost:</p><pre class="sourceCode julia">p-q, dp - dq</pre>
+<pre class="output">
+(2.0, -1.0)</pre>
+
+<p>And then</p><pre class="sourceCode julia">(p-q) + (dp - dq)</pre>
+<div class="well well-sm">
+1.0</div>
+
+<p>Note, we can check using BigFloats which have more precision:</p><pre class="sourceCode julia">big(b)^2 - big(a) * big(c)</pre>
+<div class="well well-sm">
+1.000000000000000000000000000000000000000000000000000000000000000000000000000000</div>
+
+<p>With this, the quadratic equation can be solved with:</p><pre class="sourceCode julia">function discr(a, b, c)
+    ah, al = dekker_break(a)  
+    bh, bl = dekker_break(b)  
+    ch, cl = dekker_break(c)  
+    p = b*b
+    dp = ((bh * bh - p) + 2bh * bl) + bl * bl
+    q = a*c
+	dq = ((ah*ch - q) + (ah*cl + al*ch)) + al*cl
+    (p-q) + (dp - dq)
+end
+
+## Solve ax^2 + bx + c;  complex values not covered below
+function qdrt(a, b, c)
+#  b = -b
+  d = discr(a,b,c)
+  r = sqrt(d) * (sign(b) + iszero(b)) + b
+  r/a, c/r
+end</pre>
+<pre class="output">
+qdrt (generic function with 1 method)</pre>
+
+<p>Trying it out we have:</p><pre class="sourceCode julia">a, b, c = 1, -1, 1 # x^2 - 2x + 1 -> (x-1)^2
+qdrt(a, b, c)</pre>
+<pre class="output">
+(-1.0, -1.0)</pre>
+
+<p>And</p><pre class="sourceCode julia">a,b,c = 94906266.375, 94906267.375, 94906268.375
+qdrt(a, b, c)</pre>
+<pre class="output">
+(1.0000000210734241, 1.0)</pre>
+
+<p>Which is correct, but other methods can be wrong:</p><pre class="sourceCode julia">using Polynomials
+x = variable()
+r1, r2 = roots(a*x^2 - 2b*x + c)
+r1, r2</pre>
+<pre class="output">
+(1.000000010536712, 1.000000010536712)</pre>
+
+
+  </div>
+</div>  
+
+</body>
+</html>

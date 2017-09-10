@@ -480,7 +480,7 @@ end
 
 It *should* be that $t-s$ is $y$ and so $c=0$. But if $s$ is large and $y$ small, then there is a loss of precision. The value of $c$ adjusts for this:
 
-* $(t-s)$ gets the high bits of $y$, subtracting $y$ from this sets $c$ to the *minus* the low bits of $y$. These are then subtracted off in the next step.
+* the value $(t-s)$ gets the high bits of $y$, subtracting $y$ from this sets $c$ to the *minus* the low bits of $y$. These are then subtracted off in the next step.
 
 
 ### Testing ...
