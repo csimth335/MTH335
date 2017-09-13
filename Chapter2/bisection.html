@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h2>Bisection in floating point</h2><p>Mathematically, we have an easy way to find the middle of two numbers, say $0 < a < b$:</p>$$~
+c = (a + b)/2
+~$$
+<p>Well, we can have issues with this if we try to put it on the computer.</p><p>In particular, out at the edge, we can overflow by adding two large numbers:</p><pre class="sourceCode julia">b = prevfloat(Inf)
+a = b/2
+(a + b)/2</pre>
+<pre class="output">
+Inf</pre>
+
+<p>This can be avoided by finding a difference and adding:</p><pre class="sourceCode julia">a + (b-a)/2</pre>
+<pre class="output">
+1.3482698511467367e308</pre>
+
+<p>In general this is a good practice as adding can lose precision.</p><p>So, we can control for really big values by using mathematics. What about other areas?</p><p>When $a < b$ are real–mathematical–numbers, there is always a number between $a$ and $b$. This is not so in floating point which is discrete:</p><pre class="sourceCode julia">a = 0.09999999999999998405
+b = 0.09999999999999999
+(a + b)/2   ## less than the real number 0.09999999999999998405</pre>
+<pre class="output">
+0.09999999999999998</pre>
+
+<p>It would require proof that the result of <code>c &#61; fl&#40;&#40;a&#43;b&#41;/2&#41;</code> satisfies <code>a &lt;&#61; c &lt;&#61; b</code> for machine numbers <code>a</code> and <code>b</code>. (Which may not be true with some rounding schemes)</p><p>If this were the case, we can stop if <code>a &#61;&#61; c</code>  or <code>b &#61;&#61; c</code>.</p><h2>Floating point bisection</h2><p>Rather than bisect in floating point, there is a trick to bisect over integers.</p><p>The floating point numbers are discrete and ordered, so there is a way to reinterpret them using <em>unsigned</em> integers:</p><pre class="sourceCode julia">a = Float16(0.1)
+bits(a)</pre>
+<div class="well well-sm">
+0010111001100110</div>
+
+<pre class="sourceCode julia">reinterpret(UInt16, a) |> bits</pre>
+<div class="well well-sm">
+0010111001100110</div>
+
+<p>Reinterpretation is cost free, basically, as the memory is just reinterpreted. Here we see the same bit pattern. But because of how these numbers are stored we have:</p><ul>
+<li><p>If <code>0 &lt; a &lt;  b</code> in floating point then <code>a &lt; b</code> as unsigned integers.</p>
+</li>
+</ul><p>Now division by <code>2</code> in unsigned integers is just a bit shift down:</p><pre class="sourceCode julia">UInt16(14) |> bits</pre>
+<div class="well well-sm">
+0000000000001110</div>
+
+<p>Compared to</p><pre class="sourceCode julia">UInt16(7) |> bits</pre>
+<div class="well well-sm">
+0000000000000111</div>
+
+<p>Division than can be fast using the <code>&gt;&gt;</code> shift operation:</p><pre class="sourceCode julia">UInt16(14) >> 1 |> bits</pre>
+<div class="well well-sm">
+0000000000000111</div>
+
+<p>For odd numbers it will be truncated or rounded down (7 goes to 3).</p><p>Returning to the problem, it is clear for integers that <code>a &lt;&#61; &#40;a&#43;b&#41;/2 &#61; a &#43;&#40;b-a&#41;/2 &lt;&#61; b</code> and equal to an endpoint only when the difference between a and b is at the last bit (<code>a-b &#61; 00000000....0001</code>).</p><p>So a terminating bisection algorithm that will terminate in a number of steps bounded by the storage size (16 for 16 bits) we be defined with the "midpoint" as follows:</p><pre class="sourceCode julia"># from Jason Merrill; Roots.jl
+_pairs = Dict(Float64 => UInt64, Float32 => UInt32, Float16 => UInt16)
+
+
+function _middle(x::T, y::T) where {T <: Union{Float64, Float32, Float16}}
+    # Use the usual float rules for combining non-finite numbers
+    if !isfinite(x) || !isfinite(y)
+        return x + y
+    end
+    
+    # Always return 0.0 when inputs have opposite sign
+    if sign(x) != sign(y) && !iszero(x) && ! iszero(y)
+        return 0.0
+    end
+    
+    negate = x < 0.0 || y < 0.0
+
+    # do division over unsigned integers with bit shift
+    xint = reinterpret(_pairs[T], abs(x))
+    yint = reinterpret(_pairs[T], abs(y))
+    mid = (xint + yint) >> 1
+
+	# reinterpret in original floating point
+    unsigned = reinterpret(T, mid)
+    val =  negate ? -unsigned : unsigned
+
+    (val, bits(xint), bits(yint), bits(mid))
+    
+end</pre>
+<pre class="output">
+_middle (generic function with 1 method)</pre>
+
+<p>We can see the algorithm in action:</p><pre class="sourceCode julia">a, b = Float16(2.5), Float16(100.5)
+ai, bi = reinterpret(UInt16, a), reinterpret(UInt16, b)
+bits(ai), bits(bi)</pre>
+<pre class="output">
+("0100000100000000", "0101011001001000")</pre>
+
+<p>And the sum</p><pre class="sourceCode julia">bits(ai + bi)</pre>
+<div class="well well-sm">
+1001011101001000</div>
+
+<p>And the "middle":</p><pre class="sourceCode julia">bits((ai + bi) >> 1)</pre>
+<div class="well well-sm">
+0100101110100100</div>
+
+<p>And as a floating point number:</p><pre class="sourceCode julia">reinterpret(Float16, (ai + bi) >> 1)</pre>
+<pre class="output">
+Float16(15.28)</pre>
+
+<p>We can see by looking the bits from left to right that the value is in the middle:</p><pre class="sourceCode julia">[bits(ai), bits((ai+bi) >> 1), bits(bi)]</pre>
+<pre class="output">
+3-element Array{String,1}:
+ "0100000100000000"
+ "0100101110100100"
+ "0101011001001000"</pre>
+
+<p>This begs the question of looking at what <code>&#40;b-a&#41;/2</code> is:</p><pre class="sourceCode julia">[bits(ai), bits(bi - ai), bits((bi - ai) >> 1), bits(bi)]</pre>
+<pre class="output">
+4-element Array{String,1}:
+ "0100000100000000"
+ "0001010101001000"
+ "0000101010100100"
+ "0101011001001000"</pre>
+
+
+  </div>
+</div>  
+
+</body>
+</html>
