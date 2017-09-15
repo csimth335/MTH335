@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<pre class="sourceCode julia">midpoint(a,b, f) = (a+b)/2</pre>
+<pre class="output">
+midpoint (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">function alldone(a, b, c, fc, n, delta, epsilon, MAXITER)
+    n > MAXITER && throw(DomainError())
+    norm(b - a) <= b * delta && return true
+    norm(fc) <= epsilon * c && return true
+    false
+end</pre>
+<pre class="output">
+alldone (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">function bisect(f, a, b; delta=eps(), epsilon=eps(), MAXITER=100, verbose=false)
+
+
+    
+    fa, fb = f(a), f(b)
+    sign(fa)*sign(fb) >= 0 && throw(DomainError())
+    
+    fncalls = 2
+    nsteps = 0
+
+    
+    c = midpoint(a, b, f)
+    fc = f(c)
+    
+    while !alldone(a, b, c, fc, nsteps, delta, epsilon, MAXITER)
+
+        iszero(fc) && return (c, nsteps, fncalls)
+        if sign(fc) * sign(fa) < 0.0
+            b, fb = c, fc
+        else
+            a, fa = c, fc
+        end
+
+        c = midpoint(a, b, f)
+        fc = f(c)
+        fncalls += 1
+        nsteps += 1
+        verbose && println(c)
+    end
+
+    (c, nsteps, fncalls)
+end</pre>
+<pre class="output">
+bisect (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">bisect(sin, 3, 4)[1] ≈ pi</pre>
+<pre class="output">
+true</pre>
+
+<pre class="sourceCode julia">bisect(log, 1/10, 10^6)[1] ≈ 1</pre>
+<pre class="output">
+true</pre>
+
+<pre class="sourceCode julia">bisect(log, .1, 10^20, delta=1e-16, epsilon=0) # error</pre>
+<pre class="output">
+DomainError()
+</pre>
+
+<p>better</p><pre class="sourceCode julia">midpoint(a, b, f) = a + (b-a)/2</pre>
+<pre class="output">
+midpoint (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">bisect(log, .1, 10^20)[1] ≈ 1</pre>
+<pre class="output">
+false</pre>
+
+<pre class="sourceCode julia">bisect(sin, 3, 4)</pre>
+<pre class="output">
+(3.141592653589793, 47, 49)</pre>
+
+<p>We might try a stopping rule that assumes floating point numbers are being used–as they are. This one would stop when the interval <code>&#91;a,b&#93;</code> can't be subdivided (an impossibility mathematically, but should be the case over the machine numbers):</p><pre class="sourceCode julia">function alldone(a, b, c, fc, n, delta, epsilon, MAXITER)
+   a < c < b && return false
+   true
+end</pre>
+<pre class="output">
+alldone (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">x, n, fncalls = bisect(sin, 3, 4)</pre>
+<pre class="output">
+(3.141592653589793, 51, 53)</pre>
+
+<pre class="sourceCode julia">x, n, fncalls = bisect(x -> x^20 - 1, 0, pi)</pre>
+<pre class="output">
+(1.0, 53, 55)</pre>
+
+<p>Regula falsi can be much faster</p><p>Here the "midpoint" comes from the intersection point of the secant line between <code>&#40;a, f&#40;a&#41;&#41;</code> and <code>&#40;b,f&#40;b&#41;&#41;</code>.</p><pre class="sourceCode julia">function midpoint(a, b, f)
+    # c = a - f(a) / (f(b)-f(a)/(b-a))
+    c = (a * f(b) - f(a) * b)/(f(b) - f(a))  # simplified
+    c
+end</pre>
+<pre class="output">
+midpoint (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">x, n, fncalls = bisect(sin, 3, 4)</pre>
+<pre class="output">
+(3.141592653589793, 4, 6)</pre>
+
+<p>But this method can have issues not <em>always</em> here:</p><pre class="sourceCode julia">f(x) = x^20 - 1 # f(1) = 0
+x, n, fncalls = bisect(f, 0, 2)  # moves too slow, note number of steps</pre>
+<pre class="output">
+(0.9999999999956345, 1935384, 1935386)</pre>
+
+
+  </div>
+</div>  
+
+</body>
+</html>
