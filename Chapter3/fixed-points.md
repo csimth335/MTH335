@@ -74,7 +74,7 @@ $$~
 |x_n - x_{n-1}| \leq \lambda^{n-1} |x_1 - x_0|.
 ~$$
 
-This implies the sequence $x_n$will converge:
+This implies the sequence $x_n$ will converge:
 
 We write
 
