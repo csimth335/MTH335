@@ -174,13 +174,7 @@ A</pre>
 
 <p>To put in <em>variables</em> we can use symbolic math:</p><pre class="sourceCode julia">using SymPy
 x = [symbols("x$i") for i in 1:3]</pre>
-<div class="well well-sm">
-\begin{bmatrix}x_{1}\\x_{2}\\x_{3}\end{bmatrix}</div>
-
 <p>And from here:</p><pre class="sourceCode julia">A*x - b</pre>
-<div class="well well-sm">
-\begin{bmatrix}x_{1} + 2 x_{2} + 3 x_{3} - 4\\5 x_{1} + 6 x_{2} + 7 x_{3} - 8\\9 x_{1} + 10 x_{2} + 11 x_{3} - 12\end{bmatrix}</div>
-
 <h3>Notation</h3><p>We saw $A$ has $m$ rows and $n$ columns.</p><p>Here we can view $x$ and $b$ as <em>vectors</em> or as matrices with 1 column. This is an identification, they are not mathematically the same thing.</p><h4>A matrix is a vector! A vector is not a matrix!</h4><p>A basic matrix in <code>Julia</code> is stored in contiguous memory, so has an order. Here we can see what it is  by looking at the first 4 elements</p><pre class="sourceCode julia">A[1:4]</pre>
 <pre class="output">
 4-element Array{Int64,1}:
@@ -251,10 +245,9 @@ A</pre>
  32   77  122
  50  122  194</pre>
 
-<p>If we think of $A = [a_1; a_2; \cdots; a_m]$ as comprised of <em>row</em> vectors and $B = [b_1 b_2 \cdots b_p]$ as <em>column</em> vectors, then we have the $ij$ terms is the product $a_i \cdot b_j$. If we identify these row and column vectors as just vectors, this is the dot product.</p><pre class="sourceCode julia">A[1, :] * B[:, 2]</pre>
+<p>If we think of $A = [a_1; a_2; \cdots; a_m]$ as comprised of <em>row</em> vectors and $B = [b_1 b_2 \cdots b_p]$ as <em>column</em> vectors, then we have the $ij$ terms is the product $a_i \cdot b_j$. If we identify these row and column vectors as just vectors, this is the dot product.</p><pre class="sourceCode julia">dot(A[1, :], B[:, 2])</pre>
 <pre class="output">
-DimensionMismatch("Cannot multiply two vectors")
-</pre>
+32</pre>
 
 <pre class="sourceCode julia">(A*B)[1, 2]</pre>
 <pre class="output">
@@ -271,7 +264,7 @@ DimensionMismatch("Cannot multiply two vectors")
  -40   14   68</pre>
 
 <ul>
-<li><p>There is no cancellation property. That is if $A\cdot B=0$ is need not be that $B$ or $A$ must be $0$.</p>
+<li><p>There is no cancellation property. That is if $A\cdot B=0$ it need not be that $B$ or $A$ must be $0$.</p>
 </li>
 </ul><pre class="sourceCode julia">C = [1 0 0;-2 0 0; 1 0 0]</pre>
 <pre class="output">
@@ -366,7 +359,7 @@ A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
 <p>So if we look at the $k$th column vector of a matrix and write this as $A_{:k}$, then:</p>$$~
 I_{:k} = \sum_l b_{lk}A_{:l}
 ~$$
-<p>So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.</p><blockquote>
+<p>So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, and so the values $b_{lk}$ are uniquely defined.</p><blockquote>
 <p>Theorem: If $A$ and $B$ are square matrices, then a right inverse is a left inverse.</p>
 </blockquote><p>Suppose $B$ is a right inverse ($AB=I$). Then set $C = BA - I + B$ and note: $AC = ABA - AI + AB = A(BA) - A + I = I$, so $C=B$ and consequently $BA = I$ as well.</p><p>So, if a square matrix $A$ has a $n\times n$ right inverse it has a unique inverse and is called invertible. When it exists, the inverse is written $A^{-1}$.</p><h3>How to find an inverse?</h3><p>We return to system of equations. There we know a few basic facts:</p><ul>
 <li><p>we could interchange the order in how we define our equations and we would have the same answers</p>

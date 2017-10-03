@@ -192,7 +192,7 @@ A * B
 If we think of $A = [a_1; a_2; \cdots; a_m]$ as comprised of *row* vectors and $B = [b_1 b_2 \cdots b_p]$ as *column* vectors, then we have the $ij$ terms is the product $a_i \cdot b_j$. If we identify these row and column vectors as just vectors, this is the dot product.
 
 ```
-A[1, :] * B[:, 2]
+dot(A[1, :], B[:, 2])
 ```
 
 ```
@@ -207,7 +207,7 @@ Though matrix multiplication is defined and uses the same notation as multiplica
 A*B - B*A
 ```
 
-* There is no cancellation property. That is if $A\cdot B=0$ is need not be that $B$ or $A$ must be $0$.
+* There is no cancellation property. That is if $A\cdot B=0$ it need not be that $B$ or $A$ must be $0$.
 
 ```
 C = [1 0 0;-2 0 0; 1 0 0]
@@ -332,7 +332,7 @@ $$~
 I_{:k} = \sum_l b_{lk}A_{:l}
 ~$$
 
-So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, ans so the values $b_{lk}$ are uniquely defined.
+So the $k$th column vector of $I$ is a linear combination of the column vectors of $A$. This means the columns of $A$ span the same space as the columns of $I$, which is $R^n$. So the columns of $A$ form a basis for $R^n$, and so the values $b_{lk}$ are uniquely defined.
 
 > Theorem: If $A$ and $B$ are square matrices, then a right inverse is a left inverse.
 

@@ -490,16 +490,16 @@ L = U'</pre>
 <pre class="sourceCode julia">sort([norm(A*rand(2) - b) for _ in 1:10])</pre>
 <pre class="output">
 10-element Array{Float64,1}:
-  1.25078
-  1.87196
-  2.12804
-  2.43762
-  2.97192
-  2.99395
-  3.09864
-  3.91735
-  4.63025
- 10.5629 </pre>
+  1.84332
+  2.70617
+  5.05982
+  5.14646
+  5.23805
+  7.20612
+  7.45674
+  7.69621
+  8.72067
+ 10.6891 </pre>
 
 <h3>Why?</h3><p>(P279) Suppose $Ax=b$ has $A$ being $m \times n$ with $m > n$ and $rank(A) = n$. Then, this will typically have no solutions. In that case, what is sought is a best solution in the sense of minimizing $\| b - Ax \|_2$.</p><p>Now suppose $x$ solves $A^TAx=A^Tb$, and $y$ is some other value, then</p>$$~
 \begin{align}

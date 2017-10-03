@@ -121,7 +121,7 @@ A = \begin{array}{ccc}
 \end{array}
 ~$$
 
-Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could solve easily by: first solving row 2, then use that to solve row 3 and then finally row 4.
+Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could solve easily by: first solving row 2, then use that to solve row 3 and then finally row 1.
 
 Define $p = [p_1, p_2, \cdots, p_n]$,  to be a permutation vector if the mapping $i \rightarrow p_i$ maps the set $1, \dots, n$ to itself in a bijective manner *and* the matrix $(\alpha_{ij}) = (a_{p_i j})$ is either upper or lower triangular.
 
