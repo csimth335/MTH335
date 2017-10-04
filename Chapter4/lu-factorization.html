@@ -176,7 +176,7 @@ A = \begin{array}{ccc}
 0 & 5 & 6
 \end{array}
 ~$$
-<p>Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could solve easily by: first solving row 2, then use that to solve row 3 and then finally row 4.</p><p>Define $p = [p_1, p_2, \cdots, p_n]$,  to be a permutation vector if the mapping $i \rightarrow p_i$ maps the set $1, \dots, n$ to itself in a bijective manner <em>and</em> the matrix $(\alpha_{ij}) = (a_{p_i j})$ is either upper or lower triangular.</p><p>(In the above we would have $p_1 = 1, p_2 = 3$, and $p_3 = 2$.)</p><p>Then clearly we could solve the permuted system of equations. For example, in the case that we end up lower triangular, so that forward substitution works, we would have:</p>$$~
+<p>Clearly if we permuted rows 2 and 3 this would be upper triangular, so we could solve easily by: first solving row 2, then use that to solve row 3 and then finally row 1.</p><p>Define $p = [p_1, p_2, \cdots, p_n]$,  to be a permutation vector if the mapping $i \rightarrow p_i$ maps the set $1, \dots, n$ to itself in a bijective manner <em>and</em> the matrix $(\alpha_{ij}) = (a_{p_i j})$ is either upper or lower triangular.</p><p>(In the above we would have $p_1 = 1, p_2 = 3$, and $p_3 = 2$.)</p><p>Then clearly we could solve the permuted system of equations. For example, in the case that we end up lower triangular, so that forward substitution works, we would have:</p>$$~
 x_i = (b_{p_i} -  \sum_{j=1}^{i-1} a_{p_i j}) / a_{p_i i}.
 ~$$
 <h2>Why bother?</h2><p>Suppose we knew that $A=LU$, then we can solve $Ax = b$ easily by:</p><ul>
@@ -225,7 +225,7 @@ a_{ij} = \sum_{s = 1}^{min(i, j)} l_{is} u_{sj}.
 a_{kk} = \sum_{s=1}^{min(k,k)} \cdot = \sum_{s=1}^k \cdot = \sum_{s=1}^{k-1} l_{ks}u_{sk} + l_{kk} u_{kk}.
 ~$$
 <p>The first part of the right hand sum involves columns of $L$ for which $s < k$ and rows of $U$ or which $s < k$. So all values are known by our assumption. So if $l_{kk}$ is known (say assumed to 1 or some other non-zero value) we can solve for $u_{kk}$ in terms of known values. To be explicit:</p>$$~
-u_kk = (a_kk - \sum_{s=1}^{k-1} l_{ks}u_{sk} ) / l_{kk}.
+u_{kk} = (a_{kk} - \sum_{s=1}^{k-1} l_{ks}u_{sk} ) / l_{kk}.
 ~$$
 <p>Then to fill out the $k$ row of $U$, we consider for $j > k$ (for which $min(j,k) = l$):</p>$$~
 a_{kj} = \sum_{s=1}^{k-1} l_{ks} u_{sj} + l_{kk} u_{kj}
@@ -354,7 +354,7 @@ a_{kk} = \sum_s^{k-1} l_{ks} u_{sk} + l_{kk}u_{kk}
 ~$$
 <p>If the value of $l_{kk} = 1$, then $u_{kk}$ can be solved as the sum is now known. That is, we can fill out $L_k$ and $U_k$ with $A_k = L_k U_k$, as desired.</p><h2>Cholesky factorization</h2><p>We know the transpose of a lower triangular matrix is upper and vice versa. This gives hope to a factorization of the form $A = L L^T$, known as the Cholesky factorization. When is this possible?</p><blockquote>
 <p>Thm: If $A$ is real, symmetric and positive definite then it has a unque factorization $A=LL^T$ and $L$ has a positive diagonal.</p>
-</blockquote><p>Pf: We must have $Ax=0$ has only a solution $x=0$, as positive definite means $x^T A x > 0$ for non-zero $x$. By considering vectors of the form $x = [x_1 x_2 \cdot x_k 0 0 \cdots 0]$ we can see that $A_k$ will also be non-singular.</p><p>So by the last theorem $A= LU$ for some $l$ and $U$. But $A^T = A$ so $LU = (LU)^T = U^T L^T$. Multiplying on the right and left as follows gives</p>$$~
+</blockquote><p>Pf: We must have $Ax=0$ has only a solution $x=0$, as positive definite means $x^T A x > 0$ for non-zero $x$. By considering vectors of the form $x = [x_1 x_2 \cdot x_k 0 0 \cdots 0]$ we can see that $A_k$ will also be non-singular.</p><p>So by the last theorem $A= LU$ for some $L$ and $U$. But $A^T = A$ so $LU = (LU)^T = U^T L^T$. Multiplying on the right and left as follows gives</p>$$~
 \begin{align}
 L^{-1} (L U) (L^T)^{-1} &=L^{-1} U^T L^T (L^T)^{-1}\\
 U (L^T)^{-1} &= L^{-1} U^T.
@@ -370,7 +370,7 @@ x^T D x &= x^T (L^{-1}) A (L^T)^{-1} x\\
 \end{align}
 ~$$
 <p>The last line as $A$ is positive definite and $(L^{-1})^Tx$ is non-zero. The fact we can swap out the inverse and transpose of a matrix is something to prove.</p><h3>Proof take 2</h3><p>Here is an alternative <a href="http://www.math.iit.edu/~fass/477577_Chapter_7.pdf">proof</a>, perhaps more instructive. It requires a few facts about matrices which are symmetric and positive definite:</p><ul>
-<li><p>If $A$ is then $a_11 > 0$.</p>
+<li><p>If $A$ is then $a_{11} > 0$.</p>
 </li>
 <li><p>If $A$ is then any sub matrix formed by removing row $i$ and column $i$ will be</p>
 </li>
@@ -490,16 +490,16 @@ L = U'</pre>
 <pre class="sourceCode julia">sort([norm(A*rand(2) - b) for _ in 1:10])</pre>
 <pre class="output">
 10-element Array{Float64,1}:
-  1.84332
-  2.70617
-  5.05982
-  5.14646
-  5.23805
-  7.20612
-  7.45674
-  7.69621
-  8.72067
- 10.6891 </pre>
+ 1.59631
+ 2.34953
+ 2.83948
+ 2.9917 
+ 3.05481
+ 4.25942
+ 4.66051
+ 4.73319
+ 5.00539
+ 6.7586 </pre>
 
 <h3>Why?</h3><p>(P279) Suppose $Ax=b$ has $A$ being $m \times n$ with $m > n$ and $rank(A) = n$. Then, this will typically have no solutions. In that case, what is sought is a best solution in the sense of minimizing $\| b - Ax \|_2$.</p><p>Now suppose $x$ solves $A^TAx=A^Tb$, and $y$ is some other value, then</p>$$~
 \begin{align}

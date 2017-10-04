@@ -201,7 +201,7 @@ a_{kk} = \sum_{s=1}^{min(k,k)} \cdot = \sum_{s=1}^k \cdot = \sum_{s=1}^{k-1} l_{
 The first part of the right hand sum involves columns of $L$ for which $s < k$ and rows of $U$ or which $s < k$. So all values are known by our assumption. So if $l_{kk}$ is known (say assumed to 1 or some other non-zero value) we can solve for $u_{kk}$ in terms of known values. To be explicit:
 
 $$~
-u_kk = (a_kk - \sum_{s=1}^{k-1} l_{ks}u_{sk} ) / l_{kk}.
+u_{kk} = (a_{kk} - \sum_{s=1}^{k-1} l_{ks}u_{sk} ) / l_{kk}.
 ~$$
 
 Then to fill out the $k$ row of $U$, we consider for $j > k$ (for which $min(j,k) = l$):
@@ -400,7 +400,7 @@ We know the transpose of a lower triangular matrix is upper and vice versa. This
 
 Pf: We must have $Ax=0$ has only a solution $x=0$, as positive definite means $x^T A x > 0$ for non-zero $x$. By considering vectors of the form $x = [x_1 x_2 \cdot x_k 0 0 \cdots 0]$ we can see that $A_k$ will also be non-singular.
 
-So by the last theorem $A= LU$ for some $l$ and $U$. But $A^T = A$ so $LU = (LU)^T = U^T L^T$. Multiplying on the right and left as follows gives
+So by the last theorem $A= LU$ for some $L$ and $U$. But $A^T = A$ so $LU = (LU)^T = U^T L^T$. Multiplying on the right and left as follows gives
 
 $$~
 \begin{align}
@@ -435,7 +435,7 @@ The last line as $A$ is positive definite and $(L^{-1})^Tx$ is non-zero. The fac
 
 Here is an alternative [proof](http://www.math.iit.edu/~fass/477577_Chapter_7.pdf), perhaps more instructive. It requires a few facts about matrices which are symmetric and positive definite:
 
-* If $A$ is then $a_11 > 0$.
+* If $A$ is then $a_{11} > 0$.
 * If $A$ is then any sub matrix formed by removing row $i$ and column $i$ will be
 * If $A$ is and $L$ has full rank, then $LAL^T$ is one.
 
