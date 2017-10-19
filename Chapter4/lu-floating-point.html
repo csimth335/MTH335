@@ -135,7 +135,7 @@ l_{ik} = \frac{a_{ik}^{(k)} }{a_{kk}^{(k)}}.
 <p>Where the entries of $\Delta$ satisfy:</p>$$~
 |\Delta_{ij}| \leq \frac{6}{5}(n+1) \epsilon |l_{ij}|.
 ~$$
-<p>A similar theorem applies for solving $Uy=b$, though the bound is includes $|u_{ij}|$ terms.</p><h3>But with our pivoting...</h3><p>With our pivoting we have the entries of $L$ are bounded by $1$, as we pivot to make the row chosen have the largest value and our entries involve $a_{ik}^{(k)} / a_{kk}^{(k)}$. This isn't the case for $U$ and $U$ can grow. For example, consider this <a href="http://www.math.iit.edu/~fass/477577_Chapter_7.pdf">matrix</a>:</p><pre class="sourceCode julia">n = 5
+<p>A similar theorem applies for solving $Uy=b$, though the bound  includes $|u_{ij}|$ terms.</p><h3>But with our pivoting...</h3><p>With our pivoting we have the entries of $L$ are bounded by $1$, as we pivot to make the row chosen have the largest value and our entries involve $a_{ik}^{(k)} / a_{kk}^{(k)}$. This isn't the case for $U$ and $U$ can grow. For example, consider this <a href="http://www.math.iit.edu/~fass/477577_Chapter_7.pdf">matrix</a>:</p><pre class="sourceCode julia">n = 5
 A = I-tril(ones(Int, n,n),-1)
 A[:,n] = ones(Int, n)
 A</pre>
@@ -183,7 +183,7 @@ b = A[p,:]*x
 xtilde = U \ (L \ b)
 norm(x - xtilde, Inf)/norm(x, Inf)</pre>
 <pre class="output">
-0.011433011583447304</pre>
+0.01676620745275773</pre>
 
 <p>Whereas,</p><pre class="sourceCode julia">A = rand(n,n)
 L,U,p = lu(A)
@@ -192,7 +192,7 @@ b = A[p,:]*x
 xtilde = U \ (L \ b)
 norm(x - xtilde, Inf)/norm(x, Inf)</pre>
 <pre class="output">
-2.1376340128154933e-13</pre>
+2.5491915506233076e-13</pre>
 
 <p>This is quite a difference. In the book, we find this bound:</p>$$~
 \frac{\| x - \tilde{x}\|_\infty}{\|x\|_\infty} \leq 4n^2 g_n(A) \kappa_\infty(A) \epsilon
@@ -204,7 +204,7 @@ bound (generic function with 1 method)</pre>
 
 <p>Then we have for our random matrix</p><pre class="sourceCode julia">bound(A)</pre>
 <pre class="output">
-6.8603046251143e-10</pre>
+6.849075494946706e-10</pre>
 
 <p>This is a small bound and we see that the actual value is orders of magnitude less</p><p>And for our devious one – where there is a a big relative error – we have a very large bound:</p><pre class="sourceCode julia">A = I-tril(ones(n,n),-1)
 A[:,n] = ones(n)

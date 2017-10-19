@@ -36,15 +36,15 @@ M
 Then we look at the second row. We use that $M_{22}$ value to "knock out" those below it:
 
 ```
-M[3,:] = M[3,:] -3*M[2,:]
-M[4,:] = M[4,:] +1//2 * M[2,:]
+M[3,:] = M[3,:] - 3*M[2,:]
+M[4,:] = M[4,:] + 1//2 * M[2,:]
 M
 ```
 
 Finally, we use the third row to knock out the 4th:
 
 ```
-M[4,:] = M[4,:] +1//5*M[3,:]
+M[4,:] += 1//5*M[3,:]  # alternate syntax
 ```
 
 We have $U$ sitting in this:
@@ -236,7 +236,13 @@ Are we done? Our bookkeeping, `ps`, points to the pivot rows, to see $L$ and $U$
 ```
 L = L[ps, :]
 U = A[ps, :]
-L, U
+L
+```
+
+and
+
+```
+U
 ```
 
 And we verify
@@ -355,6 +361,9 @@ lu(A)
 
 This agrees with the factorization we found with partial pivoting. The empirical claim is that partial pivoting is nearly always better compared to complete pivoting due to the extra overhead required for complete pivoting.
 
+[pivoting](https://github.com/JuliaLang/julia/blob/master/base/linalg/lu.jl#L45)
+ in Julia code.
+
 ## Counting steps
 
 Suppose $A$ is $n \times n$. If applicable, mathematicallly solving $Ax = b$ is as easy as writing $x = A^{-1} b$. Why bother with $LUx = b$ and then solving both $Ly=b$ and $Ux=y$? (Actually we take  $[A ~b]$ and find $[U ~ b']$ then solve this backsubstitution problem.)
@@ -413,7 +422,7 @@ $$~
 f''(x) \approx \frac{f(x + h) - 2 f(x) + f(x-h)}{h^2}
 ~$$
 
-If we took an interval, say $[0,1]$ and split into a grid of $n+1$ points, then we could discretize $f$ on these points. Using just these point, then we would approximate the second derivative at each point as above. Suppose we had values $f_i = f((i-1_/n)$ for $i = 1, 1, \dots n+1$. Then we could do many of these derivatives at once using matrix notation. To be speicific, we take $n=4$. Then we get
+If we took an interval, say $[0,1]$ and split into a grid of $n+1$ points, then we could discretize $f$ on these points. Using just these points, then we would approximate the second derivative at each point as above. Suppose we had values $f_i = f((i-1_/n)$ for $i = 1, 1, \dots n+1$. Then we could do many of these derivatives at once using matrix notation. To be speicific, we take $n=4$. Then we get
 
 ```
 n=4
@@ -455,6 +464,8 @@ out = (A * fs) / h^2 + fs
 out[1:10]
 ```
 
-But our focus here is on the special shape of $A$ -- it is tridiagonal. that is $a_{ij} = 0$ if $|i-j| > 1$. For this system -- which does not need pivoting -- then number of `ops` is dramatically reduced, as each row is done with $2$ `ops`, so to get the $LU$ factorization can be done quite quickly.
+But our focus here is on the special shape of $A$ -- it is
+tridiagonal. that is $a_{ij} = 0$ if $|i-j| > 1$. For this system --
+which does not need pivoting -- then the number of `ops` is dramatically reduced, as each row is done with $2$ `ops`, so to get the $LU$ factorization can be done quite quickly.
 
 This is a good thing, as we see that large $n$s are needed to get accuracy, an if the algorithm scaled like $(1/3) \cdot n^3$ that would be a big problem.
