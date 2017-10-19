@@ -449,19 +449,24 @@ We see we don't have very good approximations to the second derivative. Were we 
 
 ```
 n = 1000
-xs = linspace(0, 1, n)
-fs = map(f, xs)
+a, b = 0, pi
+h = (b - a) /n 
 
-A = zeros(n,n)
-for i in 1:n A[i,i] = -2 end
-for i in 2:n
-  A[i,i-1] = 1
-  A[i-1, i] = 1
-end
-h = (1-0)/n
-out = (A * fs) / h^2 + fs
-## look at first 10:
-out[1:10]
+xs = linspace(a, b, n)
+fs = f.(xs)
+
+A = -2 * I + diagm(ones(n-1), 1) + diagm(ones(n-1), -1)  # I=identity,diagm=construct diagonal
+out = (A * fs) / h^2
+
+using Plots
+plot(xs[2:end-1], out[2:end-1])
+```
+
+And our error can be found from:
+
+```
+out1 = out + fs  # -sin(x) + sin(x)
+plot(xs[2:end-1], out1[2:end-1])
 ```
 
 But our focus here is on the special shape of $A$ -- it is
