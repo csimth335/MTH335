@@ -183,7 +183,7 @@ b = A[p,:]*x
 xtilde = U \ (L \ b)
 norm(x - xtilde, Inf)/norm(x, Inf)</pre>
 <pre class="output">
-0.01676620745275773</pre>
+0.002602195262101295</pre>
 
 <p>Whereas,</p><pre class="sourceCode julia">A = rand(n,n)
 L,U,p = lu(A)
@@ -192,7 +192,7 @@ b = A[p,:]*x
 xtilde = U \ (L \ b)
 norm(x - xtilde, Inf)/norm(x, Inf)</pre>
 <pre class="output">
-2.5491915506233076e-13</pre>
+2.272103366387565e-13</pre>
 
 <p>This is quite a difference. In the book, we find this bound:</p>$$~
 \frac{\| x - \tilde{x}\|_\infty}{\|x\|_\infty} \leq 4n^2 g_n(A) \kappa_\infty(A) \epsilon
@@ -204,7 +204,7 @@ bound (generic function with 1 method)</pre>
 
 <p>Then we have for our random matrix</p><pre class="sourceCode julia">bound(A)</pre>
 <pre class="output">
-6.849075494946706e-10</pre>
+2.647887805864984e-9</pre>
 
 <p>This is a small bound and we see that the actual value is orders of magnitude less</p><p>And for our devious one – where there is a a big relative error – we have a very large bound:</p><pre class="sourceCode julia">A = I-tril(ones(n,n),-1)
 A[:,n] = ones(n)
