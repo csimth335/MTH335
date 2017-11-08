@@ -273,8 +273,7 @@ q(x) = p(x) +  f[x_0, x_1, \dots, x_n, t] \cdot \prod (x - x_j)
 ~$$
 
 > Thm 4 p333: Divided differences look like *derivatives*. If $f$ has sufficient
-> derivatives, then if $a < x_0 < x_1 < \dots x_n < b$ there exists
-> $\xi$ in $(a,b)$ with
+> derivatives, then if $a<x_0<x_1<\dots x_n<b$ there exists $\xi$ in $(a,b)$ with
 
 $$~
 f[x_0, x_1, \dots, x_n] = \frac{1}{n!}f^{(n)}(\xi).
@@ -290,7 +289,7 @@ This is the error bound theorem in disguise.
 
 
 In calculus, we have that the tangent line is the limit of the secant
-line. Here we can view it as the limit of the newton interpolating
+line. Here we can view it as the limit of the Newton interpolating
 polynomial between $x_0$ and $x_1$ as $x_1 \rightarrow x_0$:
 
 ```
