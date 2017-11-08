@@ -65,13 +65,15 @@ Making the error as small as possible has to balance of both errors, as choosing
 
 Let's look at forming the derivative of the tangent.
 
-We have $f(x) = \atan(x)$ and $c=\sqrt{2}$ (as in the book
+We have $f(x) = \tan^{-1}(x)$ and $c=\sqrt{2}$ (as in the book
 
 ```
 f(x) = atan(x)
+fp(x) = 1/(1+x^2)
 c = sqrt(2)
 hs = [1/10^i for i in 5:20]
-[(f(c+h) - f(c)) / h for h in hs]
+ds = [(f(c+h) - f(c)) / h for h in hs]
+[hs ds ds.-fp(c)] # a table
 ```
 
 We see that somewhere the answer went off the rails.
@@ -126,13 +128,55 @@ Does this give a familiar formula?
 
 ```
 dd(f, xs) =   length(xs) ==1 ? f(xs[1]) : (dd(f,xs[2:end]) - dd(f,xs[1:end-1])) / (xs[end] - xs[1])
+Base.getindex(f::T, xs...) where {T <: Function} = dd(f, [xs...])
+
 using SymPy
 x,h = symbols("x,h")
 
 f(x) = atan(x)
 x0, x1, x2 = x-h, x, x + h
-dd(f, [x0,x1]) + dd(f, [x0,x1,x2])*(2x -(x0 + x1)) |> simplify
+f[x0,x1] + f[x0,x1,x2] * (2x -(x0 + x1)) |> simplify
 ```
+
+#### Keeping track of the error term
+
+We have -- in the LaGrange Base (p470):
+
+$$~
+f(x) = \sum_0^n f(x_i) l_i(x) + \frac{f^{(n+1)}(\xi)}{(n+1)!} w(x),
+\quad w(x) = \prod(x - x_i).
+~$$
+
+Then we can differentiate in $x$ using the product rule **and** noting
+the $\xi = \xi(x)$:
+
+$$~
+f'(x) =  \sum_0^n f(x_i) l_i'(x) +
+\frac{f^{(n+1)}(\xi)}{(n+1)!} w'(x) +
+\frac{d}{dx}(\frac{f^{(n+1)}(\xi)}{(n+1)!}) w(x) .
+~$$
+
+Rather than differentiate $\xi_x$, we take $x=x_\alpha$ as $w(x_\alpha) = 0$. So
+this simplifies to:
+
+$$~
+f'(x_\alpha) = \sum_0^n f(x_i) l_i'(x_\alpha)  +
+\frac{f^{(n+1)}(\xi)}{(n+1)!} w'(x_\alpha)
+~$$
+
+But $w'(x) = \sum_{i=0}^n \prod_{j\neq i}(x - x_j)$ so $w'(x_\alpha)=\prod_{j \neq \alpha}(x_\alpha - x_j).$
+
+This gives:
+
+
+$$~
+f'(x_\alpha) = \sum_0^n f(x_i) l_i'(x_\alpha)  +
+\frac{f^{(n+1)}(\xi)}{(n+1)!} \prod_{j \neq \alpha}(x_\alpha - x_j).
+~$$
+
+
+Example. What happens if equally spaced
+
 
 ### Automatic Differentation
 
@@ -164,11 +208,11 @@ Then we can just follow these rules. For example $\sin(x^2)$ would be the compos
 
 $$~
 \sin(x^2) =
-\begin{bmatrix}\sin(\cdot)\\\cos(\cdot)\end{bmatrix} \circ (
+\begin{bmatrix}\sin(\cdot)      \\  \cos(\cdot)\end{bmatrix} \circ (
 \begin{bmatrix}x\\1\end{bmatrix} \cdot \begin{bmatrix}x\\1\end{bmatrix} )
-= \begin{bmatrix}\sin(\cdot)\\\cos(\cdot)\end{bmatrix} \circ
-\begin{bmatrix}x \cdot x\\ x\cdot 1 + 1\cdot x\end{bmatrix}
-= \begin{bmatrix} \sin(x^2) \cos(x^2) \cdot 2x\end{bmatrix}
+= \begin{bmatrix}\sin(\cdot)    \\  \cos(\cdot)\end{bmatrix} \circ
+\begin{bmatrix}x \cdot x        \\ x\cdot 1 + 1\cdot x\end{bmatrix}
+= \begin{bmatrix} \sin(x^2)     \\ \cos(x^2) \cdot (x\cdot 1 + 1\cdot x) \end{bmatrix}
 ~$$
 
 We can implement this with just a little work:
@@ -196,7 +240,7 @@ import Base: *, +,-,  ^
 
 (F::DFunction)(G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
 (F::DFunction)(x::Real) = F.f(x)
-Base.ctranspose(F::DFunction) = x->F.fp(x) ## does '
+Base.transpose(F::DFunction) = x->F.fp(x) ## does '
 ```
 
 

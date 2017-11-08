@@ -128,28 +128,30 @@ We see the two errors that come in if this is done in floating point: the trunca
 $$~
 error = d h + \frac{10^{-16}}{h}
 ~$$
-<p>Making the error as small as possible has to balance of both errors, as choosing $h$ too small runs into floating point error and too big runs into truncation error.</p><h3>Example</h3><p>Let's look at forming the derivative of the tangent.</p><p>We have $f(x) = atan(x)$ and $c=\sqrt{2}$ (as in the book</p><pre class="sourceCode julia">f(x) = atan(x)
+<p>Making the error as small as possible has to balance of both errors, as choosing $h$ too small runs into floating point error and too big runs into truncation error.</p><h3>Example</h3><p>Let's look at forming the derivative of the tangent.</p><p>We have $f(x) = \tan^{-1}(x)$ and $c=\sqrt{2}$ (as in the book</p><pre class="sourceCode julia">f(x) = atan(x)
+fp(x) = 1/(1+x^2)
 c = sqrt(2)
 hs = [1/10^i for i in 5:20]
-[(f(c+h) - f(c)) / h for h in hs]</pre>
+ds = [(f(c+h) - f(c)) / h for h in hs]
+[hs ds ds.-fp(c)] # a table</pre>
 <pre class="output">
-16-element Array{Float64,1}:
-  0.333332
-  0.333333
-  0.333333
-  0.333333
-  0.333333
-  0.333333
-  0.333333
-  0.3334  
-  0.333067
-  0.333067
-  0.333067
-  0.0     
-  0.0     
-  0.0     
- -0.0     
-  0.0     </pre>
+16×3 Array{Float64,2}:
+  1.0e-5        0.333332  -1.57134e-6 
+  1.0e-6        0.333333  -1.57161e-7 
+  1.0e-7        0.333333  -1.57186e-8 
+  1.0e-8        0.333333  -5.72657e-9 
+  1.0e-9        0.333333   2.75801e-8 
+  1.0e-10       0.333333   2.75801e-8 
+  1.0e-11       0.333333   2.75801e-8 
+  1.0e-12       0.3334     6.6641e-5  
+  1.0e-13       0.333067  -0.000266426
+  1.0e-14       0.333067  -0.000266426
+  1.0e-15       0.333067  -0.000266426
+  1.0e-16       0.0       -0.333333   
+  1.0e-17       0.0       -0.333333   
+  1.0e-18       0.0       -0.333333   
+ -1.18389e-19  -0.0       -0.333333   
+  1.28762e-19   0.0       -0.333333   </pre>
 
 <p>We see that somewhere the answer went off the rails.</p><h3>A strategy</h3><p>Can we get smaller truncation error, so we can get more accuracy before round off considerations come into play?</p><p>The central difference will also converge to $f'$. However, the error is different:</p>$$~
 \begin{align}
@@ -158,28 +160,47 @@ hs = [1/10^i for i in 5:20]
 \end{align}
 ~$$
 <p>Subtract and divide by $2h$ to get:</p>$$~
-\frac{f(x+h) - f(x)}{2h} = f'(x) + \frac{h^2}{12}(f'''(\xi_1) + f'''(xi_2)).
+\frac{f(x+h) - f(x)}{2h} = f'(x) + \frac{h^2}{12}(f'''(\xi_1) + f'''(\xi_2)).
 ~$$
-<p>We we too assume $f'''$ is continuous, then we could replace $ (f'''(\xi_1) + f'''(xi_2))$ with $2f'''(\xi_3)$, so the error is basically</p>$$~
+<p>We we too assume $f'''$ is continuous, then we could replace $ (f'''(\xi_1) + f'''(\xi_2))$ with $2f'''(\xi_3)$, so the error is basically</p>$$~
 \frac{h^2}{6} f'''(\xi)
 ~$$
-<p>(The above is similar to a test question to find an approximate second derivative using $f(x+h)- 2f(x) + f(x-h)$...</p><h3>Relate to polynomial</h3><p>What would be derivative of the function if you only knew its values at $x-h, x, x+h$?</p><p>Well, we could find the interpolating polynomial and find its derivative.</p><p>For example, suppose in general we have points $x_0, x_1, x_2$:</p>$$~
+<h3>Relate to polynomial</h3><p>What would be derivative of the function if you only knew its values at $x-h, x, x+h$?</p><p>Well, we could find the interpolating polynomial and find its derivative.</p><p>For example, suppose in general we have points $x_0, x_1, x_2$:</p>$$~
 p2(x) = f[x_0] + f[x_0,x1](x-x_0) + f[x_0,x_1,x_2] (x-x0)(x-x1)
 ~$$
 <p>Differentiating:</p>$$~
 p2'(x) = f[x_0,x_1] + f[x_0, x_1, x_2](2x - (x_0+x_1))
 ~$$
 <p>Does this give a familiar formula?</p><pre class="sourceCode julia">dd(f, xs) =   length(xs) ==1 ? f(xs[1]) : (dd(f,xs[2:end]) - dd(f,xs[1:end-1])) / (xs[end] - xs[1])
+Base.getindex(f::T, xs...) where {T <: Function} = dd(f, [xs...])
+
 using SymPy
 x,h = symbols("x,h")
 
 f(x) = atan(x)
 x0, x1, x2 = x-h, x, x + h
-dd(f, [x0,x1]) + dd(f, [x0,x1,x2])*(2x -(x0 + x1)) |> simplify</pre>
+f[x0,x1] + f[x0,x1,x2] * (2x -(x0 + x1)) |> simplify</pre>
 <div class="well well-sm">
 $$\frac{1}{2 h} \left(\operatorname{atan}{\left (h - x \right )} + \operatorname{atan}{\left (h + x \right )}\right)$$</div>
 
-<h3>Automatic Differentation</h3><p><a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a> is an alternate means to compute numeric derivatives that does not suffer from truncation error. (This is different from symbolic differentiation.) There are two flavors, we will mention an implementation of <em>forward</em> automatic differentiation.</p><p>There are various ways to view this, but we will choose Taylor series.</p><p>Consider the first-order Taylor series for $f(x)$ about $c$:</p>$$~
+<h4>Keeping track of the error term</h4><p>We have – in the LaGrange Base (p470):</p>$$~
+f(x) = \sum_0^n f(x_i) l_i(x) + \frac{f^{(n+1)}(\xi)}{(n+1)!} w(x),
+\quad w(x) = \prod(x - x_i).
+~$$
+<p>Then we can differentiate in $x$ using the product rule <strong>and</strong> noting the $\xi = \xi(x)$:</p>$$~
+f'(x) =  \sum_0^n f(x_i) l_i'(x) +
+\frac{f^{(n+1)}(\xi)}{(n+1)!} w'(x) +
+\frac{d}{dx}(\frac{f^{(n+1)}(\xi)}{(n+1)!}) w(x) .
+~$$
+<p>Rather than differentiate $\xi_x$, we take $x=x_\alphpa$ as $w(x_\alpha) = 0$. So this simplifies to:</p>$$~
+f'(x_\alpha) = \sum_0^n f(x_i) l_i'(x_\alpha)  +
+\frac{f^{(n+1)}(\xi)}{(n+1)!} w'(x_\alpha)
+~$$
+<p>But $w'(x) = \sum_{i=0}^n \prod_{j\neq i}(x - x_j)$ so $w'(x_\alpha)=\prod_{j \neq \alpha}(x_\alpha - x_j).$</p><p>This gives:</p>$$~
+f'(x_\alpha) = \sum_0^n f(x_i) l_i'(x_\alpha)  +
+\frac{f^{(n+1)}(\xi)}{(n+1)!} \prod_{j \neq \alpha}(x_\alpha - x_j).
+~$$
+<p>Example. What happens if equally spaced</p><h3>Automatic Differentation</h3><p><a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a> is an alternate means to compute numeric derivatives that does not suffer from truncation error. (This is different from symbolic differentiation.) There are two flavors, we will mention an implementation of <em>forward</em> automatic differentiation.</p><p>There are various ways to view this, but we will choose Taylor series.</p><p>Consider the first-order Taylor series for $f(x)$ about $c$:</p>$$~
 f(x) = f(c) + f'(c)(x-c) + \mathcal{O}(x-c)^2
 ~$$
 <p>So, we can think of a function $f(x)$ in terms of $f(c)$ and $f'(c)$. With this, we can define an algebra of functions:</p>$$~
@@ -194,11 +215,11 @@ f(g(x)) &= \begin{bmatrix}f(g(x))\\ f'(g(x)) g'(x) \end{bmatrix}
 ~$$
 <p>Then we can just follow these rules. For example $\sin(x^2)$ would be the composition of the sine function with $x$ times itself:</p>$$~
 \sin(x^2) =
-\begin{bmatrix}\sin(\cdot)\\\cos(\cdot)\end{bmatrix} \circ (
+\begin{bmatrix}\sin(\cdot)      \\  \cos(\cdot)\end{bmatrix} \circ (
 \begin{bmatrix}x\\1\end{bmatrix} \cdot \begin{bmatrix}x\\1\end{bmatrix} )
-= \begin{bmatrix}\sin(\cdot)\\\cos(\cdot)\end{bmatrix} \circ
-\begin{bmatrix}x \cdot x\\ x\cdot 1 + 1\cdot x\end{bmatrix}
-= \begin{bmatrix} \sin(x^2) \cos(x^2) \cdot 2x\end{bmatrix}
+= \begin{bmatrix}\sin(\cdot)    \\  \cos(\cdot)\end{bmatrix} \circ
+\begin{bmatrix}x \cdot x        \\ x\cdot 1 + 1\cdot x\end{bmatrix}
+= \begin{bmatrix} \sin(x^2)     \\ \cos(x^2) \cdot (x\cdot 1 + 1\cdot x) \end{bmatrix}
 ~$$
 <p>We can implement this with just a little work:</p><pre class="sourceCode julia">type DFunction
 f
@@ -222,7 +243,7 @@ import Base: *, +,-,  ^
 
 (F::DFunction)(G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
 (F::DFunction)(x::Real) = F.f(x)
-Base.ctranspose(F::DFunction) = x->F.fp(x) ## does '</pre>
+Base.transpose(F::DFunction) = x->F.fp(x) ## does '</pre>
 <pre class="sourceCode julia">Sin(1) - sin(1)</pre>
 <pre class="output">
 0.0</pre>
@@ -245,7 +266,7 @@ x = symbols("x")
 <div class="well well-sm">
 $$-2.59132971171261 \cdot 10^{-29}$$</div>
 
-
+<p>Julia has several packages for computing automatic derivatives including <code>ForwardDiff</code> and <code>ReverseDiff</code>. (The difference is one is better with many inputs, the other with many outputs.)</p>
   </div>
 </div>  
 
