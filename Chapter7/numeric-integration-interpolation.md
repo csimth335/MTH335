@@ -17,7 +17,7 @@ using Polynomials
 f(x) = sin(x)
 x = poly([0.0])
 g = sum([ D(f,k)(0)*x^k / factorial(k) for k in 0:5])
-[g, polyint(g)]
+g, polyint(g)
 ```
 
 Integrating over $[0,\pi]$ gives an exact answer of 2. This one approximates via:
