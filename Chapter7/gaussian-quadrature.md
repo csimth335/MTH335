@@ -9,7 +9,7 @@ $$~
 In fact, we generalize this to include a positive *weight* function, $w(x)$:
 
 $$~
-\int_a^b f(x) w*x( dx = \sum_{i=0}^n f(x_i) A_i.
+\int_a^b f(x) w(x) dx = \sum_{i=0}^n f(x_i) A_i.
 ~$$
 
 With $f(x)$ interpolated by the polynomial $\sum f(x_i) l_i(x)$, we have
