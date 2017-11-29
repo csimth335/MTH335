@@ -107,7 +107,7 @@ $( document ).ready(function() {
 \int_a^b f(x) dx = \sum_{i=0}^n f(x_i) A_i.
 ~$$
 <p>In fact, we generalize this to include a positive <em>weight</em> function, $w(x)$:</p>$$~
-\int_a^b f(x) w*x( dx = \sum_{i=0}^n f(x_i) A_i.
+\int_a^b f(x) w(x) dx = \sum_{i=0}^n f(x_i) A_i.
 ~$$
 <p>With $f(x)$ interpolated by the polynomial $\sum f(x_i) l_i(x)$, we have</p>$$~
 A_i = \int_a^b w(x) \prod_{j=0, j \neq i}^n \frac{x-x_j}{x_i - x_j} dx
@@ -127,10 +127,16 @@ for n = 1:5
    push!(ps, simplify(p))
 end
 ps</pre>
+<div class="well well-sm">
+\begin{bmatrix}1\\x\\\frac{3 x^{2}}{2} - \frac{1}{2}\\\frac{x}{2} \left(5 x^{2} - 3\right)\\\frac{35 x^{4}}{8} - \frac{15 x^{2}}{4} + \frac{3}{8}\\\frac{x}{8} \left(63 x^{4} - 70 x^{2} + 15\right)\\\frac{231 x^{6}}{16} - \frac{315 x^{4}}{16} + \frac{105 x^{2}}{16} - \frac{5}{16}\end{bmatrix}</div>
+
 <p>Now, take $a=-1$, $b=1$ and $w(x) = 1$. Are these orthogonal? That is, do we have:</p>$$~
 \int_a^b p_i(x) p_j(x) w(x) dx = \int_{-1}^1 p_i(x) p_j(x) dx = 0?
 ~$$
 <p>We can check. For example,</p><pre class="sourceCode julia">[integrate(ps[end] * ps[i], (x, -1, 1)) for i in 1:length(ps)-1]</pre>
+<div class="well well-sm">
+\begin{bmatrix}0\\0\\0\\0\\0\\0\end{bmatrix}</div>
+
 <p>So $p_i$ is orthogonal to any linear combination of the $p_j, j < i$. But these polynomials span the space of polynomials of degree $i-1$. So they are $w$-orthogonal.</p><h3>Gaussian quadrature theorem</h3><blockquote>
 <p>(p 493) If $q(x)$ is a non-zero polynomial of degree $n+1$, $w$-orthogonal to $\Pi_n$ and $x_0, x_1, \dots, x_n$ are the <em>zeros</em> of $q$, then the quadrature formula will be exact for all functions in $\Pi_{2n+1}$.</p>
 </blockquote><p>Before seeing why, let's see that it works with $P_4$:</p><pre class="sourceCode julia">p4 = ps[5] # 1/8 *(35x^4 - 30x^2+3)
@@ -157,17 +163,44 @@ end</pre>
 l (generic function with 1 method)</pre>
 
 <p>With these, we define $A_i$ via:</p><pre class="sourceCode julia">Ais = [integrate(l(i), (x, -1,1)) for i in 0:3]</pre>
+<div class="well well-sm">
+\begin{bmatrix}\frac{\sqrt{30}}{36} + \frac{1}{2}\\- \frac{\sqrt{30}}{36} + \frac{1}{2}\\\frac{\sqrt{30}}{36} + \frac{1}{2}\\- \frac{\sqrt{30}}{36} + \frac{1}{2}\end{bmatrix}</div>
+
 <p>Then the claim is $\sum f(x_i) A_i$ will be exactly the integral $\int f(x) dx$ for any $7$th degree polynomial or less. Let's try a polynomial:</p><pre class="sourceCode julia">f(x) = 5x^5 - 4x^4
 integrate(f(x), (x, -1, 1))</pre>
+<div class="well well-sm">
+$$- \frac{8}{5}$$</div>
+
 <p>And compare with:</p><pre class="sourceCode julia">sum([f(xi) * Ais[i] for (i,xi) in enumerate(xis)])</pre>
+<div class="well well-sm">
+$$\left(- \frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 5 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}} - 4 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2}\right) + \left(\frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 4 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2} - 5 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}}\right) + \left(\frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 4 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2} + 5 \left(- \frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}}\right) + \left(- \frac{\sqrt{30}}{36} + \frac{1}{2}\right) \left(- 4 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{2} + 5 \left(\frac{2 \sqrt{30}}{35} + \frac{3}{7}\right)^{\frac{5}{2}}\right)$$</div>
+
 <p>Wow, not even close. But let's simplify:</p><pre class="sourceCode julia">sum([f(xi) * Ais[i] for (i,xi) in enumerate(xis)]) |> simplify</pre>
+<div class="well well-sm">
+$$- \frac{8}{5}$$</div>
+
 <p>Now let's try for some "arbitrary" polynomial:</p><pre class="sourceCode julia">f(x) = exp(x)
 p = series(f(x), x, n=8) |> removeO # 7th degree poly</pre>
+<div class="well well-sm">
+$$\frac{x^{7}}{5040} + \frac{x^{6}}{720} + \frac{x^{5}}{120} + \frac{x^{4}}{24} + \frac{x^{3}}{6} + \frac{x^{2}}{2} + x + 1$$</div>
+
 <pre class="sourceCode julia">integrate(p, (x, -1, 1))</pre>
+<div class="well well-sm">
+$$\frac{5923}{2520}$$</div>
+
 <p>And compare with:</p><pre class="sourceCode julia">sum([subs(p,x,xi) * Ais[i] for (i,xi) in enumerate(xis)]) |> simplify</pre>
+<div class="well well-sm">
+$$\frac{5923}{2520}$$</div>
+
 <p>The theorem does <em>not</em> guarantee this is true for 8th degree polynomials:</p><pre class="sourceCode julia">p = series(f(x), x, n=9) |> removeO
 integrate(p, (x, -1,1))</pre>
+<div class="well well-sm">
+$$\frac{426457}{181440}$$</div>
+
 <p>Compare with</p><pre class="sourceCode julia">sum([subs(p,x,xi) * Ais[i] for (i,xi) in enumerate(xis)]) |> simplify</pre>
+<div class="well well-sm">
+$$\frac{58045529}{24696000}$$</div>
+
 <h3>Proof</h3><p>We have $q$ given. Take $f$  a polynomial of degree $2n+1$ or less. Then we can do polynomial long division to write:</p>$$~
 f(x) = q(x) p(x) + r(x)
 ~$$

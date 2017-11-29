@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Illustrations of numerical integration</h1><h2>Newton Cotes formulas and errors</h2><p>A Newton-Cotes formula uses an interpolating polynomial over $[a,b]$ to estimate $f$ and in turn the integral of $f$ over $[a,b]$. The nodes are evenly spaced, e.g.: <code>&#123;a&#125;</code>, <code>&#123;a,b&#125;</code>, <code>&#123;a,&#40;a&#43;b&#41;/2, b&#125;</code>, ...</p><pre class="sourceCode julia">function interpolating_nodes(a, b, n)
+  n == 0 && return [a]
+  collect(linspace(a,b,n+1))
+end
+
+function l(i, nodes)
+  length(nodes) == 1 && return(x -> 1.0)
+  x -> begin
+    prod((x-nodes[j])/(nodes[i]-nodes[j]) for j in eachindex(nodes) if i !== j)
+  end
+end
+
+function poly_interp(f, nodes)
+  x -> sum(f(nodes[i]) * l(i, nodes)(x) for i in eachindex(nodes))
+end
+
+function quadrature(f, a, b, nodes)
+	As = [quadgk(l(i, nodes), a, b)[1] for i in eachindex(nodes)]
+	sum(f(nodes[i]) * As[i] for i in eachindex(nodes))
+end
+   
+function newton_cotes(f, a, b, n)
+  nodes = interpolating_nodes(a, b, n)
+  quadrature(f, a, b, nodes)
+end</pre>
+<pre class="output">
+newton_cotes (generic function with 1 method)</pre>
+
+<pre class="sourceCode julia">using Plots, QuadGK
+f = sin
+a, b = 0, pi/2
+plot(f, a, b)
+plot!(poly_interp(f, interpolating_nodes(a, b, 0)), color=:red)
+plot!(poly_interp(f, interpolating_nodes(a, b, 1)), color=:brown)
+plot!(poly_interp(f, interpolating_nodes(a, b, 2)), color=:yellow)</pre>
+    <div id="ebca43f6-5f02-4d3d-9a36-77cb0365a446" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('ebca43f6-5f02-4d3d-9a36-77cb0365a446');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.015339511014701464,0.15653518043614337,0.24005492356825142,0.3093338647765429,0.38275885138299665,0.4483830820525568,0.5161370180225519,0.590748224715583,0.6530897057668233,0.7043605909815007,0.7563355122164005,0.8041934085546572,0.8516024395353533,0.8910446310661762,0.9259160470831407,0.9502400551809932,0.9735169253637492,0.9888182032633145,0.9998007366681562],"type":"scatter","name":"y1","yaxis":"y","x":[0.015340112644426933,0.15718160432911563,0.24242242858978297,0.3144924606585486,0.3927807160357447,0.46495556277463396,0.5423346264010439,0.6319858600091139,0.7116572965148645,0.7815219666990599,0.857693210854355,0.9343171616249684,1.019034737503921,1.0996413732821289,1.1834535718383798,1.254005590649321,1.3401416088813418,1.4211120065657248,1.5508328626745866]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(255, 0, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"type":"scatter","name":"y2","yaxis":"y","x":[0.030335456947418245,0.16898906748883188,0.25231410805976,0.3227643694006629,0.3992930997609362,0.4698458200669679,0.5454857927201436,0.6331221188868436,0.7110029434420451,0.7792974083075003,0.8537567071778271,0.9286585381026631,1.0114720902757113,1.090267095541802,1.172195618706738,1.2411619840694808,1.3253620991675366,1.404512690807329,1.5313180765120993]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(165, 42, 42, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.019312151696531967,0.10758178167735,0.16062815003813374,0.20547817937621596,0.25419788227775314,0.2991131390188927,0.3472670411912475,0.40305805920662313,0.4526385320067551,0.49611613868336696,0.5435184005808441,0.5912023871341282,0.6439231318674851,0.694085590183686,0.7462429079513597,0.7901482597696085,0.8437517178766569,0.894140549509141,0.9748673652914952],"type":"scatter","name":"y3","yaxis":"y","x":[0.030335456947418245,0.16898906748883188,0.25231410805976,0.3227643694006629,0.3992930997609362,0.4698458200669679,0.5454857927201436,0.6331221188868436,0.7110029434420451,0.7792974083075003,0.8537567071778271,0.9286585381026631,1.0114720902757113,1.090267095541802,1.172195618706738,1.2411619840694808,1.3253620991675366,1.404512690807329,1.5313180765120993]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(255, 255, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.03500189247883912,0.18711736496195736,0.27232228476988474,0.34072462129908815,0.41125218921893886,0.47278830376205105,0.5350488073335203,0.6023794977613041,0.657887061143496,0.7032104235614173,0.749056264072096,0.7914184147033468,0.8338699830384093,0.8699861708053407,0.903117538460451,0.9275130645548801,0.952967206109817,0.9725538503934184,0.9951646461642196],"type":"scatter","name":"y4","yaxis":"y","x":[0.030335456947418245,0.16898906748883188,0.25231410805976,0.3227643694006629,0.3992930997609362,0.4698458200669679,0.5454857927201436,0.6331221188868436,0.7110029434420451,0.7792974083075003,0.8537567071778271,0.9286585381026631,1.0114720902757113,1.090267095541802,1.172195618706738,1.2411619840694808,1.3253620991675366,1.404512690807329,1.5313180765120993]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.2,0.4,0.6000000000000001,0.8,1.0,1.2000000000000002,1.4000000000000001],"visible":true,"ticks":"inside","range":[0.015340112644426933,1.5508328626745866],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.2","0.4","0.6","0.8","1.0","1.2","1.4"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.2,0.4,0.6000000000000001,0.8],"visible":true,"ticks":"inside","range":[0.0,0.9998007366681562],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.0","0.2","0.4","0.6","0.8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
+<p>How accurate for the sine function</p><pre class="sourceCode julia">quadgk(f, a, b)  # 1.0</pre>
+<pre class="output">
+(0.9999999999999999, 1.1102230246251565e-16)</pre>
+
+<pre class="sourceCode julia">[newton_cotes(f, a, b, i) for i in 0:6] .- 1.0</pre>
+<pre class="output">
+7-element Array{Float64,1}:
+ -1.0       
+ -0.214602  
+  0.00227988
+  0.00100492
+ -8.43453e-6
+ -4.73861e-6
+  2.58372e-8</pre>
+
+<p>Should be exact for polynomials of degree $n$ or less – but not necessarily more:</p><pre class="sourceCode julia">a, b = 0, 1
+function err(n)
+  fn = x -> x^n  # x-> x^(n+1)
+  nodes = interpolating_nodes(a, b, n)
+  p = poly_interp(fn, nodes)
+  newton_cotes(p, a, b, n) - quadgk(fn, a, b)[1]
+end
+[err(n) for n in 0:6]</pre>
+<pre class="output">
+7-element Array{Float64,1}:
+  0.0        
+  0.0        
+  5.55112e-17
+  5.55112e-17
+ -2.77556e-17
+ -2.77556e-17
+ -5.55112e-17</pre>
+
+<h2>Gauss quadrature</h2><p>Legendre polynomials satisfy $P_0=1$, $P_1(x) = x$, and $(n+1)P_{n+1}(x) = (2n+1)xP_n(x) -nP_{n-1}(x)$.</p><pre class="sourceCode julia">using SymPy
+@vars x
+ps = Sym[1, x]
+for n = 1:5
+   pn, pn_1 = ps[end], ps[end-1]
+   p =( (2n+1) * x*pn - n*pn_1 ) * (1// (n+1))
+   push!(ps, simplify(p))
+end
+ps</pre>
+<div class="well well-sm">
+\begin{bmatrix}1\\x\\\frac{3 x^{2}}{2} - \frac{1}{2}\\\frac{x}{2} \left(5 x^{2} - 3\right)\\\frac{35 x^{4}}{8} - \frac{15 x^{2}}{4} + \frac{3}{8}\\\frac{x}{8} \left(63 x^{4} - 70 x^{2} + 15\right)\\\frac{231 x^{6}}{16} - \frac{315 x^{4}}{16} + \frac{105 x^{2}}{16} - \frac{5}{16}\end{bmatrix}</div>
+
+<p>We were told these were <em>orthogonal</em>:</p><pre class="sourceCode julia">w = 1
+[integrate(ps[i] * ps[j] * w, (x, -1, 1)) for i in eachindex(ps), j in eachindex(ps) if i < j]</pre>
+<div class="well well-sm">
+\begin{bmatrix}0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\end{bmatrix}</div>
+
+<p>We were told that these give exact quadrature for polynomials in $\Pi_{2n+1}$.</p><pre class="sourceCode julia">n = 5
+a,b = -1, 1
+pn = ps[n+1]  # 1 - based
+nodes = solve(pn)  # solve p(x) == 0  </pre>
+<div class="well well-sm">
+\begin{bmatrix}0\\- \sqrt{- \frac{2 \sqrt{70}}{63} + \frac{5}{9}}\\\sqrt{- \frac{2 \sqrt{70}}{63} + \frac{5}{9}}\\- \sqrt{\frac{2 \sqrt{70}}{63} + \frac{5}{9}}\\\sqrt{\frac{2 \sqrt{70}}{63} + \frac{5}{9}}\end{bmatrix}</div>
+
+<pre class="sourceCode julia">function err(i)
+   fn = x -> x^i
+   Fn = x -> x^(i+1)/(i+1)
+   quadrature(fn, a, b, N.(nodes)) - (Fn(b) - Fn(a))
+end
+n = length(nodes) - 1   
+[err(i) for i in 0:2n+1]</pre>
+<pre class="output">
+10-element Array{Float64,1}:
+ -2.22045e-16
+ -1.11022e-16
+  0.0        
+ -5.55112e-17
+  0.0        
+ -5.55112e-17
+  0.0        
+ -5.55112e-17
+  0.0        
+ -4.16334e-17</pre>
+
+<p>But 10th degree polys are not necessarily exact:</p><pre class="sourceCode julia">fn = x -> x^10
+Fn = x -> x^11/11
+quadrature(fn, a, b, N.(nodes)) - (Fn(b) - Fn(a))</pre>
+<pre class="output">
+-0.002931812455622018</pre>
+
+<h2>Error</h2><p>Thm 4 on p497 has: if $f$ is in $C^{2n}([a,b])$ where $g(x)$ is of degree $n$ (so that there are $n$ nodes) then (note $n-1$):</p>$$~
+E = \int_a^b f(x) w(x)dx - \sum_{i-1}^{n-1} f(x_i) A_i
+= \frac{f^{(2n)}(\xi)}{(2n)!} \int_a^b q^2(x) w(x) dx
+= \frac{f^{(2n)}(\xi)}{(2n)!} \langle q,q \rangle_w
+~$$
+<p>Here $q(x) = \Pi(x - x_i)$.</p><p>For this $n=5$ we have the exact integral</p><pre class="sourceCode julia">q = prod(x-xi for xi in nodes)
+integrate(q*q*w, (x, a, b))</pre>
+<div class="well well-sm">
+$$\frac{128}{43659}$$</div>
+
+<p>So for $f(x) = x^{10}$  we have $f^{(10)}(\xi)/10! = 1$ and so the error is</p><pre class="sourceCode julia">float(integrate(q*q*w, (x, a, b)))</pre>
+<pre class="output">
+0.0029318124556219796</pre>
+
+<p>Which matches what was previously found.</p><h3>Simpson's error</h3><p>If we used 5 points and simpson's formula, then we would apply simpsons over $x_0, x_1, x_2$ and $x_2, x_3, x_4$. How accurate would that be?</p><pre class="sourceCode julia">nodes = N.(nodes) # make floating point
+quadrature(fn, nodes[1], nodes[3], nodes[1:3]) +
+quadrature(fn, nodes[3], nodes[5], nodes[3:5]) - (Fn(1) - Fn(-1))</pre>
+<pre class="output">
+-0.118219124196878</pre>
+
+<p>So quite far off by comparison</p><h2>QuadGk</h2><p>The <a href="https://github.com/JuliaMath/QuadGK.jl">QuadGK</a> package, as seen, performs integration. The name is now less opaque:</p><ul>
+<li><p><code>Quad</code> as we are performing quadrature</p>
+</li>
+<li><p><code>G</code> For Guass</p>
+</li>
+<li><p><code>K</code> is for Kronrod, who added a computationally important step</p>
+</li>
+</ul><p>The basic idea is to adaptively integrate over a region using Gaussian quadrature. If the estimated error in a region is too large, the region is split in two and Gaussian quadrature is used to investigate each piece. The method is quite efficient.</p><p>For example, with errors like $1/n$, $1/n^2$ and $1/n^4$ for Riemann, Trapezoid and Simpsons, we see that it might take 10^4 steps to get machine tolerance accuracy.</p><p>For example, to integrate $\sin(x)$ over $[0, \pi]$ using Simpson's we have</p><pre class="sourceCode julia">simpson(f, a, b) = 1/6 * (f(a) + 4f((a+b)/2) + f(b))
+a, b = 0, pi
+n = 10_000
+xs = linspace(a, b, n)
+sum(simpson(sin, a, b)*(b-a) for (a,b) in zip(xs[1:end-1], xs[2:end])) - 2.0</pre>
+<pre class="output">
+-1.1102230246251565e-15</pre>
+
+<p>How many function calls is this?</p><pre class="sourceCode julia">mutable struct CountingFunction
+  n::Int
+  f::Function
+  CountingFunction(f) = new(0, f)
+end
+(F::CountingFunction)(x) = (F.n += 1; F.f(x))</pre>
+<p>And</p><pre class="sourceCode julia">Sin = CountingFunction(sin)
+sum(simpson(Sin, a, b)*(b-a) for (a,b) in zip(xs[1:end-1], xs[2:end])) - 2.0</pre>
+<pre class="output">
+-1.1102230246251565e-15</pre>
+
+<p>How many steps:</p><pre class="sourceCode julia">Sin.n</pre>
+<pre class="output">
+29997</pre>
+
+<p>Whereas for <code>quadgk</code>:</p><pre class="sourceCode julia">Sin = CountingFunction(sin)
+quadgk(Sin, 0, pi)</pre>
+<pre class="output">
+(2.0, 1.7905676941154525e-12)</pre>
+
+<p>and</p><pre class="sourceCode julia">Sin.n</pre>
+<pre class="output">
+15</pre>
+
+
+  </div>
+</div>  
+
+</body>
+</html>
