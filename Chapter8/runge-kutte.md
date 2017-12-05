@@ -21,7 +21,15 @@ x''''(t) &= \dots
 \end{align}
 ~$$
 
-Now, we use the taylor expansion for a function of two variables:
+Substitute this into the Taylor expansion for $x(t+h)$ up to order 2
+
+$$~
+x(t+h) = x(t) + h f + h^2/2 \cdot(f_t + f_x f) + \mathcal{O}(h^3).
+= x(t) + 1/2 h\cdot f + h/2 ( f + h\cdot f_t + h \cdot f_x f).
+~$$
+
+The latter rewrites the last term so that we can use the following
+fact from the Taylor expansion for a function of two variables:
 
 $$~
 f(t+h, x+hf) = f(t, x) + f_t(t,x) h + f_x(t,x)hf + \mathcal{O}(h^2)
@@ -30,24 +38,51 @@ $$
 The choice of $hf$ is there so that we can substitute in for $f f_x$:
 
 $$~
-x(t+h) = x + f (h/2) + f(t+h, x + hf) h/2 +  \mathcal{O}(h^2)
+x(t+h) = x + (1/2) h \cdot f + (1/2) h \cdot f(t+h, x + hf) +  \mathcal{O}(h^2)
 ~$$
 
-This gives the formula to move a step:
+Let $F1 = h \cdot f$ and $F2 = h \cdot f(t + h, x + F1)$ then we get
+the approximation
 
 $$~
-x(t+h) = x(t) + \frac{1}{2} F_1+ \frac{1}{2} F_2,
+x(t+h) \approx x(t) + (1/2) F1 + (1/2) F2.
 ~$$
 
-With
-
-$$~
-F_1 = hf, \quad F_2 = hf(t+h, x + F_1)
-~$$
 
 The book calls this Heun's method (1859-1929).
 
 It is used like Euler's method:
+
+
+```
+f(t, x) = 1.0 - (1/2)* x^2
+h = 1/10
+t0, x0 = 0, 1
+n = 10               ## so t = h*n = 1
+F1(t,x) = h*f(t,x)
+F2(t,x) = f(t+h, x + F1(t,x))
+
+ts = Float64[t0]
+xs = Float64[x0]
+for i in 1:10
+ti, xi = ts[end], xs[end]
+
+xi1 = xi + 1/2 * F1(ti, xi) + 1/2 * F2(ti, xi)
+
+push!(ts, ti + h)
+push!(xs, xi1)
+end
+```
+
+```
+[ts xs]
+```
+
+```
+using Plots
+plot(ts, xs)
+```
+
 
 
 
@@ -60,7 +95,7 @@ x(t+h) = x + w_1 hf + w_2 hf(t +\alpha h, x + \beta h f) + \mathcal{O}(h^3)
 = x + w_1 hf + w_2 h \left( f + \alpha hf_t + \beta h f f_x\right) + \mathcal{O}(h^3)
 ~$$
 
-The coefficients satisfy: $w1 + w2=1, w_2\alpha = 1/2, w_2\beta = 1/2$.
+The coefficients satisfy: $w_1 + w_2=1, w_2\alpha = 1/2, w_2\beta = 1/2$.
 
 Setting $w_1 = 0, w_2 = 1, \alpha = \beta = 1/2$ gives:
 
@@ -68,12 +103,12 @@ $$~
 \begin{align}
 x(t+h) &= x(t) + F2\\
 F_1 &= h f(t,x)\\
-F_2 &= h f(t + h/2, x + F1/2).
+F_2 &= h f(t + h/2, x + F_1/2).
 \end{align}
 ~$$
 
 
-This is called a modified Euler method, which is of the form $x(t+h) = x(t) + F1$
+This is called a modified Euler method. (Euler's method is of the form $x(t+h) = x(t) + F_1$.)
 
 
 ### Example
@@ -160,7 +195,7 @@ The general form of an RK method becomes:
 
 $$~
 x_{n+1} = x_n + h \sum_{i=1}^s b_i k_i
-k_i = f(t_n + c_i h, x_n + h \sum_{j=1}^s a_{ij} k_j
+k_i = f(t_n + c_i h, x_n + h \sum_{j=1}^s a_{ij} k_j)
 ~$$
 
 Where, the coefficients $a,b,c$ are from a table:
@@ -177,6 +212,48 @@ c_s & a_{s1} & a_{s2} & \cdots & a_{ss}\\
 ~$$
 
 To see some examples: [Runge-Kutta](https://github.com/JuliaLang/ODE.jl/blob/master/src/runge_kutta.jl) .
+
+
+### Examples
+
+These methods -- and much more -- are implemented in Julia's
+differential equations packages. (These must be installed to be used on JuliaBox)
+
+For example,
+
+```
+using DifferentialEquations
+f(t, u) = pi * exp(-t) * cos(pi*t) - u
+u0 = 0.0
+tspan = (0.0, 1.0)
+prob = ODEProblem(f,u0,tspan)
+sol = solve(prob,DP5(),reltol=1e-8,abstol=1e-8) # solve(prob) for defaults
+sol(.5)
+```
+
+Here `DP5` specifies the Runge-Kutta method with order 4-5.
+
+
+Plotting a solution is easy:
+
+```
+plot(sol)
+```
+
+
+The `DP5()` bit specifies the RK-4-5 method, the adaptive `Tsit5()`,
+the default, is more efficient:
+
+```
+sol1 = solve(prob)
+plot!(sol1)
+```
+
+In MATLAB, the `ode45` function is the typical workhorse. A Julia
+implementation is
+[here](https://github.com/JuliaDiffEq/ODE.jl/blob/master/src/runge_kutta.jl).
+
+
 
 ## Error
 
