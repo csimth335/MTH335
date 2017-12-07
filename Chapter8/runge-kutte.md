@@ -86,25 +86,38 @@ plot(ts, xs)
 
 
 
-### General RK method
+### General second-order RK method
 
 The general second-order method may have coefficients:
 
 $$~
-x(t+h) = x + w_1 hf + w_2 hf(t +\alpha h, x + \beta h f) + \mathcal{O}(h^3)
-= x + w_1 hf + w_2 h \left( f + \alpha hf_t + \beta h f f_x\right) + \mathcal{O}(h^3)
+\begin{align}
+x(t+h) &= x + w_1 hf + w_2 hf(t +\alpha h, x + \beta h f) + \mathcal{O}(h^3) \\
+       &= x + w_1 hf + w_2 h \left( f + \alpha hf_t + \beta h f
+	   f_x\right) + \mathcal{O}(h^3) \quad \text{Using Taylor on
+	   f(.,.)}\\
+   & = x + h\cdot (w_1+w_2) f + h^2\cdot w_2\alpha f_t + h^2 w_2\beta
+   f f_x + \mathcal{O}(h^3)
+\end{align}
 ~$$
 
-The coefficients satisfy: $w_1 + w_2=1, w_2\alpha = 1/2, w_2\beta = 1/2$.
+Comparing to an earlier equation:
+
+$$~
+x(t+j_ = x + h \cdot  f + h^2 \cdot (1/2) f_t + h^2 \cdot (1/2) f
+f_x + + \mathcal{O}(h^3),
+~$$
+
+the coefficients should satisfy: $w_1 + w_2=1, w_2\alpha = 1/2, w_2\beta = 1/2$.
 
 Setting $w_1 = 0, w_2 = 1, \alpha = \beta = 1/2$ gives:
 
 $$~
-\begin{align}
+\begin{align*}
 x(t+h) &= x(t) + F2\\
 F_1 &= h f(t,x)\\
 F_2 &= h f(t + h/2, x + F_1/2).
-\end{align}
+\end{align*}
 ~$$
 
 
@@ -157,12 +170,12 @@ x(t+h) = x(t) + \frac{1}{6}F_1 + \frac{1}{3} F_2 + \frac{1}{3}F_3 + \frac{1}{6}F
 where
 
 $$~
-\begin{align}
+\begin{align*}
 F1(t,x) &= h f(t,x)\\
 F2(t,x) &= hf(t + h/2, x + F_1/2)\\
 F3(t,x) &=  hf(t + h/2, x + F_2/2)\\
 F4(t,x) &=  hf(t + h, x + F_3).
-\end{align}
+\end{align*}
 ~$$
 
 We can    visualize and compare:
@@ -198,7 +211,7 @@ x_{n+1} = x_n + h \sum_{i=1}^s b_i k_i
 k_i = f(t_n + c_i h, x_n + h \sum_{j=1}^s a_{ij} k_j)
 ~$$
 
-Where, the coefficients $a,b,c$ are from a table:
+Where, the coefficients $a,b,c$ are from a table (a Butcher Tableu)
 
 $$~
 \begin{array}{c|cccc}
@@ -207,9 +220,80 @@ c_2 & a_{21} & a_{22} & \cdots & a_{2s}\\
 &&\cdots&&\\
 c_s & a_{s1} & a_{s2} & \cdots & a_{ss}\\
 \hline
-& b_1 & b_2 & \cdots & b_n
+& b_1 & b_2 & \cdots & b_s
 \end{array}
 ~$$
+
+
+Specializing this to **explicit** equations -- ones where the $k_i$'s
+can be computed directly -- the matrix becomes lower triangular:
+
+
+$$~
+\begin{array}{c|cccc}
+
+0 &  &  & & \\
+c_2 & a_{21} & &  & \\
+&&\cdots&&\\
+c_s & a_{s1} & a_{s2} & \cdots & a_{s,s-1}\\
+\hline
+& b_1 & b_2 & \cdots & b_s
+\end{array}
+~$$
+
+Consistency -- a criteria for convergence -- imposes the condition
+$c_i = \sum_{j=1}^{i-1} a_{ij}$.
+
+
+With this, the Heun method:
+
+$$~
+\begin{align*}
+k1 &= f(t, x)\\
+k2 &= f(t + h, x + h\cdot k1)
+\end{align*}
+~$$
+
+Becomes
+
+$$~
+\begin{array}{c|ccc}
+0 & &     &\\
+1/2 & 1/2   &\\
+\hline
+& 1 & 1
+\end{array}
+~$$
+
+The modified Euler method becomes
+
+
+$$~
+\begin{array}{c|ccc}
+0 & &     &\\
+1 & 1   &\\
+\hline
+& 1/2 & 1/2
+\end{array}
+~$$
+
+
+
+And the 4th-order one
+
+$$~
+\begin{array}{c|ccccc}
+0 & &  & & & \\
+1/2 &  1/2 &&& \\
+1/2 &  0 & 1/2 &&\\
+1   &  0 & 0 & 1& \\
+&  1/6& 1/3 & 1/3 & 1/6 &
+\hline
+\end{array}
+~$$
+
+
+
 
 To see some examples: [Runge-Kutta](https://github.com/JuliaLang/ODE.jl/blob/master/src/runge_kutta.jl) .
 
@@ -253,28 +337,44 @@ In MATLAB, the `ode45` function is the typical workhorse. A Julia
 implementation is
 [here](https://github.com/JuliaDiffEq/ODE.jl/blob/master/src/runge_kutta.jl).
 
-
+Higher order RK methods are available, but as the order goes up, the
+number of function calls does as well, so typical is the 4-5 method.
 
 ## Error
 
 The local truncation error for the 4th order RK method is like $C h^5$, as the Taylor series used employs exact terms up to $h^4$.
 
 
-If we have, as in the book, $x$ be the approximate solution and $x^*$ the exact one, we have:
+If we have, as in the book, $x^*$ be the approximate solution and $x$
+the exact one (opposite the book, p543), we have:
 
 $$~
-x^*(t_0 + h) - x(t_0+h) = \text{local truncation error} = C h^5.
+x(t_0 + h) - x^*(t_0+h) = \text{local truncation error} = C h^5.
 ~$$
 
-How to monitor the growth of this error? The book suggests looking at $u$ -- the approximate value with one step of size $h$ and $v$ -- the approximate error of two steps of size $h/2$.
+This is manageable unless $C$ gets very big.
 
-Then we have $x^*(t+h) = u + Ch^5$ and if $C$ is constant:
+$C$ is a constant dependent on $t$ and $h$, but *suppose* it does not
+change as $t$ changes to $t+h$.
+
+
+Let $v$ be the value by taking one step of length $h$ from $t_0$.
+
+Let $u$ be the value by taking *two* steps of length $h/2$ from $t_0$.
+
+Then with this error, we have:
 
 $$~
 \begin{align}
-x(t + h/2) &= v + C(h/2)^5\\
-x(t + h) &= x(t + h/2 + h/2) = x(t+h/2) + C(h/2)^5 = v + C(h/2)^5 + C(h/2)^5 = v + 2C (h/2)^5
+x(t + h) &= v + C h^5, \quad \text{whereas}\\
+x(t_h) &= h + 2 \cdot C(h/2)^5.
 \end{align}
 ~$$
 
-So, we have local error $= Ch^5 = (u-v)/(1 = 2^{-4}$ so is basically estimated by $u-v$. This can be monitored during the evaluation to see if there is growth. If so, $h$ can be adjusted.
+The local truncation error, $Ch^5$ then looks like $(u-v)/(1 - 2^{-4})
+\approx (u-v).$
+
+The book suggests that this difference can be monitored during the algorithm. If it gets too
+large the algorithm has more accumulated error than expected, and if
+so, can be repeated with a smaller $h$ in hopes of circumventing this.
+
