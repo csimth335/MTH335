@@ -17,10 +17,18 @@ If we can compute the integral, then we are done. This can happen when $f(t,x)$ 
 
 ## Multistep models
 
-If we have time setps $t_0, t_1, \dots$, then we can consider our solutions to depend on one or more previous steps. Euler's method uses one:
+If we have time steps $t_0, t_1, \dots$, then we can consider our
+solutions to depend on one or more previous steps. Euler's method uses
+one, with $f(t,x(t)) \approx f(t_n, x_n)$ (a constant) then
 
 $$~
-x_{n+1} = x_n + h\cdot f(t_n, x_n)
+x(t+h) - x(t) = \int_t^{t+h} f(t, x(t)) dt \approx \int_t^{t+h} f(t_n,x(t_n)) dt = h \cdot f(t_n, x_n).
+~$$
+
+So we write:
+
+$$~
+x_{n+1} = x_n + h\cdot f(t_n, x_n).
 ~$$
 
 The general multistep model allows for more than one. A general form might look like this (from p557)
@@ -78,6 +86,28 @@ This is an Adams Bashworth formula. It is a multstep model with $a_2=1, a_1=-1, 
 The local error will be basically $h\cdot \mathcal{O}(h^2)$, as the linear polynomial approximation has the $h^2$ error.
 
 
+### Method of undetermind coefficients
+
+Another way to derive this is to *assume* the approximation $a
+f_{n+1} + b f_n$ is exact for *polynomials* of degree 1 or less, and
+integrate. Using $p(t) = 1$ and then $p(t) = t$ and *assuming*
+(without loss of generality that $t_{n+1}=0$, $t_{n+2} = 1$ that
+
+$$~
+\int_{t_n}^{t_{n+1}} 1 dt = 1 = h = h \cdot (a \cdot 1 + b \cdot 1),
+\quad \text{or}\quad 1 = a + b,
+~$$
+
+and
+
+$$~
+\int_{t_n}^{t_{n+1}} t dt = 1/2 = (a \cdot 0 + b \cdot (-1)),
+\quad\text{or}\quad 1/2 = -b.
+~$$
+
+Piecing togther, we get $x_{n+2} - x_{n+1} = 3/2 x_{n+1} - 1/2 x_n$.
+
+
 ## Adams Moulton
 
 What if we had used all three points, $t_n, t_{n+1},$ **and** $t_{n+2}$ to approximate $f$? The error would be like $h^3$ then. The right hand side would become:
@@ -107,8 +137,21 @@ integrate( (u - u1) * (u-u2) / (u0-u1) / (u0 - u2), (u, u1, u2))  |> simplify
 ```
 
 
-This of course could be [generalized](https://en.wikipedia.org/wiki/Linear_multistep_method) by taking more points.
+Putting these together gives the formula:
 
+$$~
+x_{n+2} - x_{n+1} \approx h (\frac{5}{12} f_{n+2} - \frac{2}{3}
+f_{n+1} - \frac{1}{12} f_n).
+~$$
+
+
+This of course could be
+[generalized](https://en.wikipedia.org/wiki/Linear_multistep_method)
+by taking more points. The book shows a higher order value.
+
+
+> Note: we can't explicitly solve for $x_{n+2}$ as it appears on
+> *both* sides of the equation -- the right-hand side has $f_{n+2}=f(t_{n+2},x_{n+2})$.
 
 
 ## Example
@@ -146,7 +189,7 @@ When $n=1$ this gives $x_4$
 *But* we have in $f_{n+3} = f(t_{n+3}, x_{n+3})$, so we have $x_{n+3}$ on both sides. To work around that we use the *explicit* method (8.4p4):
 
 $$~
-x_{n+4} = x_{n+3} + h/24 [55 f_{n+3} - 59f_{n+2} + 37f_{n+1} - 9f_n
+x_{n+4} = x_{n+3} + h/24 [55 f_{n+3} - 59f_{n+2} + 37f_{n+1} - 9f_n]
 ~$$
 
 At $n=0$ this gives $x_4$ in terms of previoius values $x_3, x_2, x_1$ and the given value of $x_0$.
