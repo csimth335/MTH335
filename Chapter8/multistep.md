@@ -35,7 +35,7 @@ The general multistep model allows for more than one. A general form might look 
 
 $$~
 a_k x_n + a_{k-1}x_{n-1} + \cdots + a_0 x_{n-k} =
-h( b_k f_n + f_{k-1} f_{n-1} + \cdots + b_0 f_{n-k}).
+h( b_k f_n + b_{k-1} f_{n-1} + \cdots + b_0 f_{n-k}).
 ~$$
 
 With this indexing, Euler's method, $1\cdot x_n - 1\cdot x_{n-1} = h \cdot 1 \cdot \cdot f_n$, has
@@ -81,7 +81,7 @@ $$~
 x_{n+2} - x_{n+1} \approx h (\frac{3}{2} f_{n+1} - \frac{1}{2} f_n).
 ~$$
 
-This is an Adams Bashworth formula. It is a multstep model with $a_2=1, a_1=-1, a_0=0$ and $b_0=0, b_1=3/2, b_0=-1/2$.
+This is an Adams Bashworth formula. It is a multstep model with $a_2=1, a_1=-1, a_0=0$ and $b_2=0, b_1=3/2, b_0=-1/2$.
 
 The local error will be basically $h\cdot \mathcal{O}(h^2)$, as the linear polynomial approximation has the $h^2$ error.
 
