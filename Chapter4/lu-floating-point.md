@@ -1,3 +1,9 @@
+XXX Cf.
+
+http://web.mit.edu/ehliu/Public/Yelp/conditioning_and_precision.pdf
+
+integrate in
+
 # LU decomposition and floating point issues
 
 Solving $A x = b$ for $x$ with inputs $A$ and $b$ can be done more efficiently by $LU$ factorization, than by finding an inverse and then solving via $x = A^{-1}b$. The number of steps is at least 1/3 as few.

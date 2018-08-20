@@ -183,6 +183,58 @@ F'(u) = 1 - \frac{f'(u)^2 - f(u) f''(u)}{f'(u)^2} = \frac{f(u)f''(u)}{f'(u)^2}.
 If $s$ is a fixed point, $f(s) = 0$, so $F'(s)=0$. That is $q \geq 2$.
 
 
+### Halley, order of convergence is 3 (or more)
+
+Halley's method, a zero-finding method like Newton's method, is summarized by
+
+$$~
+F(x) = x - 2f(x)\cdot f'(x) / (2f'(x)^2 - f(x)\cdot f''(x)).
+~$$
+
+We can verify it has order 3 or more by showing $F''(s) = 0$, but
+$F'''(s) \neq 0$ in general.
+
+
+We use `SymPy` as the derivatives are involved:
+
+```
+using SymPy
+@vars x
+@symfuns u
+F(x) = x - 2u(x)*u'(x) / (2u'(x)^2 - u(x) * u''(x))
+```
+
+First we verify that $F'(s)$ and $F''(s)$ are $0$ where $u(s) = 0$.
+
+```
+@vars up upp uppp
+diff(F(x),x) |> simplify
+```
+
+If it hard to see $u(x)$ as a factor, we can substitute:
+
+```
+ex = diff(F(x), x)
+ex(u'''(x) => uppp, u''(x)=>upp, u'(x) => up)(u(x) => 0)
+```
+
+We can see for $F^{(2)}$ with:
+
+```
+ex = diff(F(x), x, x)
+ex(u'''(x) => uppp, u''(x)=>upp, u'(x) => up)(u(x) => 0)
+```
+
+Finally, for $q=3$ we have:
+
+```
+ex = diff(F(x), x, x, x)  # third derivative
+ex(u'''(x) => uppp, u''(x)=>upp, u'(x) => up)(u(x) => 0)
+```
+
+As this is not zero in general, the convergence is cubic except
+possibly in special cases.
+
 ### visualize
 
 If we graph $F(x)$ and layer on the line $y=x$, we can see cobwebbing converges to a fixed point.
