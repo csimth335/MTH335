@@ -15,17 +15,11 @@ To use `juliabox.com`:
 * proceed to `juliabox.com` and log in with your gmail credentials
 * Under the "new" dropdown on the right side, open a new "Julia 0.6.0"
   notebook. (As of writing, this is the latest release)
-* We will enter two commands to install some additional software. Copy
-  and paste the following into a cell, then press the "play" button:
+* We would need to install some packages: `Plots`, `PyPlot`, `SymPy`,
+  `Roots`, `FowardDiff`, `QuadGK`.
 
-```
-Pkg.clone("https://github.com/mth229/MTH229.jl")
-using MTH229
-```
 
-Wait... while waiting, learn that the first line downloads a bunch of external
-packages that can be convenient. To access these packages during a
-session, the second line must be executed.
+
 
 Now that that is done, you can type commands in a cell and hit the
 play button of "shift+enter" to execute them. Their output fills in
@@ -305,6 +299,7 @@ Plotting a function by passing the function object by name.
 
 ```
 using Plots      # needed just once per session
+pyploy()         # select a back end plotting package
 plot(sin, 0, 2pi)
 ```
 
