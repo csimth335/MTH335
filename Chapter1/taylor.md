@@ -190,7 +190,7 @@ Let $F(x) = \sin(x)$ and $G(x) = \cos(3x)$ and let $a,b=0,7\pi/8$. Then we make 
 ```
 F(x) = sin(x); G(x) = cos(3x)
 a, b = 0, 7pi/8
-using Plots
+using Plots; pyplot()
 plot(F,G, a, b)
 ```
 
