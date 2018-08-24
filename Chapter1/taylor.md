@@ -188,9 +188,11 @@ Rolle's Theorem will imply the Cauchy Mean Value [Theorem](http://tinyurl.com/pp
 Let $F(x) = \sin(x)$ and $G(x) = \cos(3x)$ and let $a,b=0,7\pi/8$. Then we make a parametric plot:
 
 ```
-F(x) = sin(x); G(x) = cos(3x)
+F(x) = sin(x)
+G(x) = cos(3x)
 a, b = 0, 7pi/8
-using Plots; pyplot()
+using Plots
+pyplot()
 plot(F,G, a, b)
 ```
 
@@ -365,7 +367,7 @@ f4 * g5 |> expand
 
 ## Sequences: limit
 
-Many algorithms are iterative. An example is Newton's method, where a sequence of approximate answers is provided: $x_0, x_1, x_2, \dots$ with the expectation that as $n$ gets bigger, the values get closer to the actual answer. (Which happens in most -- but not all cases.)
+Many algorithms are iterative. An example is Newton's method, where a sequence of approximate answers is provided: $x_0, x_1, x_2, \dots$ with the expectation that as $n$ gets bigger, the values get closer to the actual answer. (Which happens in many -- but not all cases.)
 
 The formal definition of closer is in terms of a limit:
 

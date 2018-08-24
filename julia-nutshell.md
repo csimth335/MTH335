@@ -2,11 +2,21 @@
 
 A quick overview of some `Julia` commands and constructs.
 
+```
+note("""
+Version 1.0 of Julia was released in August 2018. These notes reflect
+version 0.6 of Julia. There are some surface level changes
+(i.e. renaming of functions) that will cause errors if these are run
+under 1.0. When the JuliaBox and Binder support 1.0, these should be
+updated.
+""")
+```
+
 ## Getting Started
 
 You can download and install `Julia` on your computer -- it is freely
 available. However, you can also use it through the web at
-`juliabox.com`. This is easy and gives the convenient `Jupyter`
+[juliabox.com](https://juliabox.com). This is easy and gives the convenient `Jupyter`
 interface, we we will assume.
 
 To use `juliabox.com`:
@@ -19,6 +29,8 @@ To use `juliabox.com`:
   `Roots`, `FowardDiff`, `QuadGK`.
 
 
+As well, you can view this file using Binder, which though slow at
+first, allows access without an account.
 
 
 Now that that is done, you can type commands in a cell and hit the
@@ -73,6 +85,10 @@ The standard mathematical operations are implemented by `+`, `-`, `*`, `/`, `^`.
 Arithmetic sequences can be defined by either
 
 - `linspace(a,b,n)` which produces `n` values between `a` and `b`;
+
+```
+note("In v1.0 this is `range(a, stop=b, length=n)`")
+```
 
 - `a:h:b` or `a:b` which produces values starting at `a` separated by `h` (`h` is `1` in the last form) until they reach `b`.
 
@@ -240,7 +256,7 @@ end
 And:
 
 ```
-out_abs2(5), our_abs2(-5)
+our_abs2(5), our_abs2(-5)
 ```
 
 
@@ -267,15 +283,33 @@ log.([2,3,10], [10, 3, 2])  # log(2,10), log(3,3), log(10, 2)...
 
 ### Fibonacci numbers
 
+Here are some examples.
+
 What is some code to create the first 15 Fibonacci numbers?
 
 ```
+fibs = zeros(Int, 15) # space for 15 values
+fibs[1:2] = [1,1] # first two
+for i in 3:15
+fibs[i] = fibs[i-1] + fibs[i-2]
+end
+fibs  
 ```
 
 
 What is some code to create *all* the Fibonacci numbers less than 100?
 
 ```
+fibs = zeros(Int, 15) # space for 15 values
+fibs[1:2] = [1,1] # first two
+i = 3
+while true                            # loop until we break
+  next_one = fibs[i-1] + fibs[i-2]    # next value
+  next_one >= 100 && break            # break if 100 or more
+  fibs[i] = next_one                  # o/w we assign it
+  i += 1                              # must manually increment in while 
+end
+fibs  
 ```
 
 What is some code to make change? That is given an amount find the
@@ -283,10 +317,41 @@ most efficient usage of quarters, dimes, nickels and pennies to equal
 the amount:
 
 ```
+function change(x)
+
+  excess = Int(100 * x)
+  Q,D,N,P = 25, 10, 5, 1
+
+  qs, excess = divrem(excess, Q)
+  ds, excess = divrem(excess, D)
+  ns, excess = divrem(excess, N)
+  ps = excess
+  (qs, ds, ns, ps)
+end
+
+change(1.34)
 ```
 
+What are *all* ways to make change?
 
+```
+function all_change(x)
+  x = Int(100 * x)
+  Q,D,N,P = 25, 10, 5, 1
+  out = Anyp[
+  for q in 0:Q:x
+    for d in 0:D:(x - q)
+      for n in 0:N:(x - q - d)
+         p = x - q - d - n
+         push!(out, (q÷Q,d÷D,n÷N,p))
+       end
+     end
+  end
+  out
+end
 
+all_changes(0.12)
+```
 
 
 ## Plotting
@@ -299,7 +364,7 @@ Plotting a function by passing the function object by name.
 
 ```
 using Plots      # needed just once per session
-pyploy()         # select a back end plotting package
+pyplot()         # select a back end plotting package
 plot(sin, 0, 2pi)
 ```
 
@@ -316,6 +381,8 @@ plot(sin, 0, 2pi)
 plot!(cos)
 plot!(zero)
 ```
+
+The `scatter` and `scatter!` functions will plot points individually.
 
 ## Matrices
 
@@ -372,11 +439,16 @@ There are various functions to work with floating point values.
 
 - `nextfloat` and `prevfloat` to give the floating point value to the right or left
 
-- `typemax` and `typemin` to give the larges and smallest value representable by a type
+- `typemax` and `typemin` to give the largest and smallest value representable by a type
 
 - `bits` to show the bits used in storage
 
-- `Float16`, `Float32`, `Float64`, `BigFloat` for floats of different sizes.
+```
+note("In v1.0 this is `bitstring`")
+```
+
+- `Float16`, `Float32`, `Float64`, `BigFloat` for floats of different
+  storage size.
 
 
 For example, this is the largest non-infinite floating point value for 16-bit floating point values:

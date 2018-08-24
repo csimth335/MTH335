@@ -1,7 +1,9 @@
-In a paper of Kahan (https://people.eecs.berkeley.edu/~wkahan/Qdrtcs.pdf)
+# The quadratic equation
+
+In a paper of [Kahan](https://people.eecs.berkeley.edu/~wkahan/Qdrtcs.pdf)
 the issue of computing the quadratic equation arises.
 
-Kahan write as $ax^2 + 2bx + c$ so the critical computation is the
+Kahan writes the equation as $ax^2 + 2bx + c$ so the critical computation is the
 discriminant $b^2 - a \cdot c$. The issue comes from large enough values that the subtraction masks the low bits influence.
 
 Here is an example in the paper, which should be 1.0 -- not 2.0

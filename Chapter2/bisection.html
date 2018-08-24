@@ -109,18 +109,18 @@ c = (a + b)/2
 <p>Well, we can have issues with this if we try to put it on the computer.</p><p>In particular, out at the edge, we can overflow by adding two large numbers:</p><pre class="sourceCode julia">b = prevfloat(Inf)
 a = b/2
 (a + b)/2</pre>
-<pre class="output">
-Inf</pre>
+<div class="well well-sm">
+Inf</div>
 
 <p>This can be avoided by finding a difference and adding:</p><pre class="sourceCode julia">a + (b-a)/2</pre>
-<pre class="output">
-1.3482698511467367e308</pre>
+<div class="well well-sm">
+1.3482698511467367e308</div>
 
-<p>In general this is a good practice as adding can lose precision.</p><p>So, we can control for really big values by using mathematics. What about other areas?</p><p>When $a < b$ are real–mathematical–numbers, there is always a number between $a$ and $b$. This is not so in floating point which is discrete:</p><pre class="sourceCode julia">a = 0.09999999999999998405
+<p>In general this is a good practice as adding can lose precision.</p><p>(This too has issues when <code>a</code> and <code>b</code> are both large of different signs. The definition <code>a/2 &#43; b/2</code> is more robust.)</p><p>So, we can control for really big values by using mathematics. What about other areas?</p><p>When $a < b$ are real–mathematical–numbers, there is always a number between $a$ and $b$. This is not so in floating point which is discrete:</p><pre class="sourceCode julia">a = 0.09999999999999998405
 b = 0.09999999999999999
 (a + b)/2   ## less than the real number 0.09999999999999998405</pre>
-<pre class="output">
-0.09999999999999998</pre>
+<div class="well well-sm">
+0.09999999999999998</div>
 
 <p>It would require proof that the result of <code>c &#61; fl&#40;&#40;a&#43;b&#41;/2&#41;</code> satisfies <code>a &lt;&#61; c &lt;&#61; b</code> for machine numbers <code>a</code> and <code>b</code>. (Which may not be true with some rounding schemes)</p><p>If this were the case, we can stop if <code>a &#61;&#61; c</code>  or <code>b &#61;&#61; c</code>.</p><h2>Floating point bisection</h2><p>Rather than bisect in floating point, there is a trick to bisect over integers.</p><p>The floating point numbers are discrete and ordered, so there is a way to reinterpret them using <em>unsigned</em> integers:</p><pre class="sourceCode julia">a = Float16(0.1)
 bits(a)</pre>
@@ -193,8 +193,8 @@ bits(ai), bits(bi)</pre>
 0100101110100100</div>
 
 <p>And as a floating point number:</p><pre class="sourceCode julia">reinterpret(Float16, (ai + bi) >> 1)</pre>
-<pre class="output">
-Float16(15.28)</pre>
+<div class="well well-sm">
+15.28</div>
 
 <p>We can see by looking the bits from left to right that the value is in the middle:</p><pre class="sourceCode julia">[bits(ai), bits((ai+bi) >> 1), bits(bi)]</pre>
 <pre class="output">
@@ -211,7 +211,22 @@ Float16(15.28)</pre>
  "0000101010100100"
  "0101011001001000"</pre>
 
+<h2>Speed</h2><p>For 64 bit floating point numbers, this is guaranteed to take no more than 64 steps. How many steps does the more traditional bisection take?</p><p>The bound is $|b_n - a+n| <= 2^n |b_0 - a_0|. Generally this isn't too bad: Take $f(x)=\sin(x)$, $(a,b) = (3,4)$. Then we can get $|b_n-a_n| < \epsilon$ in</p><pre class="sourceCode julia">delta = (4-3)
+# solve 2^(-n) * delta < eps:
+-log2(eps(1pi)/delta)</pre>
+<div class="well well-sm">
+51.0</div>
 
+<p>So, it would take about 52 steps here.</p><p>But this isn't always the case. At an extreme, we might have to find a zero of $x - 10^{-200}$. And we begin with the interval <code>&#40;-1e6, 1e6&#41;</code>. The value of <code>epsilon</code> is now very small</p><pre class="sourceCode julia">eps(1e-200)</pre>
+<div class="well well-sm">
+1.450417759929779e-216</div>
+
+<p>Solving gives</p><pre class="sourceCode julia">delta = 1e-6 - (-1e-6)
+-log2(eps(1e-200)/delta)</pre>
+<div class="well well-sm">
+698.0684314306758</div>
+
+<p>So almost 700 steps to get down to adjacent floating point values.</p>
   </div>
 </div>  
 

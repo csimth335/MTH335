@@ -10,56 +10,6 @@ As not every number is a machine number, numbers are rounded to machine numbers.
 * round to $\infty$ (or $-\infty$): always round up (or down)
 
 
-### For example,...
-
-```
-current_rounding_mode = rounding(Float32)
-setrounding(Float32, RoundUp)
-.1 + .2 + .3
-```
-
-```
-setrounding(Float32, RoundDown)
-.1 + .2 + .3
-```	   
-
-```
-setrounding(Float32, RoundDown)
--.1 - .2 - .3
-```
-
-and
-
-```
-setrounding(Float32, RoundToZero) 
--.1 - .2 - .3
-```
-
-```
-setrounding(Float32, current_rounding_mode)
-```
-
-### A more realistic problem
-
-```
-xs = rand(10^7) - 0.5
-ys = big(xs)
-current_rounding_mode = rounding(Float64)
-setrounding(Float64, RoundUp)
-rup = sum(xs)
-
-setrounding(Float64, RoundDown)
-rdown = sum(xs)
-
-setrounding(Float64, current_rounding_mode)
-
-ex = convert(Float64, sum(ys))  # exact sum converted
-
-ex - sum(xs), ex - rup, ex - rdown
-```
-
-
-
 ### How big can the error be in rounding one number?
 
 We've seen this answered: the significand can be off by at most $1/2$`ulp` $=1/2 \cdot 2^{-p}$.
@@ -308,6 +258,7 @@ sin(X) + X
 The moral of the story -- try to avoid subtraction when the values are of the same size.
 
 (Yes, but what about $f(x+h) - f(x)$?)
+
 
 ### floating point is not always associative
 
@@ -559,13 +510,14 @@ $$~
 (Written to emphasize a factor times the relative error in the approximation to the number $x$.
 
 ### Redundant functions
+
 In `Julia` there are many "redundant" functions:
 
 * `sinpi` for computing $\sin(\pi x)$, `cospi`, ...
-* `expm` to compute $e^x - 1$ for $x$ near 0
+* `expm1` to compute $e^x - 1$ for $x$ near 0
 * `log1p` to compute $\log(1+x)$ near 0
 
-The reason for `expm` seems clear. $e^x \approx 1 + x + x^2/2! + \cdot$, so $e^x-1$ for small $x$ is a subtraction of like-sized values.
+The reason for `expm1` seems clear. $e^x \approx 1 + x + x^2/2! + \cdot$, so $e^x-1$ for small $x$ is a subtraction of like-sized values.
 
 ###
 
@@ -921,31 +873,4 @@ rts = roots(p(x))
 scatter(real.(rts), imag.(rts), markersize=5)
 scatter!(collect(1:20), 0*collect(1:20), color=:blue)
 ```
-
-
-Other alogorithms can give different errors:
-
-```nocode
-using Iterators
-```
-
-```
-using PolynomialZeros
-rts = poly_roots(p, Over.C, method=:PolynomialRoots)
-scatter(real.(rts), imag.(rts), markersize=5)
-scatter!(collect(1:20), 0*collect(1:20), color=:blue)
-```
-
-and
-
-
-```
-using PolynomialZeros
-rts = poly_roots(p, Over.C, method=:AMVW)
-scatter(real.(rts), imag.(rts), markersize=5)
-scatter!(collect(1:20), 0*collect(1:20), color=:blue)
-```
-
-
-
 

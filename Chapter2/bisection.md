@@ -25,6 +25,10 @@ a + (b-a)/2
 
 In general this is a good practice as adding can lose precision.
 
+(This too has issues when `a` and `b` are both large of different
+signs. The definition `a/2 + b/2` is more robust.)
+
+
 So, we can control for really big values by using mathematics. What about other areas?
 
 
@@ -159,6 +163,41 @@ This begs the question of looking at what `(b-a)/2` is:
 [bits(ai), bits(bi - ai), bits((bi - ai) >> 1), bits(bi)]
 ```
 
+
+## Speed
+
+For 64 bit floating point numbers, this is guaranteed to take no more
+than 64 steps. How many steps does the more traditional bisection
+take?
+
+The bound is $|b_n - a+n| <= 2^n |b_0 - a_0|. Generally this isn't too
+bad: Take $f(x)=\sin(x)$, $(a,b) = (3,4)$. Then we can get $|b_n-a_n|
+< \epsilon$ in
+
+```
+delta = (4-3)
+# solve 2^(-n) * delta < eps:
+-log2(eps(1pi)/delta)
+```
+
+So, it would take about 52 steps here.
+
+But this isn't always the case. At an extreme, we might have to find a
+zero of $x - 10^{-200}$. And we begin with the interval `(-1e6,
+1e6)`. The value of `epsilon` is now very small
+
+```
+eps(1e-200)
+```
+
+Solving gives
+
+```
+delta = 1e-6 - (-1e-6)
+-log2(eps(1e-200)/delta)
+```
+
+So almost 700 steps to get down to adjacent floating point values.
 
 
 

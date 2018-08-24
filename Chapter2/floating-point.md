@@ -375,7 +375,8 @@ For binary floating point, things are similar. For *simplicity* let's look at 16
 * the $q$ is represented with $10$ bits (the *precision* is 10)
 * the $m$ is represented with $5$ bits.
 
-There is nothing to represent the *sign* of $m$. The trick is offset the value by subtracting and using  $m -15$.
+There is nothing to represent the *sign* of $m$. The trick is offset
+the value by subtracting and using  $m -15$. (Here $15 = 2^{5-1}-1$.)
 
 With this, can we represent some numbers:
 
@@ -725,3 +726,11 @@ eps()
 ```
 eps(Float16)
 ```
+
+
+In floating point, `1.0 = 1.000...000 * 2^0` where there are `k` zeros
+in the mantissa. The next floating point value is `1.000...001 * 2^0$
+so the differcne is the $2^{-k}$. 
+
+[FloatingPoint](https://en.wikipedia.org/wiki/Floating-point_arithmetic)
+has $k=10$ for 16-bit, $k=23$ for 32 bit and $k=52$ for 64 bit.

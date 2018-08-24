@@ -103,7 +103,7 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<p>In a paper of Kahan (https://people.eecs.berkeley.edu/~wkahan/Qdrtcs.pdf) the issue of computing the quadratic equation arises.</p><p>Kahan write as $ax^2 + 2bx + c$ so the critical computation is the discriminant $b^2 - a \cdot c$. The issue comes from large enough values that the subtraction masks the low bits influence.</p><p>Here is an example in the paper, which should be 1.0 – not 2.0</p><pre class="sourceCode julia">a,b,c = 94906266.375, 94906267.375, 94906268.375
+<h1>The quadratic equation</h1><p>In a paper of <a href="https://people.eecs.berkeley.edu/~wkahan/Qdrtcs.pdf">Kahan</a> the issue of computing the quadratic equation arises.</p><p>Kahan writes the equation as $ax^2 + 2bx + c$ so the critical computation is the discriminant $b^2 - a \cdot c$. The issue comes from large enough values that the subtraction masks the low bits influence.</p><p>Here is an example in the paper, which should be 1.0 – not 2.0</p><pre class="sourceCode julia">a,b,c = 94906266.375, 94906267.375, 94906268.375
 b^2 - a * c</pre>
 <div class="well well-sm">
 2.0</div>
@@ -179,7 +179,7 @@ qdrt(a, b, c)</pre>
 <pre class="output">
 (1.0000000210734241, 1.0)</pre>
 
-<p>Which is correct, but other methods can be wrong:</p><pre class="sourceCode julia">using Polynomials
+<p>Which is correct, but other methods (this one using a linear algebra techique, not the straightforward discriminant calculution) can be wrong:</p><pre class="sourceCode julia">using Polynomials
 x = variable()
 r1, r2 = roots(a*x^2 - 2b*x + c)
 r1, r2</pre>

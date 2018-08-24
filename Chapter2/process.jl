@@ -1,7 +1,9 @@
 using WeavePynb
 
 fnames = ["floating-point",
-          "floating-point-2"
+          "floating-point-2",
+          "quadratic",
+          "bisection"
           ]
 
 for f in fnames
