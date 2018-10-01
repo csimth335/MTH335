@@ -9,7 +9,7 @@
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -115,10 +115,10 @@ $( document ).ready(function() {
 </li>
 <li><p>won't work with roots of functions like $f(x) = (x-2)^2$</p>
 </li>
-</ul><h2>Newton's method</h2><p>See this <a href="http://calculuswithjulia.github.io/derivatives/newtons_method.html#Examples">algorithm</a></p><p>Basic idea: approximate function by tangent line and find that intersection.</p>    <div id="8c7077a3-b21c-44ac-89b5-13461d0a4def" style="width:600px;height:400px;"></div>
+</ul><h2>Newton's method</h2><p>See this <a href="http://calculuswithjulia.github.io/derivatives/newtons_method.html#Examples">algorithm</a></p><p>Basic idea: approximate function by tangent line and find that intersection.</p>    <div id="5c49ad24-1c3c-4f4a-8662-8de3b1d7626e" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('8c7077a3-b21c-44ac-89b5-13461d0a4def');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-1.9806566565510737,-1.961680388794898,-1.9430575239163532,-1.9247751390803831,-1.7699008959605365,-1.6358271742351838,-1.51762253030485,-1.4119248559636641,-1.2980995840792797,-1.1959165962695089,-1.1169880675096935,-1.0438360948993504,-0.9012491341793436,-0.7856811303785483,-0.6750259915473444,-0.5604782967260431,-0.46864453388200067,-0.3945181640632487,-0.3195081529243131,-0.24933370267855848,-0.17708085834253362,-0.11286557640512118,-0.0502003465845231,-0.0003327188897663813,0.057360178943127504,0.10871681065069749,0.18586327166495353],"type":"scatter","name":"y1","yaxis":"y","x":[1.0195316380395762,1.0390632760791525,1.058594914118729,1.0781265521583052,1.2587247484554744,1.4393229447526439,1.6199211410498133,1.8005193373469828,2.0175833138959867,2.234647290444991,2.4181721200855586,2.6016969497261258,3.0004157602644113,3.3679992362770252,3.7620875712519184,4.2186775547082584,4.624440848888171,4.98025869232176,5.368195653242556,5.758438230022497,6.189901300995234,6.6004275259587475,7.027279548090804,7.3865980293347615,7.825285167890913,8.237664017029667,8.89832691212848]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 0, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,0],"type":"scatter","name":"y2","yaxis":"y","x":[1,9]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(255, 165, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.0,-1.5945348918918356,0.0,-0.6411276237496559,0.0,-0.14574404272814934,0.0],"type":"scatter","name":"y3","yaxis":"y","x":[1.5,1.5,3.8918023378377535,3.8918023378377535,6.386944322799028,6.386944322799028,7.317803409083361]},{"showlegend":true,"mode":"markers","xaxis":"x","colorbar":{"title":""},"marker":{"symbol":"circle","color":"rgba(255, 165, 0, 1.000)","line":{"color":"rgba(0, 0, 0, 1.000)","width":1},"size":10},"y":[0.0,0.0,0.0,0.0],"type":"scatter","name":"y4","yaxis":"y","x":[1.5,3.8918023378377535,6.386944322799028,7.317803409083361]}], {"showlegend":false,"xaxis":{"tickvals":[2.5,5.0,7.5],"ticks":"inside","tickmode":"array","domain":[0.03619130941965587,0.9934383202099738],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["2.5","5.0","7.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"tickvals":[-2.0,-1.0,0.0],"ticks":"inside","tickmode":"array","domain":[0.03762029746281716,0.9901574803149606],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["-2","-1","0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"x"},"width":600});
+    PLOT = document.getElementById('5c49ad24-1c3c-4f4a-8662-8de3b1d7626e');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[1.0195316380395762,1.0390632760791525,1.058594914118729,1.0781265521583052,1.2587247484554744,1.4393229447526439,1.6199211410498133,1.8005193373469828,2.0175833138959867,2.234647290444991,2.4181721200855586,2.6016969497261258,3.0004157602644113,3.3679992362770252,3.7620875712519184,4.2186775547082584,4.624440848888171,4.98025869232176,5.368195653242556,5.758438230022497,6.189901300995234,6.6004275259587475,7.027279548090804,7.3865980293347615,7.825285167890913,8.237664017029667,8.89832691212848],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-1.9806566565510737,-1.961680388794898,-1.9430575239163532,-1.9247751390803831,-1.7699008959605365,-1.6358271742351838,-1.51762253030485,-1.4119248559636641,-1.2980995840792797,-1.1959165962695089,-1.1169880675096935,-1.0438360948993504,-0.9012491341793436,-0.7856811303785485,-0.6750259915473444,-0.5604782967260431,-0.46864453388200067,-0.3945181640632487,-0.31950815292431334,-0.24933370267855848,-0.17708085834253362,-0.11286557640512118,-0.05020034658452288,-0.0003327188897663813,0.057360178943127504,0.10871681065069749,0.18586327166495353],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null],"x":[1,9],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(0, 0, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,0],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null],"x":[1.5,1.5,3.8918023378377535,3.8918023378377535,6.386944322799028,6.386944322799028,7.317803409083361],"showlegend":true,"mode":"lines","name":"y3","zmin":-0.1,"legendgroup":"y3","zmax":0.1,"line":{"color":"rgba(255, 165, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.0,-1.5945348918918356,0.0,-0.6411276237496559,0.0,-0.14574404272814934,0.0],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null],"x":[1.5,3.8918023378377535,6.386944322799028,7.317803409083361],"showlegend":true,"mode":"markers","name":"y4","zmin":-0.1,"legendgroup":"y4","marker":{"symbol":"circle","color":"rgba(255, 165, 0, 1.000)","line":{"color":"rgba(0, 0, 0, 1.000)","width":1},"size":10},"zmax":0.1,"y":[0.0,0.0,0.0,0.0],"type":"scatter","hoverinfo":"text"}], {"showlegend":false,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[2.0,4.0,6.0,8.0],"visible":true,"ticks":"inside","range":[0.76,9.24],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["2","4","6","8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-2.0,-1.5,-1.0,-0.5,0.0],"visible":true,"ticks":"inside","range":[-2.0456522543975546,0.2508588695114343],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-2.0","-1.5","-1.0","-0.5","0.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"width":600});
     </script>
 <p>More formally, Let $r$ be a zero of $f(x)$. Further, suppose $r$ is a <em>simple</em> zero where $f'(r) \neq 0$.</p><p>Suppose $x$ is an approximation to $r$. That is, suppose $r = x + h$ for some small $h$, then using Taylor's theorem about $x$, we have:</p>$$~
 0 = f(r) = f(x+h) = f(x) + f'(x) \cdot h + \mathcal{O}(h^2)
@@ -190,7 +190,8 @@ nm (generic function with 1 method)</pre>
 <pre class="sourceCode julia">f(x) = x^5 - x - 1; fp(x) = 5x^4 - 1
 nm(f, fp, 1)</pre>
 <pre class="output">
-1.1673039782614396</pre>
+UndefVarError(:norm)
+</pre>
 
 <h3>made for floating point not exact math</h3><p>Look at finding the square root of 2 starting at 2. We use $f(x) = x^2 - 2$, so $x - f(x)/f'(x) = x - (x^2-2)/(2x) = x/2 - 1/x$</p><pre class="sourceCode julia">x = 2//1
 x = x/2 + 1/x</pre>
@@ -215,7 +216,7 @@ x = x/2 + 1/x</pre>
 
 <pre class="sourceCode julia">x = x/2 + 1/x</pre>
 <pre class="output">
-OverflowError()
+OverflowError("886731088897 * 886731088897 overflowed for type Int64")
 </pre>
 
 <p>The floating point doesn't go crazy, the digits just get refined.</p><h3>Special cases are quite old</h3><p>The <a href="https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method">Babylonian</a> method is this algorithm:</p>$$~
@@ -228,7 +229,7 @@ x - \frac{x^2 - S}{2x} = x - \frac{x}{2} + \frac{S}{2x} = \frac{x}{2} + \frac{S}
 f(x) = f(x_n) + f'(x_n) \cdot (x - x_n) + f''(\xi)/2 \cdot (x - x_n)^2
 ~$$
 <p>Using $r$ for $x$ gives:</p>$$~
-0 = f(r) = f(x_n) + f'(x_n) \cdot (r - x_n) + f''(\xi)/2 \cdot (r - x_n)^2 
+0 = f(r) = f(x_n) + f'(x_n) \cdot (r - x_n) + f''(\xi)/2 \cdot (r - x_n)^2
 ~$$
 <p>Divide by $f'(x_n)$</p>$$~
 0 = f(x_n)/f'(x_n) + (r - x_n) + \frac{1}{2}\frac{f''(\xi)}{f'(x_n)}(e_n)^2.
@@ -252,9 +253,8 @@ e_{n+1} = \frac{1}{2}\frac{f''(\xi)}{f'(x_n)}(e_n)^2.
 <li><p>the function $e_0$ not too far off.</p>
 </li>
 </ul><h3>A function which has problems</h3><p>Wilkinson proposed this function $f(x) = x^{20} - 1$ to test Newton's method for a root $r=1$. Why?</p><p>Notice $f''(x) = 20 \cdot 19 \cdot x^{18}$ is large if $x > 1$ ($f''(1.1) = 2112.\dots$)</p><p>But $f'(x) = 20 x^{19}$ is <em>small</em> when $x < 1$!. $f'(0.5) = 1.9\cdot 10^{-6}$.</p><p>So the Newton algorithm will have trouble</p><pre class="sourceCode julia">using Roots
-Base.ctranspose(f) = x -> D(f)(x) # makes f'(x) work
 f(x) = x^20 - 1
-newton(f, 0.5)</pre>
+newton(f,f', 0.5)</pre>
 <pre class="output">
 Roots.ConvergenceFailed("Stopped at: xn = 3368.930120334614")
 </pre>
@@ -287,7 +287,7 @@ e_{n+1} = \frac{k-1}{k} e_n + \frac{f''(\xi)}{2f'(x_n)}e_n^2 = \mathcal{O}(e_n)
 <p>And not $\mathcal{O}(e_n^2)$.</p><p>That is, as $k > 1$, the $(x_n - r)$ term dominates, and we see the convergence is linear with $\lvert e_{n+1}\rvert \approx (k-1)/k \lvert e_n\rvert$.</p><h3>Example</h3><pre class="sourceCode julia">using Roots
 f(x) = cos(x) - x
 g(x) = f(x)^4
-newton(g, 0.7, verbose=true)</pre>
+newton(g,g', 0.7, verbose=true)</pre>
 <pre class="output">
 0.7389932543606224</pre>
 
@@ -302,10 +302,10 @@ g(q) = 1/q
 h(q) = 1/17 * (48 - 32q)
 plot(g, 1/2, 1)
 plot!(h)</pre>
-    <div id="eeeb37c9-0fae-4521-a2d9-53e19c5080ec" style="width:600px;height:400px;"></div>
+    <div id="2a506b00-ea8a-4620-8c2b-135635a16645" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('eeeb37c9-0fae-4521-a2d9-53e19c5080ec');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.9806572596619125,1.8180745234091358,1.7326054257161574,1.666372109406804,1.5999334811232846,1.5432099902184533,1.4867004095692162,1.4261930536799425,1.376410290008085,1.3355304264218038,1.2936405962987252,1.2540719883997735,1.213049259041289,1.1764336061834275,1.1406345717390152,1.112146177113968,1.079237250333189,1.0500297146674413,1.0063952067682012],"type":"scatter","name":"y1","yaxis":"y","x":[0.504882909509894,0.5500324585841865,0.5771654556528119,0.6001060593578829,0.6250259850165257,0.6479999522673141,0.672630473203245,0.7011673471692661,0.7265275530555108,0.74876616827011,0.7730122283276597,0.7974023893764061,0.8243688313122021,0.8500267203724217,0.8767049717556753,0.8991623768334226,0.926580322993182,0.9523540010643542,0.99364543200803]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.864176798403264,1.7810994995977882,1.7311735058464623,1.6889617135282673,1.6431078755032913,1.600834692688101,1.5555133729964732,1.5030041795702371,1.4563402051701129,1.4154201047685957,1.370806211218029,1.3259271650502322,1.276307640595308,1.2290959151212364,1.1800066748693088,1.1386839908050743,1.0882336772925583,1.0408088945796319,0.9648307150197692],"type":"scatter","name":"y2","yaxis":"y","x":[0.509656075848266,0.5537908908386749,0.5803140750190668,0.602739089688108,0.6270989411388765,0.6495565695094463,0.6736335205956236,0.7015290296033115,0.7263192660033775,0.7480580693416835,0.7717592002904221,0.7956011935670642,0.8219615659337426,0.8470427950918431,0.8731214539756798,0.8950741298848043,0.9218758589383285,0.9470702747545705,0.9874336826457476]}], {"showlegend":true,"xaxis":{"tickvals":[0.6000000000000001,0.7000000000000001,0.8,0.9],"ticks":"inside","tickmode":"array","domain":[0.05100612423447069,0.9934383202099737],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["0.6","0.7","0.8","0.9"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"tickvals":[1.0,1.5],"ticks":"inside","tickmode":"array","domain":[0.03762029746281716,0.9901574803149606],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["1.0","1.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('2a506b00-ea8a-4620-8c2b-135635a16645');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.504882909509894,0.5500324585841865,0.5771654556528119,0.6001060593578829,0.6250259850165257,0.6479999522673141,0.672630473203245,0.7011673471692661,0.7265275530555108,0.74876616827011,0.7730122283276597,0.7974023893764061,0.8243688313122021,0.8500267203724217,0.8767049717556753,0.8991623768334226,0.926580322993182,0.9523540010643542,0.99364543200803],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.9806572596619125,1.8180745234091358,1.7326054257161574,1.666372109406804,1.5999334811232846,1.5432099902184533,1.4867004095692162,1.4261930536799425,1.376410290008085,1.3355304264218038,1.2936405962987252,1.2540719883997735,1.213049259041289,1.1764336061834275,1.1406345717390152,1.112146177113968,1.079237250333189,1.0500297146674413,1.0063952067682012],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.4952795901536242,0.5420624940434577,0.5701770692746732,0.5939475848238567,0.6197690273616715,0.6435741134344753,0.6690956815858234,0.6986649211339725,0.7249425717180425,0.7479857032566467,0.7731089020623098,0.7983814149355504,0.8263234096442295,0.852909512551816,0.8805528909686829,0.9038227274323549,0.9322325602290906,0.9589386409943071,1.001723853358955],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.8912384185343545,1.80317648180055,1.7502549284241447,1.705510428566858,1.656905360260383,1.6120957864762817,1.5640551876031559,1.508395442571346,1.458931629707214,1.4155563232816062,1.3682655961180052,1.3206938071801404,1.268097111257921,1.2180526822554052,1.1660180875883615,1.1222160424802732,1.0687387101570058,1.0184684404813042,0.9379315701478494],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.5,0.6000000000000001,0.7000000000000001,0.8,0.9,1.0],"visible":true,"ticks":"inside","range":[0.4800862622574643,1.016917181255115],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.5","0.6","0.7","0.8","0.9","1.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.0,1.2000000000000002,1.4000000000000001,1.6,1.8,2.0],"visible":true,"ticks":"inside","range":[0.9066497994624275,2.0119390303473343],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.0","1.2","1.4","1.6","1.8","2.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <h3></h3><p>It can be shown that we have for any $q$ in $[1/2, 1]$ with initial guess $x_0 = 48/17 - 32/17\cdot q$ that Newton's method will converge to 16 digits in no more than this many steps:</p>$$~
 \log_2(\frac{53 + 1}{\log_2(17)}).
@@ -319,8 +319,8 @@ ceil(Integer, a)</pre>
 |e_{n+1}| \leq \frac{f''(\xi)}{2f'(x_n)} e_n^2 \leq \frac{4}{2\cdot 1} e_n^2
 ~$$
 <p>But $|e_0| \leq 1/17$, so we get</p><pre class="sourceCode julia">e0 = 1/17
-e1 = 2*e0^2; e2 = 2*e1^2; e3=2*e2^2;e4=2*e3^2;e5=2*e4^2;
-(e1,e2,e3,e4,e5)</pre>
+e1 = 2*e0^2; e2 = 2*e1^2; e3 = 2*e2^2; e4 = 2*e3^2; e5 = 2*e4^2;
+e1, e2, e3, e4, e5</pre>
 <pre class="output">
 (0.006920415224913495, 9.578429377042899e-5, 1.8349261866199686e-8, 6.7339082206874e-16, 9.06910398492827e-31)</pre>
 
@@ -333,7 +333,7 @@ x = -q*x*x + 2*x</pre>
 <pre class="output">
 1.25</pre>
 
-<p>Timing this shows the method to be slightly faster than a regular division.</p>
+<p>Timing this shows the method to be similar to  a regular division.</p>
   </div>
 </div>  
 

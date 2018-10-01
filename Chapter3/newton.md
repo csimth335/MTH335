@@ -28,6 +28,9 @@ intersection.
 
 ```nocode
 using Plots, Roots
+using ForwardDiff
+Base.adjoint(f) = x -> ForwardDiff.derivative(f, float(x))
+D(f) = f'
 function newtons_method_graph(n, f, a, b, c)
 
     xstars = [c]
@@ -36,9 +39,9 @@ function newtons_method_graph(n, f, a, b, c)
 
     plt = plot(f, a, b, legend=false)
     plot!(plt, [a, b], [0,0], color=:black)
-    
 
-    ts = linspace(a,b)
+
+    ts = range(a,stop=b, length=100)
     for i in 1:n
         x0 = xs[end]
         x1 = x0 - f(x0)/D(f)(x0)
@@ -135,7 +138,7 @@ When do we stop?
 function nm(f, fp, x)
   ## Fill me in...
 end
-```  
+```
 
 ### Programming a stopping value
 
@@ -255,7 +258,7 @@ f(x) = f(x_n) + f'(x_n) \cdot (x - x_n) + f''(\xi)/2 \cdot (x - x_n)^2
 Using $r$ for $x$ gives:
 
 $$~
-0 = f(r) = f(x_n) + f'(x_n) \cdot (r - x_n) + f''(\xi)/2 \cdot (r - x_n)^2 
+0 = f(r) = f(x_n) + f'(x_n) \cdot (r - x_n) + f''(\xi)/2 \cdot (r - x_n)^2
 ~$$
 
 Divide by $f'(x_n)$
@@ -310,9 +313,8 @@ So the Newton algorithm will have trouble
 
 ```
 using Roots
-Base.ctranspose(f) = x -> D(f)(x) # makes f'(x) work
 f(x) = x^20 - 1
-newton(f, 0.5)
+newton(f,f', 0.5)
 ```
 
 If $x_0 = 0.5$ we have $C$ may be as big as: (Depends if $\xi$ is near $1$ or $0.5$.
@@ -408,7 +410,7 @@ convergence is linear with $\lvert e_{n+1}\rvert \approx (k-1)/k
 using Roots
 f(x) = cos(x) - x
 g(x) = f(x)^4
-newton(g, 0.7, verbose=true)
+newton(g,g', 0.7, verbose=true)
 ```
 
 ## Application: division through multiplication
@@ -431,7 +433,7 @@ simplifies to:
 
 $$~
 x - f(x) / f'(x) \quad\text{or}\quad x - (x - 1/q)/ 1 = 1/q
-~$$ 
+~$$
 
 That doesn't really help, as Newton's method is just $x_{i+1} = 1/q$
 -- that is it just jumps to the answer, the one we want to compute by
