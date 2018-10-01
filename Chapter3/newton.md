@@ -181,7 +181,7 @@ still small.
 ```
 function nm(f, fp, x; atol=eps(), rtol=1e-12, maxsteps=100)
    cnt = 0
-   while cnt < maxsteps && norm(f(x)) >= atol + norm(x) * rtol
+   while cnt < maxsteps && abs(f(x)) >= atol + abs(x) * rtol
      x = x - f(x) / fp(x)
      cnt = cnt + 1
   end
