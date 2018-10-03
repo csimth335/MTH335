@@ -12,7 +12,7 @@ Where $F(u) = u - f(u)/f'(u)$.
 
 What conditions on $F$ ensure that this sequence will converge? For the specific case of Newton's method, the following can work:
 
-Suppose $f(z) = 0$ and $f$ is twice differentiable around $z$. 
+Suppose $f(z) = 0$ and $f$ is twice differentiable around $z$.
 If there is some $\delta > 0$ such that $|f''(y)/f'(x)| < 2/\delta$ whenever $|x-z|, |y-z| < \delta$, then the algorithm will converge to $z$.
 
 ## A fixed point
@@ -120,7 +120,7 @@ $$~
 F(x) - F(y) = \frac{1}{3}(\sin(2x) - \sin(2y)) = \frac{1}{3}(2\cos(2\xi))( x- y) = \cos(2\xi) \cdot \frac{2}{3} \cdot (x-y).
 ~$$
 
-### 
+###
 
 So we have a contractive map. It will converge for *any* starting point, as $C$ did not need specifying. Let's see.
 
@@ -200,7 +200,7 @@ We use `SymPy` as the derivatives are involved:
 ```
 using SymPy
 @vars x
-@symfuns u
+u = SymFunction("u")
 F(x) = x - 2u(x)*u'(x) / (2u'(x)^2 - u(x) * u''(x))
 ```
 
@@ -256,6 +256,7 @@ ys = F.(xs)
 
 
 for i = 0:3
+  global x0
   annotate!([(x0, F(x0), "(x$i, F(x$i))")])
   x0 = F(x0)
 end

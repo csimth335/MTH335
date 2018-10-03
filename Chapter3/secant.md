@@ -45,7 +45,7 @@ We could implement the method following the algorithm on page 95, but instead us
 ```
 using Roots
 f(x) = x^3 - sinh(x) + 4x^2 + 6x + 9
-xstar = secant_method(f, 7.0, 8.0, verbose=true)
+xstar = find_zero(f, (7.0, 8.0), Roots.Secant(), verbose=true)
 ```
 
 
@@ -66,7 +66,7 @@ e_{n+1} = \frac{1}{2} \frac{f''(\xi)}{f'(x_n)} e_n^2.
 With the secant  method we have (p96)
 
 $$~
-e_{n+1} \approx \frac{1}{2}\frac{f''(r)}{f'(r)} e_n e_{n-1} 
+e_{n+1} \approx \frac{1}{2}\frac{f''(r)}{f'(r)} e_n e_{n-1}
 ~$$
 
 Not quite the same, but similar
@@ -104,7 +104,7 @@ The left side is constant, so the right side exponent should be $0$.
 
 ```
 using SymPy
-alpha = symbols("alpha")
+@vars alpha
 solve(1 - alpha + 1/alpha, alpha)
 ```
 

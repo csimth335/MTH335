@@ -9,7 +9,7 @@
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -108,49 +108,49 @@ $( document ).ready(function() {
 </blockquote><p>What is it? We start with two points $x_0$ and $x_1$ (not the same). Then instead of the tangent line at $(x_1, f(x_1))$, we use the secant line.</p><p>Solving for when it intersects the $x$ axis yields:</p>$$~
 x_{n+1} = x_n - \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})} \cdot f(x_n)
 ~$$
-<p>Basically use the slope of a secant line instead of $f'(x_n)$, the slope of the tangent. Hence the advantage, each step only requires one function evaluation $f(x_n)$, not  (the other being $f'(x_n)$).</p><h3>Example</h3><p>Let $f(x) = \sin(x)$, $x_0=3$, $x_1=4$ and what do we get?</p><pre class="sourceCode julia">f(x) = sin(x)
+<p>Basically use the slope of a secant line instead of $f'(x_n)$, the slope of the tangent. Hence the advantage, each step only requires one function evaluation $f(x_n)$, not two (the other being $f'(x_n)$ in Newton's method).</p><h3>Example</h3><p>Let $f(x) = \sin(x)$, $x_0=3$, $x_1=4$ and what do we get?</p><pre class="sourceCode julia">f(x) = sin(x)
 x = [3.0, 4.0]
 push!(x, x[end] - (x[end] - x[end-1]) / (f(x[end]) - f(x[end-1])) * f(x[end]))</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 3.0    
- 4.0    
- 3.15716</pre>
+ 3.0              
+ 4.0              
+ 3.157162792479947</pre>
 
 <pre class="sourceCode julia">push!(x, x[end] - (x[end] - x[end-1]) / (f(x[end]) - f(x[end-1])) * f(x[end]))</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- 3.0    
- 4.0    
- 3.15716
- 3.13946</pre>
+ 3.0               
+ 4.0               
+ 3.157162792479947 
+ 3.1394590982180786</pre>
 
 <pre class="sourceCode julia">push!(x, x[end] - (x[end] - x[end-1]) / (f(x[end]) - f(x[end-1])) * f(x[end]))
 push!(x, x[end] - (x[end] - x[end-1]) / (f(x[end]) - f(x[end-1])) * f(x[end]))</pre>
 <pre class="output">
 6-element Array{Float64,1}:
- 3.0    
- 4.0    
- 3.15716
- 3.13946
- 3.14159
- 3.14159</pre>
+ 3.0               
+ 4.0               
+ 3.157162792479947 
+ 3.1394590982180786
+ 3.141592727984857 
+ 3.1415926535897367</pre>
 
 <p>So it converges in this case.</p><h3>Some check</h3><p>We could implement the method following the algorithm on page 95, but instead use that given in the <code>Roots</code> package.</p><pre class="sourceCode julia">using Roots
 f(x) = x^3 - sinh(x) + 4x^2 + 6x + 9
-xstar = secant_method(f, 7.0, 8.0, verbose=true)</pre>
+xstar = find_zero(f, (7.0, 8.0), Roots.Secant(), verbose=true)</pre>
 <pre class="output">
-7.113063429254095</pre>
+7.113063429254094</pre>
 
 <p>And we see</p><pre class="sourceCode julia">f(xstar)</pre>
 <pre class="output">
--2.1316282072803006e-13</pre>
+2.6290081223123707e-13</pre>
 
 <h2>Error analysis.</h2><p>For Newton's method, we found</p>$$~
 e_{n+1} = \frac{1}{2} \frac{f''(\xi)}{f'(x_n)} e_n^2.
 ~$$
 <p>With the secant  method we have (p96)</p>$$~
-e_{n+1} \approx \frac{1}{2}\frac{f''(r)}{f'(r)} e_n e_{n-1} 
+e_{n+1} \approx \frac{1}{2}\frac{f''(r)}{f'(r)} e_n e_{n-1}
 ~$$
 <p>Not quite the same, but similar</p><h3>Order of convergence</h3><p>Suppose we expect convergence with order $\alpha$, that is we suppose</p>$$~
 |e_{n+1}| \approx A |e_n|^\alpha
@@ -168,8 +168,11 @@ A |e_n|^\alpha \approx |C| |e_n| (A^{-1}|e_n|)^{1/\alpha}
 A^{1 + 1/\alpha} |C|^{-1} \approx |e_n|^{1 - \alpha + 1/\alpha}.
 ~$$
 <p>The left side is constant, so the right side exponent should be $0$.</p><pre class="sourceCode julia">using SymPy
-alpha = symbols("alpha")
+@vars alpha
 solve(1 - alpha + 1/alpha, alpha)</pre>
+<div class="well well-sm">
+\begin{bmatrix}\frac{1}{2} + \frac{\sqrt{5}}{2}\\- \frac{\sqrt{5}}{2} + \frac{1}{2}\end{bmatrix}</div>
+
 <p>Taking the positive root gives the rate, roughly 1.61803.</p><h3>Robust</h3><p>Two steps of the secant method would have a rate twice that, which is more than quadratic. There is more compuation, but the same number of function calls as Newton's method. So in some cases the secant method is "faster."</p><p>However, the secant method requieres more work – two guesses, not one; and is more sensitive to the quality of the initial guess.</p><h3>Proof of error</h3><p>This follows the book</p>$$~
 \begin{align}
 e_{n+1}

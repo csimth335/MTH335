@@ -9,7 +9,7 @@
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -106,7 +106,7 @@ $( document ).ready(function() {
 <h1>Iteration as fixed points</h1><h2>General Framework</h2><p>A general framework for Newton's method is</p>$$~
 x_{n+1} = F(x_n), \quad (n\geq 0)
 ~$$
-<p>Where $F(u) = u - f(u)/f'(u)$.</p><p>What conditions on $F$ ensure that this sequence will converge? For the specific case of Newton's method, the following can work:</p><p>Suppose $f(z) = 0$ and $f$ is twice differentiable around $z$.  If there is some $\delta > 0$ such that $|f''(y)/f'(x)| < 2/\delta$ whenever $|x-z|, |y-z| < \delta$, then the algorithm will converge to $z$.</p><h2>A fixed point</h2><p>Suppose $x_n \rightarrow s$. Then if $F$ is continuous we have</p>$$~
+<p>Where $F(u) = u - f(u)/f'(u)$.</p><p>What conditions on $F$ ensure that this sequence will converge? For the specific case of Newton's method, the following can work:</p><p>Suppose $f(z) = 0$ and $f$ is twice differentiable around $z$. If there is some $\delta > 0$ such that $|f''(y)/f'(x)| < 2/\delta$ whenever $|x-z|, |y-z| < \delta$, then the algorithm will converge to $z$.</p><h2>A fixed point</h2><p>Suppose $x_n \rightarrow s$. Then if $F$ is continuous we have</p>$$~
 s = \lim x_{n+1} = \lim F(x_n) = F(s)
 ~$$
 <p>That is $s = F(s)$, so $s$ is a <strong>fixed point</strong> of $F$.</p><h3>What general assumptions on $F$ will ensure a fixed point exists?</h3><blockquote>
@@ -131,7 +131,7 @@ F(x) - F(y) = \frac{x-y}{2} - \frac{s}{2}[\frac{1}{x} - \frac{1}{y}] = (x-y) \cd
 <p>So, by repeating, we get</p>$$~
 |x_n - x_{n-1}| \leq \lambda^{n-1} |x_1 - x_0|.
 ~$$
-<p>This implies the sequence $x_n$will converge:</p><p>We write</p>$$~
+<p>This implies the sequence $x_n$ will converge:</p><p>We write</p>$$~
 x_n = (x_n - x_{n-1}) + (x_{n-1} - x_{n-2}) + \cdots + (x_1 - x_0) + x_0
 ~$$
 <p>So the sequence of $x_n$ will converge only if the series $\sum_{i=0}^n (x_i -x_{i-1})$ converges. In this case it is easy to see, as</p>$$~
@@ -179,7 +179,37 @@ F(x_n) - F(s) &= x_{n+1} - s = e_{n+1}\\\\
 <p>So the <em>order of convergence</em> is atleast $q$.</p><h3>Newton, order of convergence at least $2$</h3><p>For Newton's method, $F(u) = u - f(u)/f'(u)$. We have</p>$$~
 F'(u) = 1 - \frac{f'(u)^2 - f(u) f''(u)}{f'(u)^2} = \frac{f(u)f''(u)}{f'(u)^2}.
 ~$$
-<p>If $s$ is a fixed point, $f(s) = 0$, so $F'(s)=0$. That is $q \geq 2$.</p><h3>visualize</h3><p>If we graph $F(x)$ and layer on the line $y=x$, we can see cobwebbing converges to a fixed point.</p><pre class="sourceCode julia">using Plots
+<p>If $s$ is a fixed point, $f(s) = 0$, so $F'(s)=0$. That is $q \geq 2$.</p><h3>Halley, order of convergence is 3 (or more)</h3><p>Halley's method, a zero-finding method like Newton's method, is summarized by</p>$$~
+F(x) = x - 2f(x)\cdot f'(x) / (2f'(x)^2 - f(x)\cdot f''(x)).
+~$$
+<p>We can verify it has order 3 or more by showing $F''(s) = 0$, but $F'''(s) \neq 0$ in general.</p><p>We use <code>SymPy</code> as the derivatives are involved:</p><pre class="sourceCode julia">using SymPy
+@vars x
+u = SymFunction("u")
+F(x) = x - 2u(x)*u'(x) / (2u'(x)^2 - u(x) * u''(x))</pre>
+<pre class="output">
+F (generic function with 1 method)</pre>
+
+<p>First we verify that $F'(s)$ and $F''(s)$ are $0$ where $u(s) = 0$.</p><pre class="sourceCode julia">@vars up upp uppp
+diff(F(x),x) |> simplify</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{\left(- 2 \frac{d}{d x} u{\left (x \right )} \frac{d^{3}}{d x^{3}} u{\left (x \right )} + 3 \left(\frac{d^{2}}{d x^{2}} u{\left (x \right )}\right)^{2}\right) u^{2}{\left (x \right )}}{u^{2}{\left (x \right )} \left(\frac{d^{2}}{d x^{2}} u{\left (x \right )}\right)^{2} - 4 u{\left (x \right )} \left(\frac{d}{d x} u{\left (x \right )}\right)^{2} \frac{d^{2}}{d x^{2}} u{\left (x \right )} + 4 \left(\frac{d}{d x} u{\left (x \right )}\right)^{4}}\end{equation*}</div>
+
+<p>If it hard to see $u(x)$ as a factor, we can substitute:</p><pre class="sourceCode julia">ex = diff(F(x), x)
+ex(u'''(x) => uppp, u''(x)=>upp, u'(x) => up)(u(x) => 0)</pre>
+<div class="well well-sm">
+\begin{equation*}0\end{equation*}</div>
+
+<p>We can see for $F^{(2)}$ with:</p><pre class="sourceCode julia">ex = diff(F(x), x, x)
+ex(u'''(x) => uppp, u''(x)=>upp, u'(x) => up)(u(x) => 0)</pre>
+<div class="well well-sm">
+\begin{equation*}0\end{equation*}</div>
+
+<p>Finally, for $q=3$ we have:</p><pre class="sourceCode julia">ex = diff(F(x), x, x, x)  # third derivative
+ex(u'''(x) => uppp, u''(x)=>upp, u'(x) => up)(u(x) => 0)</pre>
+<div class="well well-sm">
+\begin{equation*}- \frac{up uppp - \frac{3 upp^{2}}{2}}{up^{2}}\end{equation*}</div>
+
+<p>As this is not zero in general, the convergence is cubic except possibly in special cases.</p><h3>visualize</h3><p>If we graph $F(x)$ and layer on the line $y=x$, we can see cobwebbing converges to a fixed point.</p><pre class="sourceCode julia">using Plots
 
 F(x) = x - sin(x)/cos(x)
 a,b = 2.0, 4.3
@@ -194,6 +224,7 @@ ys = F.(xs)
 
 
 for i = 0:3
+  global x0
   annotate!([(x0, F(x0), "(x$i, F(x$i))")])
   x0 = F(x0)
 end
@@ -204,10 +235,10 @@ for i in 1:5
 end
 plot!(xs, ys, linewidth=5, alpha=0.5)
 </pre>
-    <div id="c636d763-1f29-4e18-bbe8-fd425eb10db9" style="width:600px;height:400px;"></div>
+    <div id="7f51adf7-3252-41f7-a922-7297fea84171" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('c636d763-1f29-4e18-bbe8-fd425eb10db9');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[4.158622654990162,4.132970741961312,4.10805511956091,4.0838482240488165,3.889366747177082,3.7373615007237913,3.616865556075193,3.520357532599271,3.428680512281079,3.35743093191544,3.3096323451993497,3.270978116072675,3.211123423152921,3.177236437150861,3.156289624166761,3.145026524829432,3.1419229747348556,3.1415926467948037,3.141092761124946,3.13764037640441,3.1264969016796247,3.1040046144287925,3.0614750119811385,3.003125323904946,2.9532849458206654,2.889100485770539,2.8119924844657804,2.7137886920386625,2.615474538590031,2.4945731159371345,2.344429522815772,2.15553563777501,2.1222103877015495,2.08758431207781,2.0515892275782406],"type":"scatter","name":"y1","yaxis":"y","x":[2.005615345936378,2.0112306918727563,2.0168460378091346,2.0224613837455125,2.0743833651809487,2.126305346616385,2.178227328051821,2.2301493094872575,2.2925552027450964,2.3549610960029352,2.407724484524598,2.460487873046261,2.5751195310760187,2.680799780429645,2.794100176734927,2.9253697969786243,3.0420267440553497,3.144324374042506,3.255856250307235,3.3680509911314678,3.49209662403613,3.61012291371314,3.7328428700761065,3.8361469334337435,3.8992082096011904,3.9622694857686374,4.021548945332333,4.08082840489603,4.128313550481257,4.175798696066484,4.2232838416517104,4.270768987236938,4.278076740427704,4.285384493618469,4.292692246809235]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[2.0224613837455125,2.2301493094872575,2.3549610960029352,2.460487873046261,2.5751195310760187,2.680799780429645,2.794100176734927,2.9253697969786243,3.0420267440553497,3.144324374042506,3.255856250307235,3.3680509911314678,3.49209662403613,3.61012291371314,3.7328428700761065,3.8361469334337435,3.9622694857686374,4.08082840489603,4.270768987236938],"type":"scatter","name":"y2","yaxis":"y","x":[2.0224613837455125,2.2301493094872575,2.3549610960029352,2.460487873046261,2.5751195310760187,2.680799780429645,2.794100176734927,2.9253697969786243,3.0420267440553497,3.144324374042506,3.255856250307235,3.3680509911314678,3.49209662403613,3.61012291371314,3.7328428700761065,3.8361469334337435,3.9622694857686374,4.08082840489603,4.270768987236938]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(62, 164, 78, 0.500)","shape":"linear","dash":"solid","width":5},"y":[4.185039863261519,4.185039863261519,2.467893674514666,2.467893674514666,3.266186277569106,3.266186277569106,3.1409439123176353,3.1409439123176353,3.1415926536808043,3.1415926536808043,3.141592653589793],"type":"scatter","name":"y3","yaxis":"y","x":[2.0,4.185039863261519,4.185039863261519,2.467893674514666,2.467893674514666,3.266186277569106,3.266186277569106,3.1409439123176353,3.1409439123176353,3.1415926536808043,3.1415926536808043]}], {"showlegend":true,"xaxis":{"tickvals":[2.0,2.5,3.0,3.5,4.0],"ticks":"inside","tickmode":"array","domain":[0.05100612423447069,0.9934383202099737],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["2.0","2.5","3.0","3.5","4.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":4.185039863261519,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"x","showarrow":false,"text":"(x0, F(x0))","xref":"x","x":2.0},{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":2.467893674514666,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"x","showarrow":false,"text":"(x1, F(x1))","xref":"x","x":4.185039863261519},{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":3.266186277569106,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"x","showarrow":false,"text":"(x2, F(x2))","xref":"x","x":2.467893674514666},{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":3.1409439123176353,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"x","showarrow":false,"text":"(x3, F(x3))","xref":"x","x":3.266186277569106}],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"tickvals":[2.5,3.0,3.5,4.0],"ticks":"inside","tickmode":"array","domain":[0.03762029746281716,0.9901574803149606],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["2.5","3.0","3.5","4.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('7f51adf7-3252-41f7-a922-7297fea84171');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[2.005615345936378,2.0112306918727563,2.0168460378091346,2.0224613837455125,2.0743833651809487,2.126305346616385,2.178227328051821,2.2301493094872575,2.2925552027450964,2.3549610960029352,2.407724484524598,2.460487873046261,2.5751195310760187,2.680799780429645,2.794100176734927,2.9253697969786243,3.0420267440553497,3.144324374042506,3.255856250307235,3.3680509911314678,3.49209662403613,3.61012291371314,3.7328428700761065,3.8361469334337435,3.8992082096011904,3.9622694857686374,4.021548945332333,4.08082840489603,4.128313550481257,4.175798696066484,4.2232838416517104,4.270768987236938,4.278076740427704,4.285384493618469,4.292692246809235],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[4.158622654990162,4.132970741961312,4.10805511956091,4.0838482240488165,3.889366747177082,3.7373615007237913,3.616865556075193,3.520357532599271,3.428680512281079,3.35743093191544,3.3096323451993497,3.270978116072675,3.211123423152921,3.177236437150861,3.156289624166761,3.145026524829432,3.1419229747348556,3.1415926467948037,3.141092761124946,3.13764037640441,3.1264969016796247,3.1040046144287925,3.0614750119811385,3.003125323904946,2.9532849458206654,2.889100485770539,2.8119924844657804,2.7137886920386625,2.615474538590031,2.4945731159371345,2.344429522815772,2.15553563777501,2.1222103877015495,2.08758431207781,2.0515892275782406],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[2.0224613837455125,2.2301493094872575,2.3549610960029352,2.460487873046261,2.5751195310760187,2.680799780429645,2.794100176734927,2.9253697969786243,3.0420267440553497,3.144324374042506,3.255856250307235,3.3680509911314678,3.49209662403613,3.61012291371314,3.7328428700761065,3.8361469334337435,3.9622694857686374,4.08082840489603,4.270768987236938],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[2.0224613837455125,2.2301493094872575,2.3549610960029352,2.460487873046261,2.5751195310760187,2.680799780429645,2.794100176734927,2.9253697969786243,3.0420267440553497,3.144324374042506,3.255856250307235,3.3680509911314678,3.49209662403613,3.61012291371314,3.7328428700761065,3.8361469334337435,3.9622694857686374,4.08082840489603,4.270768987236938],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null],"x":[2.0,4.185039863261519,4.185039863261519,2.467893674514666,2.467893674514666,3.266186277569106,3.266186277569106,3.1409439123176353,3.1409439123176353,3.1415926536808043,3.1415926536808043],"showlegend":true,"mode":"lines","name":"y3","zmin":-0.1,"legendgroup":"y3","zmax":0.1,"line":{"color":"rgba(62, 164, 78, 0.500)","shape":"linear","dash":"solid","width":5},"y":[4.185039863261519,4.185039863261519,2.467893674514666,2.467893674514666,3.266186277569106,3.266186277569106,3.1409439123176353,3.1409439123176353,3.1415926536808043,3.1415926536808043,3.141592653589793],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[2.0,2.5,3.0,3.5,4.0],"visible":true,"ticks":"inside","range":[1.931219232595723,4.361473014213512],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["2.0","2.5","3.0","3.5","4.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":4.185039863261519,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"y","showarrow":false,"text":"(x0, F(x0))","xref":"x","x":2.0},{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":2.467893674514666,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"y","showarrow":false,"text":"(x1, F(x1))","xref":"x","x":4.185039863261519},{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":3.266186277569106,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"y","showarrow":false,"text":"(x2, F(x2))","xref":"x","x":2.467893674514666},{"yanchor":"middle","xanchor":"center","rotation":-0.0,"y":3.1409439123176353,"font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":20},"yref":"y","showarrow":false,"text":"(x3, F(x3))","xref":"x","x":3.266186277569106}],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[2.0,2.5,3.0,3.5,4.0],"visible":true,"ticks":"inside","range":[1.9550121556407698,4.338218215341681],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["2.0","2.5","3.0","3.5","4.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 
   </div>
