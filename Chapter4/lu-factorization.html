@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -184,7 +184,8 @@ x_i = (b_{p_i} -  \sum_{j=1}^{i-1} a_{p_i j}) / a_{p_i i}.
 </li>
 <li><p>But $y = Ux$, so we solve $Ux = y$ for $x$.</p>
 </li>
-</ul><p>So if we can <em>factorize</em> $A = LU$, we can easily solve $Ax = b$.</p><h3>Example</h3><p>In Julia (and MATLAB) there is a built in solver for these problems:</p><pre class="sourceCode julia">U = [1 2; 0 1]</pre>
+</ul><p>So if we can <em>factorize</em> $A = LU$, we can easily solve $Ax = b$.</p><h3>Example</h3><p>In Julia (and MATLAB) there is a built in solver for these problems:</p><pre class="sourceCode julia">using LinearAlgebra
+U = [1 2; 0 1]</pre>
 <pre class="output">
 2×2 Array{Int64,2}:
  1  2
@@ -332,7 +333,17 @@ U[3,3] = 1</pre>
 
 <h3>Optimized versions</h3><p>There are built in functions for these:</p><pre class="sourceCode julia">L, U, p =  lu(A)</pre>
 <pre class="output">
-([1.0 0.0 0.0; 1.0 1.0 0.0; 1.0 1.0 1.0], [1.0 1.0 1.0; 0.0 1.0 1.0; 0.0 0.0 1.0], [1, 2, 3])</pre>
+LU{Float64,Array{Float64,2}}
+L factor:
+3×3 Array{Float64,2}:
+ 1.0  0.0  0.0
+ 1.0  1.0  0.0
+ 1.0  1.0  1.0
+U factor:
+3×3 Array{Float64,2}:
+ 1.0  1.0  1.0
+ 0.0  1.0  1.0
+ 0.0  0.0  1.0</pre>
 
 <p>We already verified that $LU = A$ for this $A$. The <code>p</code> is a permulation vector. In general, we should verify</p><pre class="sourceCode julia">A[p,:]  -  L * U</pre>
 <pre class="output">
@@ -406,7 +417,7 @@ w = [w]	 # a vector
 a_11 = symbols("a_11", positive=true)
 A = [a_11 w'; w K]
 L = [sqrt(a_11) 0; w*(1/sqrt(a_11)) 1]
-B_1 = [1 0;0 (K-w*w'*(1/a_11))]
+B_1 = [1 0;0 (K-dot(w,w')*(1/a_11))]
 
 L*B_1*L'</pre>
 <div class="well well-sm">
@@ -456,50 +467,51 @@ A = L_1 L_2 \cdots L_n \cdot I \cdot  L_n^T \cdots L_2^T L_1^T.
  27   53
  53  142</pre>
 
-<p>So we can take the cholesky decomposition:</p><pre class="sourceCode julia">U = chol(M)'   # default answer is upper triangular
-L = U'</pre>
+<p>So we can take the cholesky decomposition:</p><pre class="sourceCode julia">V = cholesky(M)   # default answer is upper triangular object
+U = V.U           # get U
+L = U'            # get L</pre>
 <pre class="output">
-2×2 UpperTriangular{Float64,Array{Float64,2}}:
- 5.19615  10.1999 
-  ⋅        6.16141</pre>
+2×2 Adjoint{Float64,UpperTriangular{Float64,Array{Float64,2}}}:
+  5.196152422706632  0.0              
+ 10.199854755683388  6.161409170227455</pre>
 
 <p>So we can solve $LL^Tx = A^T b$. First we solve for $y$ in $Ly=A^Tb$ with:</p><pre class="sourceCode julia">y = L \ (A'*b)</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- -16.282 
-  10.5495</pre>
+ 4.426352063787131
+ 3.221966161211625</pre>
 
 <p>And then solve $L^Tx = y$:</p><pre class="sourceCode julia">x = L' \ y</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- -3.13347
-  6.89947</pre>
+ -0.17463414634146346
+  0.5229268292682927 </pre>
 
 <p>This answer is not the "answer" (as that doesn't exist):</p><pre class="sourceCode julia">A*x - b</pre>
 <pre class="output">
 4-element Array{Float64,1}:
-  9.66548
- 23.097  
- 32.7624 
- 48.0623 </pre>
+ -0.12878048780487805 
+  0.09073170731707325 
+ -0.03804878048780491 
+  0.008780487804878057</pre>
 
 <p>However, it has a property: it is the <code>x</code> with the smallest difference:</p><pre class="sourceCode julia">norm(A*x - b)</pre>
 <pre class="output">
-63.3265770219158</pre>
+0.16230053424013788</pre>
 
 <pre class="sourceCode julia">sort([norm(A*rand(2) - b) for _ in 1:10])</pre>
 <pre class="output">
 10-element Array{Float64,1}:
- 1.59631
- 2.34953
- 2.83948
- 2.9917 
- 3.05481
- 4.25942
- 4.66051
- 4.73319
- 5.00539
- 6.7586 </pre>
+ 2.546095983340478 
+ 2.8133758013816235
+ 3.2018770213004784
+ 3.220755074796688 
+ 3.2498611568237483
+ 3.2552687877003774
+ 4.234795575807389 
+ 7.209545859319544 
+ 9.330785943196545 
+ 9.899790003090045 </pre>
 
 <h3>Why?</h3><p>(P279) Suppose $Ax=b$ has $A$ being $m \times n$ with $m > n$ and $rank(A) = n$. Then, this will typically have no solutions. In that case, what is sought is a best solution in the sense of minimizing $\| b - Ax \|_2$.</p><p>Now suppose $x$ solves $A^TAx=A^Tb$, and $y$ is some other value, then</p>$$~
 \begin{align}
@@ -512,7 +524,7 @@ L = U'</pre>
 ~$$
 <p>The latter because, $Ax-b$ has a $0$ dot product with vectors in the column space of $A$ (as $A^T(Ax-b)=0$. But $A(x-y)$ is in the column space of $A$. (Any $Az = [A_{\cdot 1} ; A_{\cdot 2} ; \cdots ; A_{\cdot n}] \cdot z = z_1A_{\cdot 1} + z_2A_{\cdot 2} + \cdots + z_n A_{\cdot n}$.) So, the cross terms are 0 and the result holds.</p>
   </div>
-</div>  
+</div>
 
 </body>
 </html>

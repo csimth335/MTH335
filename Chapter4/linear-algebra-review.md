@@ -88,6 +88,7 @@ $$~
 Then we can do the following:
 
 ```
+using LinearAlgebra
 A = [1 2 3; 5 6 7; 9 10 11]
 b = [4,8,12]
 A
@@ -236,7 +237,7 @@ $$~
 A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
 ~$$
 
-On the computer we see easily using `.'` for transpose:
+On the computer we see easily using `'` for transpose:
 
 Here is $A$:
 
@@ -247,21 +248,19 @@ A
 and its transpose
 
 ```
-A.'
+A'
 ```
 
 The transpose is an *involution* -- meaning do it twice and you haven't changed anything:
 
 ```
-(A.').'
+(A')'
 ```
 
-Without a "dot" the conjugate transpose is performed. For real-valued
-matrices the two are identical:
+Note: The above actually is the *conjugate* transpose. (Which will
+take complex conjugates of values.) To find the transpose is more
+verbose: `transpose(A)`.
 
-```
-A'
-```
 
 ----
 
@@ -304,7 +303,7 @@ For which $x^T A x = (x_1 + x_2)^2 + x_1^2 + x_2^2 > 0$ (if $x \neq 0$).
 
 Let $I$ be an $n \times n$ *identify matrix*,  that is $I$ is all $0$s with $1$s on the diagonal:
 
-Then$AI = A$ and  $IA = A$, if defined. For example:
+Then $AI = A$ and  $IA = A$, if defined. For example:
 
 $$~
 (AI)_{ij}
@@ -358,7 +357,8 @@ so is $E_i = $E'_i - E_j$.
 
 ### Matrix equivalence
 
-As systems of linear equations lend them selves to matrices, so to do elementary operations lend themselves to matrix operations.
+As systems of linear equations lend themselves to matrices, so to do
+elementary operations lend themselves to matrix operations.
 
 To illustrate:
 

@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -156,7 +156,8 @@ Ax = b.
 9x_{31} + 10x_{32} + 11x_{33} &= 12
 \end{align}
 ~$$
-<p>Then we can do the following:</p><pre class="sourceCode julia">A = [1 2 3; 5 6 7; 9 10 11]
+<p>Then we can do the following:</p><pre class="sourceCode julia">using LinearAlgebra
+A = [1 2 3; 5 6 7; 9 10 11]
 b = [4,8,12]
 A</pre>
 <pre class="output">
@@ -174,7 +175,13 @@ A</pre>
 
 <p>To put in <em>variables</em> we can use symbolic math:</p><pre class="sourceCode julia">using SymPy
 x = [symbols("x$i") for i in 1:3]</pre>
+<div class="well well-sm">
+\begin{bmatrix}x_{1}\\x_{2}\\x_{3}\end{bmatrix}</div>
+
 <p>And from here:</p><pre class="sourceCode julia">A*x - b</pre>
+<div class="well well-sm">
+\begin{bmatrix}x_{1} + 2 x_{2} + 3 x_{3} - 4\\5 x_{1} + 6 x_{2} + 7 x_{3} - 8\\9 x_{1} + 10 x_{2} + 11 x_{3} - 12\end{bmatrix}</div>
+
 <h3>Notation</h3><p>We saw $A$ has $m$ rows and $n$ columns.</p><p>Here we can view $x$ and $b$ as <em>vectors</em> or as matrices with 1 column. This is an identification, they are not mathematically the same thing.</p><h4>A matrix is a vector! A vector is not a matrix!</h4><p>A basic matrix in <code>Julia</code> is stored in contiguous memory, so has an order. Here we can see what it is  by looking at the first 4 elements</p><pre class="sourceCode julia">A[1:4]</pre>
 <pre class="output">
 4-element Array{Int64,1}:
@@ -283,42 +290,35 @@ A</pre>
 <h4>Division</h4><p>We don't have "division" defined for matrices. There are for some <em>square</em> matrices an analog, $A^{-1}$ for which $AA^{-1} = I$, the matrix with a one on the diagonal. This is sort of like $a \cdot (1/a) = 1$ when $a \neq 0$.</p><p>There is a built in function like division <code>\</code>. The expression <code>A \ b</code> will be a solution, <code>x</code> to <code>Ax &#61;b</code>:</p><pre class="sourceCode julia">A * (A \ b)  - b</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  0.0        
- -8.88178e-16
-  0.0        </pre>
+  0.0                  
+ -8.881784197001252e-16
+  0.0                  </pre>
 
 <h3>The transpose</h3><p>The transpose of the matrix $A=(a_{ij})_{1 \leq i \leq m, 1 \leq j \leq n}$ is found by swapping rows and columns:</p>$$~
 A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
 ~$$
-<p>On the computer we see easily using <code>.&#39;</code> for transpose:</p><p>Here is $A$:</p><pre class="sourceCode julia">A</pre>
+<p>On the computer we see easily using <code>&#39;</code> for transpose:</p><p>Here is $A$:</p><pre class="sourceCode julia">A</pre>
 <pre class="output">
 3×3 Array{Int64,2}:
  1  2  3
  4  5  6
  7  8  9</pre>
 
-<p>and its transpose</p><pre class="sourceCode julia">A.'</pre>
+<p>and its transpose</p><pre class="sourceCode julia">A'</pre>
 <pre class="output">
-3×3 Array{Int64,2}:
+3×3 LinearAlgebra.Adjoint{Int64,Array{Int64,2}}:
  1  4  7
  2  5  8
  3  6  9</pre>
 
-<p>The transpose is an <em>involution</em> – meaning do it twice and you haven't changed anything:</p><pre class="sourceCode julia">(A.').'</pre>
+<p>The transpose is an <em>involution</em> – meaning do it twice and you haven't changed anything:</p><pre class="sourceCode julia">(A')'</pre>
 <pre class="output">
 3×3 Array{Int64,2}:
  1  2  3
  4  5  6
  7  8  9</pre>
 
-<p>Without a "dot" the conjugate transpose is performed. For real-valued matrices the two are identical:</p><pre class="sourceCode julia">A'</pre>
-<pre class="output">
-3×3 Array{Int64,2}:
- 1  4  7
- 2  5  8
- 3  6  9</pre>
-
-<hr /><p>A matrix is <em>symmetric</em> if $A^T = A$. This means $A$ needs to be square and have symmetry along its main diagonal.</p><p>Our example <code>A</code> is <em>not</em> symmetric:</p><pre class="sourceCode julia">A' - A</pre>
+<p>Note: The above actually is the <em>conjugate</em> transpose. (Which will take complex conjugates of values.) To find the transpose is more verbose: <code>transpose&#40;A&#41;</code>.</p><hr /><p>A matrix is <em>symmetric</em> if $A^T = A$. This means $A$ needs to be square and have symmetry along its main diagonal.</p><p>Our example <code>A</code> is <em>not</em> symmetric:</p><pre class="sourceCode julia">A' - A</pre>
 <pre class="output">
 3×3 Array{Int64,2}:
   0   2  4
@@ -345,7 +345,7 @@ A^T = (a_{ji})_{1 \leq i \leq m, 1 \leq j \leq n}
  2  1
  1  2</pre>
 
-<p>For which $x^T A x = (x_1 + x_2)^2 + x_1^2 + x_2^2 > 0$ (if $x \neq 0$).</p><h2>Inverses</h2><p>Let $I$ be an $n \times n$ <em>identify matrix</em>,  that is $I$ is all $0$s with $1$s on the diagonal:</p><p>Then$AI = A$ and  $IA = A$, if defined. For example:</p>$$~
+<p>For which $x^T A x = (x_1 + x_2)^2 + x_1^2 + x_2^2 > 0$ (if $x \neq 0$).</p><h2>Inverses</h2><p>Let $I$ be an $n \times n$ <em>identify matrix</em>,  that is $I$ is all $0$s with $1$s on the diagonal:</p><p>Then $AI = A$ and  $IA = A$, if defined. For example:</p>$$~
 (AI)_{ij}
 = a_{i1} I_{1j} + \cdots+ a_{ij} I_{jj} + \cdots + a_{in} I_{nj}
 = a_{i1} 0+ \cdots+ a_{ij} 1+ \cdots + a_{in} 0
@@ -368,7 +368,7 @@ I_{:k} = \sum_l b_{lk}A_{:l}
 </li>
 <li><p>we could replace one equation by adding another to it and not effect the solutions.</p>
 </li>
-</ul><p>The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?</p><p>Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, the solution makes <em>both</em> $E'_i$ and $E_j$ $0$, so $-E_j$ is $0$, and then so is $E_i = $E'_i - E_j$.</p><h3>Matrix equivalence</h3><p>As systems of linear equations lend them selves to matrices, so to do elementary operations lend themselves to matrix operations.</p><p>To illustrate:</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]</pre>
+</ul><p>The latter is on the only tricky one. If we use $E'_i = E_i + E_j$ instead, do we get a difference?</p><p>Well, if our solutions solved $E_i$ and $E_j$, then it would also solve $E'_I$, as $0 + 0$ is still $0$. To get the reverse, the solution makes <em>both</em> $E'_i$ and $E_j$ $0$, so $-E_j$ is $0$, and then so is $E_i = $E'_i - E_j$.</p><h3>Matrix equivalence</h3><p>As systems of linear equations lend themselves to matrices, so to do elementary operations lend themselves to matrix operations.</p><p>To illustrate:</p><pre class="sourceCode julia">A = [1 2 3; 4 5 6; 7 8 9]</pre>
 <pre class="output">
 3×3 Array{Int64,2}:
  1  2  3
@@ -385,9 +385,9 @@ I_{:k} = \sum_l b_{lk}A_{:l}
 <p>We can multiply row 2 as follows:</p><pre class="sourceCode julia">[1 0 0; 0 pi 0; 0 0 1] * A</pre>
 <pre class="output">
 3×3 Array{Float64,2}:
-  1.0      2.0     3.0   
- 12.5664  15.708  18.8496
-  7.0      8.0     9.0   </pre>
+  1.0                 2.0                 3.0             
+ 12.566370614359172  15.707963267948966  18.84955592153876
+  7.0                 8.0                 9.0             </pre>
 
 <p>We can replace row $2$ with row $2$ plus row $3$ via:</p><pre class="sourceCode julia">[1 0 0; 0 1 0; 0 1 1] * A</pre>
 <pre class="output">
@@ -457,7 +457,7 @@ true</pre>
 
 
   </div>
-</div>  
+</div>
 
 </body>
 </html>

@@ -149,6 +149,7 @@ So if we can *factorize* $A = LU$, we can easily solve $Ax = b$.
 In Julia (and MATLAB) there is a built in solver for these problems:
 
 ```
+using LinearAlgebra
 U = [1 2; 0 1]
 ```
 
@@ -233,7 +234,7 @@ Let's look at this matrix
 ```
 A = [1 1 1; 1 2 2; 1 2 3]
 ```
- 
+
 We need to fill in $U$ and $L$. We start with a zeros:
 
 ```
@@ -485,7 +486,7 @@ w = [w]	 # a vector
 a_11 = symbols("a_11", positive=true)
 A = [a_11 w'; w K]
 L = [sqrt(a_11) 0; w*(1/sqrt(a_11)) 1]
-B_1 = [1 0;0 (K-w*w'*(1/a_11))]
+B_1 = [1 0;0 (K-dot(w,w')*(1/a_11))]
 
 L*B_1*L'
 ```
@@ -556,8 +557,9 @@ So we can take the cholesky decomposition:
 
 
 ```
-U = chol(M)'   # default answer is upper triangular
-L = U'
+V = cholesky(M)   # default answer is upper triangular object
+U = V.U           # get U
+L = U'            # get L
 ```
 
 So we can solve $LL^Tx = A^T b$. First we solve for $y$ in $Ly=A^Tb$ with:
