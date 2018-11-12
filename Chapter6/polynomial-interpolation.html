@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -159,11 +159,11 @@ eqs = Sym[subs(p, x, u) - v for (u,v) in zip(xs, ys)]</pre>
 
 <p>We can solve these (they are linear after all):</p><pre class="sourceCode julia">us = solve(eqs, as)</pre>
 <div class="well well-sm">
-\begin{equation*}\begin{cases}a_{0} & \text{=>} &\frac{x_{0} x_{1} y_{2} \left(x_{0} - x_{1}\right) - x_{0} x_{2} y_{1} \left(x_{0} - x_{2}\right) + x_{1} x_{2} y_{0} \left(x_{1} - x_{2}\right)}{x_{0}^{2} x_{1} - x_{0}^{2} x_{2} - x_{0} x_{1}^{2} + x_{0} x_{2}^{2} + x_{1}^{2} x_{2} - x_{1} x_{2}^{2}}\\a_{2} & \text{=>} &\frac{y_{0} \left(x_{1} - x_{2}\right) - y_{1} \left(x_{0} - x_{2}\right) + y_{2} \left(x_{0} - x_{1}\right)}{x_{0}^{2} x_{1} - x_{0}^{2} x_{2} - x_{0} x_{1}^{2} + x_{0} x_{2}^{2} + x_{1}^{2} x_{2} - x_{1} x_{2}^{2}}\\a_{1} & \text{=>} &\frac{- y_{0} \left(x_{1}^{2} - x_{2}^{2}\right) + y_{1} \left(x_{0}^{2} - x_{2}^{2}\right) - y_{2} \left(x_{0}^{2} - x_{1}^{2}\right)}{x_{0}^{2} x_{1} - x_{0}^{2} x_{2} - x_{0} x_{1}^{2} + x_{0} x_{2}^{2} + x_{1}^{2} x_{2} - x_{1} x_{2}^{2}}\\\end{cases}\end{equation*}</div>
+\begin{equation*}\begin{cases}a_{2} & \text{=>} &\frac{y_{0} \left(x_{1} - x_{2}\right) - y_{1} \left(x_{0} - x_{2}\right) + y_{2} \left(x_{0} - x_{1}\right)}{x_{0}^{2} x_{1} - x_{0}^{2} x_{2} - x_{0} x_{1}^{2} + x_{0} x_{2}^{2} + x_{1}^{2} x_{2} - x_{1} x_{2}^{2}}\\a_{0} & \text{=>} &\frac{x_{0} x_{1} y_{2} \left(x_{0} - x_{1}\right) - x_{0} x_{2} y_{1} \left(x_{0} - x_{2}\right) + x_{1} x_{2} y_{0} \left(x_{1} - x_{2}\right)}{x_{0}^{2} x_{1} - x_{0}^{2} x_{2} - x_{0} x_{1}^{2} + x_{0} x_{2}^{2} + x_{1}^{2} x_{2} - x_{1} x_{2}^{2}}\\a_{1} & \text{=>} &\frac{- y_{0} \left(x_{1}^{2} - x_{2}^{2}\right) + y_{1} \left(x_{0}^{2} - x_{2}^{2}\right) - y_{2} \left(x_{0}^{2} - x_{1}^{2}\right)}{x_{0}^{2} x_{1} - x_{0}^{2} x_{2} - x_{0} x_{1}^{2} + x_{0} x_{2}^{2} + x_{1}^{2} x_{2} - x_{1} x_{2}^{2}}\\\end{cases}\end{equation*}</div>
 
 <p>But it isn't pretty and doesn't get prettier with factoring</p><pre class="sourceCode julia">Dict(k=>factor(v) for (k,v) in us)</pre>
 <div class="well well-sm">
-\begin{equation*}\begin{cases}a_{0} & \text{=>} &\frac{1}{\left(x_{0} - x_{1}\right) \left(x_{0} - x_{2}\right) \left(x_{1} - x_{2}\right)} \left(x_{0}^{2} x_{1} y_{2} - x_{0}^{2} x_{2} y_{1} - x_{0} x_{1}^{2} y_{2} + x_{0} x_{2}^{2} y_{1} + x_{1}^{2} x_{2} y_{0} - x_{1} x_{2}^{2} y_{0}\right)\\a_{2} & \text{=>} &- \frac{x_{0} y_{1} - x_{0} y_{2} - x_{1} y_{0} + x_{1} y_{2} + x_{2} y_{0} - x_{2} y_{1}}{\left(x_{0} - x_{1}\right) \left(x_{0} - x_{2}\right) \left(x_{1} - x_{2}\right)}\\a_{1} & \text{=>} &\frac{x_{0}^{2} y_{1} - x_{0}^{2} y_{2} - x_{1}^{2} y_{0} + x_{1}^{2} y_{2} + x_{2}^{2} y_{0} - x_{2}^{2} y_{1}}{\left(x_{0} - x_{1}\right) \left(x_{0} - x_{2}\right) \left(x_{1} - x_{2}\right)}\\\end{cases}\end{equation*}</div>
+\begin{equation*}\begin{cases}a_{2} & \text{=>} &- \frac{x_{0} y_{1} - x_{0} y_{2} - x_{1} y_{0} + x_{1} y_{2} + x_{2} y_{0} - x_{2} y_{1}}{\left(x_{0} - x_{1}\right) \left(x_{0} - x_{2}\right) \left(x_{1} - x_{2}\right)}\\a_{0} & \text{=>} &\frac{x_{0}^{2} x_{1} y_{2} - x_{0}^{2} x_{2} y_{1} - x_{0} x_{1}^{2} y_{2} + x_{0} x_{2}^{2} y_{1} + x_{1}^{2} x_{2} y_{0} - x_{1} x_{2}^{2} y_{0}}{\left(x_{0} - x_{1}\right) \left(x_{0} - x_{2}\right) \left(x_{1} - x_{2}\right)}\\a_{1} & \text{=>} &\frac{x_{0}^{2} y_{1} - x_{0}^{2} y_{2} - x_{1}^{2} y_{0} + x_{1}^{2} y_{2} + x_{2}^{2} y_{0} - x_{2}^{2} y_{1}}{\left(x_{0} - x_{1}\right) \left(x_{0} - x_{2}\right) \left(x_{1} - x_{2}\right)}\\\end{cases}\end{equation*}</div>
 
 <h3>Vandermonde matrix</h3><p>A <a href="https://en.wikipedia.org/wiki/Vandermonde_matrix">Vandermonde</a> matrix is a matrix with a geometric progression in each row. For example, the matrix:</p>$$~
 \begin{bmatrix}
@@ -210,11 +210,11 @@ f(t) - p(t) = f[x_0, x_1, \dots, x_n, t] \cdot \prod (t-x_j)
 q(x) = p(x) +  f[x_0, x_1, \dots, x_n, t] \cdot \prod (x - x_j)
 ~$$
 <blockquote>
-<p>Thm 4 p333: Divided differences look like <em>derivatives</em>. If $f$ has sufficient derivatives, then if $a < x_0 < x_1 < \dots x_n < b$ there exists $\xi$ in $(a,b)$ with</p>
+<p>Thm 4 p333: Divided differences look like <em>derivatives</em>. If $f$ has sufficient derivatives, then if $a<x_0<x_1<\dots x_n<b$ there exists $\xi$ in $(a,b)$ with</p>
 </blockquote>$$~
 f[x_0, x_1, \dots, x_n] = \frac{1}{n!}f^{(n)}(\xi).
 ~$$
-<p>This is the error bound theorem in disguise.</p><h3>Relate to Taylor polynomial</h3><p>In calculus, we have that the tangent line is the limit of the secant line. Here we can view it as the limit of the newton interpolating polynomial between $x_0$ and $x_1$ as $x_1 \rightarrow x_0$:</p><pre class="sourceCode julia">function div_differences(f, xs) 
+<p>This is the error bound theorem in disguise.</p><h3>Relate to Taylor polynomial</h3><p>In calculus, we have that the tangent line is the limit of the secant line. Here we can view it as the limit of the Newton interpolating polynomial between $x_0$ and $x_1$ as $x_1 \rightarrow x_0$:</p><pre class="sourceCode julia">function div_differences(f, xs) 
   if length(xs) == 1
     return f(xs[1])
   else
@@ -231,34 +231,34 @@ Base.getindex(f::T, xs...) where {T <: SymFunction} = div_differences(f, [xs...]
 f(x) = sin(x)
 p = f[x0] + f[x0, x1]*(x-x0)</pre>
 <div class="well well-sm">
-$$\frac{1}{- x_{0} + x_{1}} \left(x - x_{0}\right) \left(- \sin{\left (x_{0} \right )} + \sin{\left (x_{1} \right )}\right) + \sin{\left (x_{0} \right )}$$</div>
+\begin{equation*}\frac{\left(x - x_{0}\right) \left(- \sin{\left (x_{0} \right )} + \sin{\left (x_{1} \right )}\right)}{- x_{0} + x_{1}} + \sin{\left (x_{0} \right )}\end{equation*}</div>
 
 <p>And taking a limit:</p><pre class="sourceCode julia">limit(p, x1 => x0)</pre>
 <div class="well well-sm">
-$$x \cos{\left (x_{0} \right )} - x_{0} \cos{\left (x_{0} \right )} + \sin{\left (x_{0} \right )}$$</div>
+\begin{equation*}x \cos{\left (x_{0} \right )} - x_{0} \cos{\left (x_{0} \right )} + \sin{\left (x_{0} \right )}\end{equation*}</div>
 
 <p>Or with a symbolic function</p><pre class="sourceCode julia">u = SymFunction("u")
 p = u[x0] + u[x0, x1]*(x-x0)</pre>
 <div class="well well-sm">
-$$\frac{1}{- x_{0} + x_{1}} \left(x - x_{0}\right) \left(- u{\left (x_{0} \right )} + u{\left (x_{1} \right )}\right) + u{\left (x_{0} \right )}$$</div>
+\begin{equation*}\frac{\left(x - x_{0}\right) \left(- u{\left (x_{0} \right )} + u{\left (x_{1} \right )}\right)}{- x_{0} + x_{1}} + u{\left (x_{0} \right )}\end{equation*}</div>
 
 <pre class="sourceCode julia">limit(p, x1 => x0)  # this is u(x_0) + u'(x_0) * (x - x_0)</pre>
 <div class="well well-sm">
-$$x \left. \frac{d}{d \xi_{1}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=x_{0} }} - x_{0} \left. \frac{d}{d \xi_{1}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=x_{0} }} + u{\left (x_{0} \right )}$$</div>
+\begin{equation*}x \left. \frac{d}{d \xi_{1}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=x_{0} }} - x_{0} \left. \frac{d}{d \xi_{1}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=x_{0} }} + u{\left (x_{0} \right )}\end{equation*}</div>
 
 <p>More generally, we can take more points:</p><pre class="sourceCode julia">@vars x h x0
 x1 = x0+h; x2=x0+2h; x3=x0+3h
 p = u[x0] + u[x0, x1]*(x-x0) + u[x0, x1, x2]*(x-x0)*(x-x1)+u[x0, x1,x2,x3]*(x-x0) *(x-x1)*(x-x2)</pre>
 <div class="well well-sm">
-$$u{\left (x_{0} \right )} + \frac{1}{3 h} \left(x - x_{0}\right) \left(- \frac{1}{2 h} \left(- \frac{1}{h} \left(- u{\left (x_{0} \right )} + u{\left (h + x_{0} \right )}\right) + \frac{1}{h} \left(- u{\left (h + x_{0} \right )} + u{\left (2 h + x_{0} \right )}\right)\right) + \frac{1}{2 h} \left(- \frac{1}{h} \left(- u{\left (h + x_{0} \right )} + u{\left (2 h + x_{0} \right )}\right) + \frac{1}{h} \left(- u{\left (2 h + x_{0} \right )} + u{\left (3 h + x_{0} \right )}\right)\right)\right) \left(- 2 h + x - x_{0}\right) \left(- h + x - x_{0}\right) + \frac{1}{2 h} \left(x - x_{0}\right) \left(- \frac{1}{h} \left(- u{\left (x_{0} \right )} + u{\left (h + x_{0} \right )}\right) + \frac{1}{h} \left(- u{\left (h + x_{0} \right )} + u{\left (2 h + x_{0} \right )}\right)\right) \left(- h + x - x_{0}\right) + \frac{1}{h} \left(x - x_{0}\right) \left(- u{\left (x_{0} \right )} + u{\left (h + x_{0} \right )}\right)$$</div>
+\begin{equation*}u{\left (x_{0} \right )} + \frac{\left(x - x_{0}\right) \left(- \frac{- \frac{- u{\left (x_{0} \right )} + u{\left (h + x_{0} \right )}}{h} + \frac{- u{\left (h + x_{0} \right )} + u{\left (2 h + x_{0} \right )}}{h}}{2 h} + \frac{- \frac{- u{\left (h + x_{0} \right )} + u{\left (2 h + x_{0} \right )}}{h} + \frac{- u{\left (2 h + x_{0} \right )} + u{\left (3 h + x_{0} \right )}}{h}}{2 h}\right) \left(- 2 h + x - x_{0}\right) \left(- h + x - x_{0}\right)}{3 h} + \frac{\left(x - x_{0}\right) \left(- \frac{- u{\left (x_{0} \right )} + u{\left (h + x_{0} \right )}}{h} + \frac{- u{\left (h + x_{0} \right )} + u{\left (2 h + x_{0} \right )}}{h}\right) \left(- h + x - x_{0}\right)}{2 h} + \frac{\left(x - x_{0}\right) \left(- u{\left (x_{0} \right )} + u{\left (h + x_{0} \right )}\right)}{h}\end{equation*}</div>
 
 <pre class="sourceCode julia">limit(p, h=>0)(x0 => 0)  # u(0) + u'(0)x + (1/2) * u''(0)x^2 + (1/6) * u'''(0)x^3</pre>
 <div class="well well-sm">
-$$\frac{x^{3}}{6} \left. \frac{d^{3}}{d \xi_{1}^{3}}  u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }} + \frac{x^{2}}{2} \left. \frac{d^{2}}{d \xi_{1}^{2}}  u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }} + x \left. \frac{d}{d \xi_{1}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }} + u{\left (0 \right )}$$</div>
+\begin{equation*}\frac{x^{3} \left. \frac{d^{3}}{d \xi_{1}^{3}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }}}{6} + \frac{x^{2} \left. \frac{d^{2}}{d \xi_{1}^{2}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }}}{2} + x \left. \frac{d}{d \xi_{1}} u{\left (\xi_{1} \right )} \right|_{\substack{ \xi_{1}=0 }} + u{\left (0 \right )}\end{equation*}</div>
 
 
   </div>
-</div>  
+</div>
 
 </body>
 </html>

@@ -23,6 +23,7 @@ Consider $f(x) = \sin(x)$ on $[0, \pi/2]$. Then the interpolation
 between 2 points is just a secant line:
 
 ```
+using Plots
 f(x) = sin(x)
 a,b = pi/2 * sort(rand(2))
 g(x) = f(a) + (f(b)-f(a))/(b-a)*(x-a)
@@ -67,18 +68,17 @@ end
 n = 4
 f(x) = cos(x)
 a,b = 0, pi/2
-xs = a + sort(rand(n+1)) * b
+xs = a .+ sort(rand(n+1)) * b
 
 ## prod_j=0^(k-1)(x-x_j)
 prodk(x, k, xs) = prod([ x - xs[j+1] for j in 0:(k-1)])
 ## sum _(k=0)^n f[x_0, \dots x_k] prod_j=0^(k-1)(x-x_j)
-p4(x) = f(xs[1]) + sum( [ dd(f, xs[1:(k+1)]) * prodk(x, k, xs) for k in 1:n])
+p4(x) = f(xs[1]) .+ sum( [ dd(f, xs[1:(k+1)]) * prodk(x, k, xs) for k in 1:n])
 ```
 
 To visualize we try:
 
 ```
-using Plots
 plot(f, 0, pi/2)
 plot!(p4)
 ```
@@ -170,8 +170,8 @@ For these nodes, we have $max_{[-1,1]} |x-x_i|$ is as small as possible.
 using Polynomials
 f(x) =  sin(4x) + cos(x)^2
 n = 5
-xs = sort(2*rand(n) - 1)
-zs = cos.((2*(0:4) +1)/(2n)* pi)
+xs = sort(2*rand(n) .- 1)
+zs = cos.((2*(0:4) .+1)/(2n)* pi)
 p = Polynomials.polyfit(xs, f.(xs))
 q = Polynomials.polyfit(zs, f.(zs))
 plot(f, -1, 1, legend=false, linewidth=3)
@@ -198,7 +198,8 @@ a,b = -5, 5
 
 
 function show_n(n)
-  xs = linspace(a, b, n + 1 + 2)[2:end-1]
+  xs = (a:(b-a)/(n+1+2):b)[2:end-1]
+#  xs = linspace(a, b, n + 1 + 2)[2:end-1]
 
   ip(x)  = f(xs[1]) + sum( [ dd(f, xs[1:(k+1)]) * prodk(x, k, xs) for k in 1:n])
   plot(f, a, b)
@@ -323,7 +324,8 @@ B(t) = \sum_{k=0}^n {n \choose k} t^k (1-t)^k P_k
 Can we graph?
 
 ```
-choose(n,k) = gamma(n+1) / gamma(k+1) / gamma(n-k+1)   
+using SpecialFunctions
+choose(n,k) = gamma(n+1) / gamma(k+1) / gamma(n-k+1)
 ```
 
 ```
@@ -333,6 +335,3 @@ B(t) = sum(choose(n,k) * t^k *(1-t)^(n-k) * Ps[k+1] for k in 0:n)
 plot(t -> B(t)[1], t -> B(t)[2], 0, 1, legend=false)
 scatter!([u[1] for u in Ps], [u[2] for u in Ps])
 ```
-
-
-
