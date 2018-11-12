@@ -53,6 +53,7 @@ $$~
 With this, we have the $2$-norm, the $1$-norm and the limiting $\infty$-norm.
 
 ```
+using LinearAlgebra
 x = [1,2,3]
 norm(x, 2)  # default so just norm(x) works too
 ```
@@ -142,7 +143,7 @@ $$~
 
 ### Can we identify these norms
 
-> Thm. (p287) The norm induced by the $2$-norm is the largest singular value.
+> Thm. (p294) The norm induced by the $2$-norm is the largest singular value.
 
 (A singular value is an eigen value of $A^T A$.)
 
@@ -165,7 +166,7 @@ We wish to quantify when a matrix might give issues, beginning with two examples
 
 ### perturbed matrix
 
-The inequalities $\| Ax\| \leq \|A\| \|x\|$ and $\|AB\| \leq \|A\| \|B\|$ are widely used. For ezample, Suppose we are considering $Ax=b$. One solution would be to form the inverse and write $x = A^{-1} b$. The compuation is not always possible though, so we might end up with $B \approx A^{-1}$. Then we have $\tilde{x} = Bb$. What can we say about how far apart $x$ and $\tilde{x}$ are?
+The inequalities $\| Ax\| \leq \|A\| \|x\|$ and $\|AB\| \leq \|A\| \|B\|$ are widely used. For example, Suppose we are considering $Ax=b$. One solution would be to form the inverse and write $x = A^{-1} b$. The compuation is not always possible though, so we might end up with $B \approx A^{-1}$. Then we have $\tilde{x} = Bb$. What can we say about how far apart $x$ and $\tilde{x}$ are?
 
 $$~
 \| x - \tilde{x} \| = \| x - Bb \| = \|x - BAx\| = \|(I - BA)x\| \leq \|I - BA\| \|x\|.
@@ -222,7 +223,7 @@ What is the condition number? For the $l_\infty$ norm, we have the row sums, $\s
 B = [14 2 -3;  -4 -4 3; -4 2 0]
 ```
 
-The largest row sum is $14 + 2 +3 = 19$. So the 
+The largest row sum is $14 + 2 +3 = 19$. So the
 $l_\infty$ norm of the inverse is $1/6 \cdot 19$. This gives a condition number of:
 
 ```
@@ -344,7 +345,3 @@ $$~
 \leq
 \kappa(A) \frac{\|r\|}{\|b\|}.
 ~$$
-
-
-
-

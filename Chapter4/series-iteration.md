@@ -17,6 +17,7 @@ A^0, A^1, A^2, \dots, A^n, \dots
 Example:
 
 ```
+using LinearAlgebra
 A = (1/4) * [1 2; 2 1]
 ```
 
@@ -287,7 +288,7 @@ b = [11, 11, 11]/18
 We take $Q$ to be the identify matrix, $I$:
 
 ```
-Q = eye(3)
+Q = diagm(0 => [1,1,1])
 ```
 
 We check that $\| I - Q^{-1}A \| < 1$:
@@ -320,8 +321,8 @@ Now we repeat 100 more times:
 
 ```
 for k in 1:100
-  r = b - A*x 
-  x = x + r
+  global r = b - A*x
+  global x = x + r
 end
 x, b - A*x
 ```
@@ -342,10 +343,10 @@ and $b$:
 b = [2, -4, 5]
 ```
 
-Now, let $Q$ be the diagonal matrix of $A$. 
+Now, let $Q$ be the diagonal matrix of $A$.
 
 ```
-Q = diagm(diag(A))   # diag finds element, diagm makes matrix
+Q = diagm(0=>diag(A))   # diag finds element, diagm makes matrix
 ```
 
 We have
@@ -385,7 +386,7 @@ Not really, let's repeat 20 times:
 
 ```
 for k in 1:20
-  x = Q \ ((Q-A)*x + b)
+	global x = Q \ ((Q-A)*x + b)
 end
 ```
 
@@ -400,7 +401,7 @@ Another 20 times gets us closer:
 
 ```
 for k in 1:20
-  x = Q \ ((Q-A)*x + b)
+  global x = Q \ ((Q-A)*x + b)
 end
 A*x - b
 ```
@@ -431,7 +432,7 @@ With a starting point at $x=[0,0,0]$ we dash off $20$ iterations:
 ```
 x = [0,0,0]
 for k in 1:20
-  x = Q \ ((Q-A)*x + b)
+  global x = Q \ ((Q-A)*x + b)
 end
 A*x - b
 ```
@@ -532,12 +533,3 @@ $$~
 Hence, as $x^k \rightarrow (I-G)^{-1}c$.
 
 If $\rho(G) \geq 1$, then with $x^0 = 0$ we get $x^k = \sum_{j=0}^{k-1} G^j c$. We can select $\lambda$ and $u$ where $Gu = \lambda u$ and $|\lambda| > 1$. Taking this as $c$, we get $x^k = \sum_{j=0}^{k-1} \lambda^j u$ and this will diverge.
-
-
-
-
-
-
-
-
-

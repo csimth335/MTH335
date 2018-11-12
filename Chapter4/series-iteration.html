@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -108,7 +108,8 @@ $( document ).ready(function() {
 </blockquote><p>Which is not the case on infinite dimensional spaces such as the space of functions.</p><h2>Example, iterations of a matrix $A$</h2><p>Take $A$ to be a square matrix. Then we can form a series of matrices by</p>$$~
 A^0, A^1, A^2, \dots, A^n, \dots
 ~$$
-<p>Example:</p><pre class="sourceCode julia">A = (1/4) * [1 2; 2 1]</pre>
+<p>Example:</p><pre class="sourceCode julia">using LinearAlgebra
+A = (1/4) * [1 2; 2 1]</pre>
 <pre class="output">
 2×2 Array{Float64,2}:
  0.25  0.5 
@@ -116,27 +117,27 @@ A^0, A^1, A^2, \dots, A^n, \dots
 
 <p>Then we have</p><pre class="sourceCode julia">A^1, A^2, A^3, A^4</pre>
 <pre class="output">
-([0.25 0.5; 0.5 0.25], [0.3125 0.25; 0.25 0.3125], [0.203125 0.21875; 0.21875 0.203125], [0.160156 0.15625; 0.15625 0.160156])</pre>
+([0.25 0.5; 0.5 0.25], [0.3125 0.25; 0.25 0.3125], [0.203125 0.21875; 0.21875 0.203125], [0.16015625 0.15625; 0.15625 0.16015625])</pre>
 
 <p>The terms seem to be getting smaller.</p><blockquote>
 <p>Claim: $A^k \rightarrow 0$.</p>
 </blockquote><p>Let's show the following: for a unit vector, we have $(4/3)^k A^k u \rightarrow (1/2) [1,1]$.</p><pre class="sourceCode julia">n = 1; (4/3)^n * A^n * [1,0]</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- 0.333333
- 0.666667</pre>
+ 0.3333333333333333
+ 0.6666666666666666</pre>
 
 <pre class="sourceCode julia">n =5; (4/3)^n * A^n * [1,0]</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- 0.497942
- 0.502058</pre>
+ 0.49794238683127556
+ 0.5020576131687241 </pre>
 
 <p>And jumping ahead:</p><pre class="sourceCode julia">n = 20; (4/3)^n * A^n * [1,0]</pre>
 <pre class="output">
 2-element Array{Float64,1}:
- 0.5
- 0.5</pre>
+ 0.5000000001433981
+ 0.4999999998566009</pre>
 
 <blockquote>
 <p>Claim: $\sum A_k$ exists.</p>
@@ -197,52 +198,52 @@ x^1 = x^0 + e^0
 <pre class="output">
 4-element Array{Float64,1}:
  0.999988
- 1.00014 
+ 1.000137
  0.99967 
- 1.00022 </pre>
+ 1.000215</pre>
 
 <p>And indeed we have:</p><pre class="sourceCode julia">r0 = b - A*x0</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- -0.000105
- -7.0e-5  
- -3.5e-5  
- -4.8e-5  </pre>
+ -0.00010499999996227416
+ -7.000000005064066e-5  
+ -3.500000002532033e-5  
+ -4.799999999249849e-5  </pre>
 
 <p>Can we refine it?</p><pre class="sourceCode julia">e0 = A \ r0
 x1 = x0 + e0</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- 1.0
- 1.0
- 1.0
- 1.0</pre>
+ 0.9999999999999989
+ 1.0000000000000373
+ 0.9999999999998813
+ 1.0000000000000882</pre>
 
 <p>The answer is $[1,1,1,1]$. We aren't quite there:</p><pre class="sourceCode julia">x1 - [1,1,1,1]</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- -1.11022e-15
-  3.73035e-14
- -1.18683e-13
-  8.81517e-14</pre>
+ -1.1102230246251565e-15
+  3.730349362740526e-14 
+ -1.1868284133242923e-13
+  8.815170815523743e-14 </pre>
 
 <p>We try to refine it again:</p><pre class="sourceCode julia">r1 = b - A*x1
 e1 = A \ r1
 x2 = x1 + e1</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- 1.0
- 1.0
- 1.0
- 1.0</pre>
+ 0.9999999999999989
+ 1.0000000000000373
+ 0.9999999999998813
+ 1.0000000000000882</pre>
 
 <p>And now</p><pre class="sourceCode julia">x2 - [1,1,1,1]</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- -1.11022e-15
-  3.73035e-14
- -1.18683e-13
-  8.81517e-14</pre>
+ -1.1102230246251565e-15
+  3.730349362740526e-14 
+ -1.1868284133242923e-13
+  8.815170815523743e-14 </pre>
 
 <p>So no better, as we got there in one step.</p><h3></h3><p>Suppose we have a <em>perturbed</em> inverse for $A$, $B$, which yields $x^0 = B b$ and is used for solving. (This might be due just to round off.)</p><p>Then we have</p>$$~
 x^1 = x^0 + e^0 = x^0 + Br^0 = x^0 + B(b - Ax^0)
@@ -283,45 +284,45 @@ Q x^{k+1} = (Q- A)x^k + b.
 b = [11, 11, 11]/18</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 0.611111
- 0.611111
- 0.611111</pre>
+ 0.6111111111111112
+ 0.6111111111111112
+ 0.6111111111111112</pre>
 
-<p>We take $Q$ to be the identify matrix, $I$:</p><pre class="sourceCode julia">Q = eye(3)</pre>
+<p>We take $Q$ to be the identify matrix, $I$:</p><pre class="sourceCode julia">Q = diagm(0 => [1,1,1])</pre>
 <pre class="output">
-3×3 Array{Float64,2}:
- 1.0  0.0  0.0
- 0.0  1.0  0.0
- 0.0  0.0  1.0</pre>
+3×3 Array{Int64,2}:
+ 1  0  0
+ 0  1  0
+ 0  0  1</pre>
 
 <p>We check that $\| I - Q^{-1}A \| < 1$:</p><pre class="sourceCode julia">norm(I - A)</pre>
 <pre class="output">
-0.8333333333333333</pre>
+1.0408329997330665</pre>
 
 <p>So our convergence should hold.</p><p>With this $Q$, our iteration step is just $x^{k+1} = (I-A)x^{k} + b = x^k + (b - Ax^k) = x^k + r^k$</p><p>And we start at $x=[0,0,0]$. What do 100 iterations produce:</p><pre class="sourceCode julia">x = [0,0,0]
 r = b - A*x
 x = x + r</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 0.611111
- 0.611111
- 0.611111</pre>
+ 0.6111111111111112
+ 0.6111111111111112
+ 0.6111111111111112</pre>
 
 <p>and again</p><pre class="sourceCode julia">r = b - A*x
 x = x+r</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 0.101852
- 0.101852
- 0.101852</pre>
+ 0.10185185185185186
+ 0.10185185185185186
+ 0.10185185185185186</pre>
 
 <p>Now we repeat 100 more times:</p><pre class="sourceCode julia">for k in 1:100
-  r = b - A*x 
-  x = x + r
+  global r = b - A*x
+  global x = x + r
 end
 x, b - A*x</pre>
 <pre class="output">
-([0.333333, 0.333333, 0.333333], [5.12428e-9, 5.12428e-9, 5.12428e-9])</pre>
+([0.3333333305382701, 0.3333333305382701, 0.3333333305382701], [5.124282664858981e-9, 5.124282775881284e-9, 5.124282664858981e-9])</pre>
 
 <p>Such a choice of $Q$ is called the Richardson method.</p><h3>Example</h3><p>For a different example, take $A$ by</p><pre class="sourceCode julia">A = [2 -1 0; 1 6 -2; 4 -3 9]</pre>
 <pre class="output">
@@ -337,7 +338,7 @@ x, b - A*x</pre>
  -4
   5</pre>
 
-<p>Now, let $Q$ be the diagonal matrix of $A$. </p><pre class="sourceCode julia">Q = diagm(diag(A))   # diag finds element, diagm makes matrix</pre>
+<p>Now, let $Q$ be the diagonal matrix of $A$.</p><pre class="sourceCode julia">Q = diagm(0=>diag(A))   # diag finds element, diagm makes matrix</pre>
 <pre class="output">
 3×3 Array{Int64,2}:
  2  0  0
@@ -346,7 +347,7 @@ x, b - A*x</pre>
 
 <p>We have</p><pre class="sourceCode julia">norm(I - inv(Q)*A)</pre>
 <pre class="output">
-0.6773603649878651</pre>
+0.8351831321318283</pre>
 
 <p>So we should have convergence of the algorithm</p>$$~
 Qx^{k+1} = (Q-A)x^k + b
@@ -355,44 +356,44 @@ Qx^{k+1} = (Q-A)x^k + b
 x = Q \ ((Q-A)*x + b)</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  1.0     
- -0.666667
-  0.555556</pre>
+  1.0               
+ -0.6666666666666666
+  0.5555555555555556</pre>
 
 <p>We repeat a few times:</p><pre class="sourceCode julia">x = Q \ ((Q-A)*x + b)
 x = Q \ ((Q-A)*x + b)</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  0.675926 
- -0.814815 
-  0.0432099</pre>
+  0.6759259259259259 
+ -0.8148148148148149 
+  0.04320987654320982</pre>
 
 <p>Are we close?</p><pre class="sourceCode julia">A*x - b</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  0.166667
- -0.299383
-  0.537037</pre>
+  0.16666666666666696
+ -0.29938271604938294
+  0.5370370370370372 </pre>
 
 <p>Not really, let's repeat 20 times:</p><pre class="sourceCode julia">for k in 1:20
-  x = Q \ ((Q-A)*x + b)
+	global x = Q \ ((Q-A)*x + b)
 end</pre>
 <p>And check the residual</p><pre class="sourceCode julia">A*x - b</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  7.64267e-9
- -2.52226e-8
-  5.48885e-8</pre>
+  7.642672716912102e-9 
+ -2.522262487758553e-8 
+  5.4888486644699697e-8</pre>
 
 <p>Another 20 times gets us closer:</p><pre class="sourceCode julia">for k in 1:20
-  x = Q \ ((Q-A)*x + b)
+  global x = Q \ ((Q-A)*x + b)
 end
 A*x - b</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  8.88178e-16
- -8.88178e-16
-  5.32907e-15</pre>
+  8.881784197001252e-16
+ -8.881784197001252e-16
+  5.329070518200751e-15</pre>
 
 <p>For this method, called <em>Jacobi iteration</em> the solving part is trivial, as $Q$ is diagonal. The multiplying by $(Q-A)$ need not be costly for sparse matrices, so it could possibly be faster than the direct method of $LU$ factorization.</p><h3>Example</h3><p>If we let $Q$ be the lower triangular part of $A$ we get the <em>Gauss-Seidel</em> method. Let's see that this converges as well:</p><p>For our same A, we now define $Q$ by:</p><pre class="sourceCode julia">Q = tril(A)</pre>
 <pre class="output">
@@ -403,18 +404,18 @@ A*x - b</pre>
 
 <p>We have</p><pre class="sourceCode julia">norm(I - inv(Q)*A)</pre>
 <pre class="output">
-0.5780112546868472</pre>
+0.6655082528172744</pre>
 
 <p>so convergence should occur.</p><p>With a starting point at $x=[0,0,0]$ we dash off $20$ iterations:</p><pre class="sourceCode julia">x = [0,0,0]
 for k in 1:20
-  x = Q \ ((Q-A)*x + b)
+  global x = Q \ ((Q-A)*x + b)
 end
 A*x - b</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- -1.15941e-11
-  9.57945e-12
-  0.0        </pre>
+ -1.159405904616051e-11
+  9.5794483456757e-12  
+  0.0                  </pre>
 
 <p>This method seems to converge faster than Jacobi iteration. It has other advantages, such as being able to be run in parallel.</p><h3>convergence of the method</h3><blockquote>
 <p>Thm. (p210) Suppose $\| I - Q^{-1}A\| < 1$ for some subordinate matrix norm. Then the sequence started at $x^0$ will converge in the associated vector norm.</p>
@@ -454,7 +455,7 @@ x^k = G^k x^0 + \sum_{j=0}^{k-1} G^j c.
 ~$$
 <p>Hence, as $x^k \rightarrow (I-G)^{-1}c$.</p><p>If $\rho(G) \geq 1$, then with $x^0 = 0$ we get $x^k = \sum_{j=0}^{k-1} G^j c$. We can select $\lambda$ and $u$ where $Gu = \lambda u$ and $|\lambda| > 1$. Taking this as $c$, we get $x^k = \sum_{j=0}^{k-1} \lambda^j u$ and this will diverge.</p>
   </div>
-</div>  
+</div>
 
 </body>
 </html>

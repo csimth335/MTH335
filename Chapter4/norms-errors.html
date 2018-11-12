@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -138,7 +138,8 @@ $( document ).ready(function() {
 <p>In fact, for any $p \geq 1$, we can define the $p$-norm by:</p>$$~
 \| x \|_p = (x_1^p + x_2^p + \cdots + x_n^p)^{1/p}.
 ~$$
-<p>With this, we have the $2$-norm, the $1$-norm and the limiting $\infty$-norm.</p><pre class="sourceCode julia">x = [1,2,3]
+<p>With this, we have the $2$-norm, the $1$-norm and the limiting $\infty$-norm.</p><pre class="sourceCode julia">using LinearAlgebra
+x = [1,2,3]
 norm(x, 2)  # default so just norm(x) works too</pre>
 <pre class="output">
 3.7416573867739413</pre>
@@ -228,7 +229,7 @@ B_1(x) = \{ y : \| y - x\| \leq 1 \}
  -4  -4   3
  -4   2   0</pre>
 
-<p>The largest row sum is $14 + 2 +3 = 19$. So the  $l_\infty$ norm of the inverse is $1/6 \cdot 19$. This gives a condition number of:</p><pre class="sourceCode julia">18 * 19 /6</pre>
+<p>The largest row sum is $14 + 2 +3 = 19$. So the $l_\infty$ norm of the inverse is $1/6 \cdot 19$. This gives a condition number of:</p><pre class="sourceCode julia">18 * 19 /6</pre>
 <pre class="output">
 57.0</pre>
 
@@ -292,7 +293,7 @@ norm(b - bt, Inf)/norm(b, Inf)</pre>
 
 <p>But solving yields two values quite a distance apart</p><pre class="sourceCode julia">x, xt = A \ b, A \ bt</pre>
 <pre class="output">
-([1.0, 2.0], [-300.0, 300.0])</pre>
+([0.9999999999955147, 2.000000000004441], [-300.00000000003587, 300.0000000000355])</pre>
 
 <p>And these have a relative error of:</p><pre class="sourceCode julia">norm(x-xt, Inf) / norm(x, Inf)</pre>
 <pre class="output">
@@ -312,7 +313,7 @@ norm(b - bt, Inf)/norm(b, Inf)</pre>
 ~$$
 
   </div>
-</div>  
+</div>
 
 </body>
 </html>
