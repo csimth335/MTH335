@@ -218,7 +218,7 @@ $$~
 We can implement this with just a little work:
 
 ```
-type DFunction
+struct DFunction
 f
 fp
 end
@@ -240,7 +240,7 @@ import Base: *, +,-,  ^
 
 (F::DFunction)(G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
 (F::DFunction)(x::Real) = F.f(x)
-Base.transpose(F::DFunction) = x->F.fp(x) ## does '
+Base.adjoint(F::DFunction) = x->F.fp(x) ## does '
 ```
 
 
@@ -259,7 +259,7 @@ Sin'(1) - cos(1)
 And it is faster too:
 
 ```
-@time prod([Sin(n*X) for n in 1:100])'(1/10) # 0.021830 
+@time prod([Sin(n*X) for n in 1:100])'(1/10) # 0.021830
 ```
 
 Against

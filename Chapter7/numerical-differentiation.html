@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -136,22 +136,22 @@ ds = [(f(c+h) - f(c)) / h for h in hs]
 [hs ds ds.-fp(c)] # a table</pre>
 <pre class="output">
 16×3 Array{Float64,2}:
-  1.0e-5        0.333332  -1.57134e-6 
-  1.0e-6        0.333333  -1.57161e-7 
-  1.0e-7        0.333333  -1.57186e-8 
-  1.0e-8        0.333333  -5.72657e-9 
-  1.0e-9        0.333333   2.75801e-8 
-  1.0e-10       0.333333   2.75801e-8 
-  1.0e-11       0.333333   2.75801e-8 
-  1.0e-12       0.3334     6.6641e-5  
-  1.0e-13       0.333067  -0.000266426
-  1.0e-14       0.333067  -0.000266426
-  1.0e-15       0.333067  -0.000266426
-  1.0e-16       0.0       -0.333333   
-  1.0e-17       0.0       -0.333333   
-  1.0e-18       0.0       -0.333333   
- -1.18389e-19  -0.0       -0.333333   
-  1.28762e-19   0.0       -0.333333   </pre>
+  1.0e-5                   0.3333317619924614   -1.5713408718642796e-6
+  1.0e-6                   0.3333331761723457   -1.5716098755724772e-7
+  1.0e-7                   0.33333331761475904  -1.571857422000278e-8 
+  1.0e-8                   0.33333332760676626  -5.72656699837637e-9  
+  1.0e-9                   0.333333360913457     2.7580123740378326e-8
+  1.0e-10                  0.333333360913457     2.7580123740378326e-8
+  1.0e-11                  0.333333360913457     2.7580123740378326e-8
+  1.0e-12                  0.3333999742949345    6.664096160124977e-5 
+  1.0e-13                  0.33306690738754696  -0.0002664259457862972
+  1.0e-14                  0.33306690738754696  -0.0002664259457862972
+  1.0e-15                  0.33306690738754696  -0.0002664259457862972
+  1.0e-16                  0.0                  -0.33333333333333326  
+  1.0e-17                  0.0                  -0.33333333333333326  
+  1.0e-18                  0.0                  -0.33333333333333326  
+ -1.1838881245526248e-19  -0.0                  -0.33333333333333326  
+  1.2876178137472069e-19   0.0                  -0.33333333333333326  </pre>
 
 <p>We see that somewhere the answer went off the rails.</p><h3>A strategy</h3><p>Can we get smaller truncation error, so we can get more accuracy before round off considerations come into play?</p><p>The central difference will also converge to $f'$. However, the error is different:</p>$$~
 \begin{align}
@@ -162,7 +162,7 @@ ds = [(f(c+h) - f(c)) / h for h in hs]
 <p>Subtract and divide by $2h$ to get:</p>$$~
 \frac{f(x+h) - f(x)}{2h} = f'(x) + \frac{h^2}{12}(f'''(\xi_1) + f'''(\xi_2)).
 ~$$
-<p>We we too assume $f'''$ is continuous, then we could replace $ (f'''(\xi_1) + f'''(\xi_2))$ with $2f'''(\xi_3)$, so the error is basically</p>$$~
+<p>We we too assume $f'''$ is continuous, then we could replace $ (f'''(\xi<em>1) + f'''(\xi</em>2))$ with $2f'''(\xi_3)$, so the error is basically</p>$$~
 \frac{h^2}{6} f'''(\xi)
 ~$$
 <h3>Relate to polynomial</h3><p>What would be derivative of the function if you only knew its values at $x-h, x, x+h$?</p><p>Well, we could find the interpolating polynomial and find its derivative.</p><p>For example, suppose in general we have points $x_0, x_1, x_2$:</p>$$~
@@ -181,7 +181,7 @@ f(x) = atan(x)
 x0, x1, x2 = x-h, x, x + h
 f[x0,x1] + f[x0,x1,x2] * (2x -(x0 + x1)) |> simplify</pre>
 <div class="well well-sm">
-$$\frac{1}{2 h} \left(\operatorname{atan}{\left (h - x \right )} + \operatorname{atan}{\left (h + x \right )}\right)$$</div>
+\begin{equation*}\frac{\operatorname{atan}{\left (h - x \right )} + \operatorname{atan}{\left (h + x \right )}}{2 h}\end{equation*}</div>
 
 <h4>Keeping track of the error term</h4><p>We have – in the LaGrange Base (p470):</p>$$~
 f(x) = \sum_0^n f(x_i) l_i(x) + \frac{f^{(n+1)}(\xi)}{(n+1)!} w(x),
@@ -192,7 +192,7 @@ f'(x) =  \sum_0^n f(x_i) l_i'(x) +
 \frac{f^{(n+1)}(\xi)}{(n+1)!} w'(x) +
 \frac{d}{dx}(\frac{f^{(n+1)}(\xi)}{(n+1)!}) w(x) .
 ~$$
-<p>Rather than differentiate $\xi_x$, we take $x=x_\alphpa$ as $w(x_\alpha) = 0$. So this simplifies to:</p>$$~
+<p>Rather than differentiate $\xi_x$, we take $x=x_\alpha$ as $w(x_\alpha) = 0$. So this simplifies to:</p>$$~
 f'(x_\alpha) = \sum_0^n f(x_i) l_i'(x_\alpha)  +
 \frac{f^{(n+1)}(\xi)}{(n+1)!} w'(x_\alpha)
 ~$$
@@ -221,7 +221,7 @@ f(g(x)) &= \begin{bmatrix}f(g(x))\\ f'(g(x)) g'(x) \end{bmatrix}
 \begin{bmatrix}x \cdot x        \\ x\cdot 1 + 1\cdot x\end{bmatrix}
 = \begin{bmatrix} \sin(x^2)     \\ \cos(x^2) \cdot (x\cdot 1 + 1\cdot x) \end{bmatrix}
 ~$$
-<p>We can implement this with just a little work:</p><pre class="sourceCode julia">type DFunction
+<p>We can implement this with just a little work:</p><pre class="sourceCode julia">struct DFunction
 f
 fp
 end
@@ -243,7 +243,7 @@ import Base: *, +,-,  ^
 
 (F::DFunction)(G::DFunction) = DFunction(x -> F.f(G.f(x)), x->F.fp(G.f(x)) * G.fp(x))
 (F::DFunction)(x::Real) = F.f(x)
-Base.transpose(F::DFunction) = x->F.fp(x) ## does '</pre>
+Base.adjoint(F::DFunction) = x->F.fp(x) ## does '</pre>
 <pre class="sourceCode julia">Sin(1) - sin(1)</pre>
 <pre class="output">
 0.0</pre>
@@ -256,7 +256,7 @@ Base.transpose(F::DFunction) = x->F.fp(x) ## does '</pre>
 <pre class="output">
 3.552713678800501e-15</pre>
 
-<p>And it is faster too:</p><pre class="sourceCode julia">@time prod([Sin(n*X) for n in 1:100])'(1/10) # 0.021830 </pre>
+<p>And it is faster too:</p><pre class="sourceCode julia">@time prod([Sin(n*X) for n in 1:100])'(1/10) # 0.021830</pre>
 <pre class="output">
 -2.5913297117126114e-29</pre>
 
@@ -264,11 +264,11 @@ Base.transpose(F::DFunction) = x->F.fp(x) ## does '</pre>
 x = symbols("x")
 @time diff(prod([sin(n*x) for n in 1:100]), x)(x => 1/10) # 3.031204</pre>
 <div class="well well-sm">
-$$-2.59132971171261 \cdot 10^{-29}$$</div>
+\begin{equation*}-2.59132971171261 \cdot 10^{-29}\end{equation*}</div>
 
 <p>Julia has several packages for computing automatic derivatives including <code>ForwardDiff</code> and <code>ReverseDiff</code>. (The difference is one is better with many inputs, the other with many outputs.)</p>
   </div>
-</div>  
+</div>
 
 </body>
 </html>

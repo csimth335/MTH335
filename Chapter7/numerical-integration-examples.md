@@ -6,6 +6,7 @@
 A Newton-Cotes formula uses an interpolating polynomial over $[a,b]$ to estimate $f$ and in turn the integral of $f$ over $[a,b]$. The nodes are evenly spaced, e.g.: `{a}`, `{a,b}`, `{a,(a+b)/2, b}`, ...
 
 ```
+linspace(a,b,n=251) = range(a,stop=b, length=n)
 function interpolating_nodes(a, b, n)
   n == 0 && return [a]
   collect(linspace(a,b,n+1))
@@ -26,7 +27,7 @@ function quadrature(f, a, b, nodes)
 	As = [quadgk(l(i, nodes), a, b)[1] for i in eachindex(nodes)]
 	sum(f(nodes[i]) * As[i] for i in eachindex(nodes))
 end
-   
+
 function newton_cotes(f, a, b, n)
   nodes = interpolating_nodes(a, b, n)
   quadrature(f, a, b, nodes)
@@ -64,7 +65,7 @@ function err(n)
   newton_cotes(p, a, b, n) - quadgk(fn, a, b)[1]
 end
 [err(n) for n in 0:6]
-```  
+```
 
 
 ## Gauss quadrature
@@ -97,7 +98,7 @@ We were told that these give exact quadrature for polynomials in $\Pi_{2n+1}$.
 n = 5
 a,b = -1, 1
 pn = ps[n+1]  # 1 - based
-nodes = solve(pn)  # solve p(x) == 0  
+nodes = solve(pn)  # solve p(x) == 0
 ```
 
 ```
@@ -106,7 +107,7 @@ function err(i)
    Fn = x -> x^(i+1)/(i+1)
    quadrature(fn, a, b, N.(nodes)) - (Fn(b) - Fn(a))
 end
-n = length(nodes) - 1   
+n = length(nodes) - 1
 [err(i) for i in 0:2n+1]
 ```
 
@@ -217,5 +218,3 @@ and
 ```
 Sin.n
 ```
-
-

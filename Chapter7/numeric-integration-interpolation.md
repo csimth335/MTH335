@@ -12,7 +12,8 @@ We can approximate an integral a few ways. First, if we approximate $f$ by $g$, 
 For example, if we approximate $\sin(x)$ by its Taylor polynomial of degree $5$ we get an approximation.
 
 ```
-using Roots
+using Roots, ForwardDiff
+D(f,n=1) = n == 0 ? f : n > 1 ? D(D(f),n-1) : x -> ForwardDiff.derivative(f, float(x))
 using Polynomials
 f(x) = sin(x)
 x = poly([0.0])
@@ -25,7 +26,8 @@ Integrating over $[0,\pi]$ gives an exact answer of 2. This one approximates via
 
 
 ```
-diff(map(x->polyval(polyint(g), x), [0, pi]))
+G = polyint(g)
+G(pi) - G(0) # is this 2?
 ```
 
 Not so close!
@@ -38,7 +40,7 @@ The Taylor series isn't the best approximation over an interval, rather it is go
 
 ```
 using Plots
-plot([f, x -> polyval(g, x)], 0, pi)
+plot([f, x -> g(x)], 0, pi)
 ```
 
 
@@ -98,7 +100,7 @@ $$~
 \int_a^b (f(x) - p(x))dx  = -\int_a^b  f''(\xi_x)/2 (x-a)(x-b) dx = -f''(\xi) \int_a^b (x-a)(x-b)/2 dx = -f''(\xi) (b-a)^3/12.
 ~$$
 
-Again, the error depends on the length of the integral cubed. 
+Again, the error depends on the length of the integral cubed.
 
 
 ### The more familiar trapezoid rule:
@@ -146,6 +148,7 @@ simpson(f, a, b) = (b-a)/6*(f(a) + 4f((a+b)/2) + f(b))
 Let's look at $f(x) = e^x$ between $0$ and $\log(2)$ with an answer of $e^{log(2)} - e^0 = 2 - 1 = 1$.
 
 ```
+linspace(a,b,n=251) = range(a, stop=b, length=n)
 n = 10
 a,b = 0, log(2)
 xs = linspace(a, b, n+1)
@@ -224,7 +227,7 @@ How to compare:
 ```
 n = 3
 i = 0:n
-cos.((i+1)*pi/(n+2))
+cos.((i.+1)*pi/(n+2))
 ```
 
 These values are the zeros of the function
@@ -248,9 +251,3 @@ $$~
 ~$$
 
 > Thm (p487): For monic polynomials $p$ of degree $n$, the Chebyshev polynomials minimize $\int_{-1}^1 |p(x)| dx$.
-
-
-
-
-
-

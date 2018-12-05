@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -105,7 +105,8 @@ $( document ).ready(function() {
   <div class="span10 offset1">
 <h1>Numeric integration based on interpolation.</h1><p>The process of integration has an <em>easy</em> answer: $\int_a^b f(x) dx = F(b) - F(a)$ <em>when</em> you can find an antiderivative $F$. But that isn't always the case.</p><blockquote>
 <p>The <a href="https://en.wikipedia.org/wiki/Risch_algorithm">Risch algorithm</a> characterizes when an <em>elementary</em> function has an antiderivative of a specific form.  The original problem is posed by Liouville. Not all elementary functions (functions obtained by composing exponentials, logarithms, radicals, trigonometric functions, and the four arithmetic operations (+ − × ÷)) are integrable. For example, $f(x) = \exp(x^2)$.</p>
-</blockquote><h2>What to do when you can't find an antiderivative?</h2><p>We can approximate an integral a few ways. First, if we approximate $f$ by $g$, then $\int_a^b f(x) dx \approx \int_a^b g(x) dx$.</p><p>For example, if we approximate $\sin(x)$ by its Taylor polynomial of degree $5$ we get an approximation.</p><pre class="sourceCode julia">using Roots
+</blockquote><h2>What to do when you can't find an antiderivative?</h2><p>We can approximate an integral a few ways. First, if we approximate $f$ by $g$, then $\int_a^b f(x) dx \approx \int_a^b g(x) dx$.</p><p>For example, if we approximate $\sin(x)$ by its Taylor polynomial of degree $5$ we get an approximation.</p><pre class="sourceCode julia">using Roots, ForwardDiff
+D(f,n=1) = n == 0 ? f : n > 1 ? D(D(f),n-1) : x -> ForwardDiff.derivative(f, float(x))
 using Polynomials
 f(x) = sin(x)
 x = poly([0.0])
@@ -114,17 +115,17 @@ g, polyint(g)</pre>
 <pre class="output">
 (Poly(1.0*x - 0.16666666666666666*x^3 + 0.008333333333333333*x^5), Poly(0.5*x^2 - 0.041666666666666664*x^4 + 0.001388888888888889*x^6))</pre>
 
-<p>Integrating over $[0,\pi]$ gives an exact answer of 2. This one approximates via:</p><pre class="sourceCode julia">diff(map(x->polyval(polyint(g), x), [0, pi]))</pre>
+<p>Integrating over $[0,\pi]$ gives an exact answer of 2. This one approximates via:</p><pre class="sourceCode julia">G = polyint(g)
+G(pi) - G(0) # is this 2?</pre>
 <pre class="output">
-1-element Array{Float64,1}:
- 2.21135</pre>
+2.2113528429825005</pre>
 
 <p>Not so close!</p><p>The Taylor series isn't the best approximation over an interval, rather it is good near a point, in this case $c=0$.</p><pre class="sourceCode julia">using Plots
-plot([f, x -> polyval(g, x)], 0, pi)</pre>
-    <div id="7d25b672-9324-48e5-8623-806ee1a06a95" style="width:600px;height:400px;"></div>
+plot([f, x -> g(x)], 0, pi)</pre>
+    <div id="f9589268-d848-4a91-8506-bc93b2623bda" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('7d25b672-9324-48e5-8623-806ee1a06a95');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.015339511014701464,0.03067541242093728,0.17166717434870798,0.3092109495508594,0.38905360195643246,0.4660711028717981,0.528569798326157,0.5883242430613824,0.64976343137182,0.7072222201480519,0.7563636858789748,0.8015668055511774,0.8453874952692148,0.88414893600324,0.9224276439123988,0.953297448140898,0.9743114618127554,0.9891442673157648,0.9969893076459937,0.999969950348809,0.9976603433323025,0.9895650509231215,0.9756317894726576,0.955973171617894,0.9277136899890839,0.892799925717166,0.8536308148768001,0.8089183002652021,0.7568615568015717,0.699491362414812,0.6473736431477508,0.5920349014277694,0.44512104927186746,0.2949169869941366,0.03991632077017152],"type":"scatter","name":"y1","yaxis":"y","x":[0.015340112644426933,0.030680225288853866,0.17252171697354257,0.31436320865823125,0.39960403291889857,0.48484485717956594,0.5569148892483315,0.6289849213170972,0.7072731766942932,0.7855614320714894,0.8577362788103786,0.9299111255492679,1.0072901891756778,1.0846692528020878,1.1743204864101577,1.2639717200182279,1.3436431565239784,1.423314593029729,1.4931792632139245,1.5630439333981199,1.639215177553415,1.71538642170871,1.7920103724793233,1.8686343232499367,1.9533518991288894,2.038069475007842,2.11867611078605,2.1992827465642577,2.2830949451205087,2.3669071436767597,2.437459162487701,2.508011181298642,2.6802832177626836,2.8422240131314496,3.1016657253491733]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.030675412420942356,0.3092110096676083,0.4660723484522798,0.5883319284669571,0.6497808761586655,0.7072585374155731,0.7564307693029837,0.801684689126639,0.845593342442877,0.8844937399188665,0.9230271346626385,0.9542977416262005,0.9758415258568157,0.991427286657274,1.0001732790582354,1.0043422393821217,1.0037403960673696,0.9978916341076183,0.9868964262522322,0.971016241111002,0.9481408265455626,0.9201697846429002,0.8893752555572255,0.8551209698810402,0.7759552027445169,0.7056542136502948,0.6635724374713655,0.6238430018746416,0.590054539350293,0.5611775133729703,0.5426307483492475,0.529084405288722,0.5214446237851065,0.5206701403130787,0.5212243276115256,0.5219687899756136,0.5229073630372536],"type":"scatter","name":"y2","yaxis":"y","x":[0.030680225288853866,0.31436320865823125,0.48484485717956594,0.6289849213170972,0.7072731766942932,0.7855614320714894,0.8577362788103786,0.9299111255492679,1.0072901891756778,1.0846692528020878,1.1743204864101577,1.2639717200182279,1.3436431565239784,1.423314593029729,1.4931792632139245,1.5630439333981199,1.639215177553415,1.71538642170871,1.7920103724793233,1.8686343232499367,1.9533518991288894,2.038069475007842,2.11867611078605,2.1992827465642577,2.3669071436767597,2.508011181298642,2.5941471995306626,2.6802832177626836,2.7612536154470666,2.8422240131314496,2.9070844411858805,2.9719448692403114,3.0368052972947424,3.1016657253491733,3.1116474574093282,3.121629189469483,3.131610921529638]}], {"showlegend":true,"xaxis":{"gridwidth":0.5,"tickvals":[1.0,2.0,3.0],"ticks":"inside","tickmode":"array","domain":[0.05100612423447069,0.9934383202099737],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"gridwidth":0.5,"tickvals":[0.2,0.4,0.6000000000000001,0.8,1.0],"ticks":"inside","tickmode":"array","domain":[0.03762029746281716,0.9901574803149606],"linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","tickangle":0,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgba(0, 0, 0, 1.000)","ticktext":["0.2","0.4","0.6","0.8","1.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('f9589268-d848-4a91-8506-bc93b2623bda');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.015340112644426933,0.030680225288853866,0.17252171697354257,0.31436320865823125,0.39960403291889857,0.48484485717956594,0.5569148892483315,0.6289849213170972,0.7072731766942932,0.7855614320714894,0.8577362788103786,0.9299111255492679,1.0072901891756778,1.0846692528020878,1.1743204864101577,1.2639717200182279,1.3436431565239784,1.423314593029729,1.4931792632139245,1.5630439333981199,1.639215177553415,1.71538642170871,1.7920103724793233,1.8686343232499367,1.9533518991288894,2.038069475007842,2.11867611078605,2.1992827465642577,2.2830949451205087,2.3669071436767597,2.437459162487701,2.508011181298642,2.6802832177626836,2.8422240131314496,3.1016657253491733],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.015339511014701464,0.03067541242093728,0.17166717434870798,0.3092109495508594,0.38905360195643246,0.4660711028717981,0.528569798326157,0.5883242430613824,0.64976343137182,0.7072222201480519,0.7563636858789748,0.8015668055511774,0.8453874952692148,0.88414893600324,0.9224276439123988,0.953297448140898,0.9743114618127554,0.9891442673157648,0.9969893076459937,0.999969950348809,0.9976603433323025,0.9895650509231215,0.9756317894726576,0.955973171617894,0.9277136899890839,0.892799925717166,0.8536308148768001,0.8089183002652021,0.7568615568015717,0.699491362414812,0.6473736431477508,0.5920349014277694,0.44512104927186746,0.2949169869941366,0.03991632077017152],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.030680225288853866,0.31436320865823125,0.48484485717956594,0.6289849213170972,0.7072731766942932,0.7855614320714894,0.8577362788103786,0.9299111255492679,1.0072901891756778,1.0846692528020878,1.1743204864101577,1.2639717200182279,1.3436431565239784,1.423314593029729,1.4931792632139245,1.5630439333981199,1.639215177553415,1.71538642170871,1.7920103724793233,1.8686343232499367,1.9533518991288894,2.038069475007842,2.11867611078605,2.1992827465642577,2.3669071436767597,2.508011181298642,2.5941471995306626,2.6802832177626836,2.7612536154470666,2.8422240131314496,2.9070844411858805,2.9719448692403114,3.0368052972947424,3.1016657253491733,3.1116474574093282,3.121629189469483,3.131610921529638],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.030675412420942356,0.3092110096676083,0.4660723484522798,0.5883319284669571,0.6497808761586655,0.7072585374155731,0.7564307693029837,0.801684689126639,0.845593342442877,0.8844937399188665,0.9230271346626385,0.9542977416262005,0.9758415258568157,0.991427286657274,1.0001732790582354,1.0043422393821217,1.0037403960673696,0.9978916341076183,0.9868964262522322,0.971016241111002,0.9481408265455626,0.9201697846429002,0.8893752555572255,0.8551209698810402,0.7759552027445169,0.7056542136502948,0.6635724374713655,0.6238430018746416,0.590054539350293,0.5611775133729703,0.5426307483492475,0.529084405288722,0.5214446237851065,0.5206701403130787,0.5212243276115256,0.5219687899756136,0.5229073630372536],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,1.0,2.0,3.0],"visible":true,"ticks":"inside","range":[-0.0781480116221294,3.2250990457961946],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.25,0.5,0.75,1.0],"visible":true,"ticks":"inside","range":[-0.014330570836321143,1.0340123212331445],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.00","0.25","0.50","0.75","1.00"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <h3>Polynomial interpolation</h3><p>We discussed that there exists a unique polynomial of degree $n$ or less that goes through the points $(x_i, f(x_i))$ for $i=0, 1, \dots, n$. We gave a formula in terms of <em>divided differences</em>. This is due to Newton. Lagrange gave an alternate form. Let</p>$$~
 l_i(x) = \prod_{j=0, j\neq i}^n \frac{x - x_j}{x_i-x_j}.
@@ -148,7 +149,7 @@ l_0(x) = \frac{b-x}{b-a}, \quad \text{ and } l_1(x) = \frac{x-a}{b-a}
 <p>And $A_0 = A_1 = (b-a)/2$.</p><p>So, $\int_a^b f(x) dx \approx f(x_0)A_0 + f(x_1) A_1 = (b-a)/2 \cdot (f(a)  + f(b))$. The formula for the trapezoid.</p><p>To compute the error, we have $f(x) - p(x) = f''(\xi_x)/2 (x-a)(x-b)$. Is we write:</p>$$~
 \int_a^b (f(x) - p(x))dx  = -\int_a^b  f''(\xi_x)/2 (x-a)(x-b) dx = -f''(\xi) \int_a^b (x-a)(x-b)/2 dx = -f''(\xi) (b-a)^3/12.
 ~$$
-<p>Again, the error depends on the length of the integral cubed. </p><h3>The more familiar trapezoid rule:</h3><p>Take the partition $a=x_0 < x_1 < \cdots < x_{n-1} < x_n = b$ and apply the trapezoid rule to each pair. This will give an approximation formula. Suppose $x_i = a + (b-a)/n \cdot i$. Then the formulas become:</p>$$~
+<p>Again, the error depends on the length of the integral cubed.</p><h3>The more familiar trapezoid rule:</h3><p>Take the partition $a=x_0 < x_1 < \cdots < x_{n-1} < x_n = b$ and apply the trapezoid rule to each pair. This will give an approximation formula. Suppose $x_i = a + (b-a)/n \cdot i$. Then the formulas become:</p>$$~
 \int_a^b f(x) dx \approx \frac{h}{2}(f(a) + 2 \sum_{i=1}^{n-1} f(a + ih) + f(b)), \quad h=(b-a)/2.
 ~$$
 <p>The errors add to give:</p>$$~
@@ -166,7 +167,8 @@ simpson(f, a, b) = (b-a)/6*(f(a) + 4f((a+b)/2) + f(b))</pre>
 <pre class="output">
 simpson (generic function with 1 method)</pre>
 
-<p>Let's look at $f(x) = e^x$ between $0$ and $\log(2)$ with an answer of $e^{log(2)} - e^0 = 2 - 1 = 1$.</p><pre class="sourceCode julia">n = 10
+<p>Let's look at $f(x) = e^x$ between $0$ and $\log(2)$ with an answer of $e^{log(2)} - e^0 = 2 - 1 = 1$.</p><pre class="sourceCode julia">linspace(a,b,n=251) = range(a, stop=b, length=n)
+n = 10
 a,b = 0, log(2)
 xs = linspace(a, b, n+1)
 xis = zip(xs[1:end-1], xs[2:end])
@@ -180,7 +182,7 @@ s = sum([simpson(f, xi, xi1) for (xi,xi1) in xis])
 [r-1 t-1 s-1]</pre>
 <pre class="output">
 1×3 Array{Float64,2}:
- -0.034257  0.000400345  8.01396e-9</pre>
+ -0.03425701357316213  0.00040034545483513817  8.01396171645763e-9</pre>
 
 <h2>Change of variables</h2><p>If we have a formula to approximate $\int_c^d f(x) dx$ then we can do a linear $u$-substitution to integrate over $[a,b]$. The transform is</p>$$~
 u(t) = \frac{b-a}{d-c}t + \frac{ad - bc}{d-c}
@@ -210,13 +212,13 @@ title!(string(v))
 end</pre>
 <p>How to compare:</p><pre class="sourceCode julia">n = 3
 i = 0:n
-cos.((i+1)*pi/(n+2))</pre>
+cos.((i.+1)*pi/(n+2))</pre>
 <pre class="output">
 4-element Array{Float64,1}:
-  0.809017
-  0.309017
- -0.309017
- -0.809017</pre>
+  0.8090169943749475 
+  0.30901699437494745
+ -0.30901699437494734
+ -0.8090169943749473 </pre>
 
 <p>These values are the zeros of the function</p>$$~
 U_{n+1}(x) = \frac{\sin((n+2)\theta)}{\sin(\theta)}, \quad x = \cos(\theta).
@@ -231,7 +233,7 @@ U_{n+1}(x) = \frac{\sin((n+2)\theta)}{\sin(\theta)}, \quad x = \cos(\theta).
 <p>Thm (p487): For monic polynomials $p$ of degree $n$, the Chebyshev polynomials minimize $\int_{-1}^1 |p(x)| dx$.</p>
 </blockquote>
   </div>
-</div>  
+</div>
 
 </body>
 </html>
