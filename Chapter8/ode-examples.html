@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) {
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Some example ODEs</h1><h2>Newton</h2><ul>
+<li><p>The famous equation $F=ma$ can be written as a differential equation via $F=m dv/dt$ or $F = m d^2x /dt^2$.</p>
+</li>
+</ul><p>This equation is solved to give the basic equations of motion.</p><pre class="sourceCode julia">using SymPy
+v = SymFunction("v")
+@vars t F m t0 v0
+eqn = dsolve(v'(t) - F/m, t, (v, t0, v0))</pre>
+<div class="well well-sm">
+\begin{equation*}v{\left (t \right )} = \frac{F t}{m} - \frac{F t_{0}}{m} + v_{0}\end{equation*}</div>
+
+<pre class="sourceCode julia">x = SymFunction("x")
+@vars x0
+eqn = dsolve(x'(t) - rhs(eqn), t, (x, t0, x0))</pre>
+<div class="well well-sm">
+\begin{equation*}x{\left (t \right )} = \frac{F t^{2}}{2 m} + \frac{F t_{0}^{2}}{2 m} - t_{0} v_{0} + x_{0} + \frac{t \left(- F t_{0} + m v_{0}\right)}{m}\end{equation*}</div>
+
+<pre class="sourceCode julia">using Plots
+fn = lambdify(real(rhs(eqn(t0=>0, x0=>0, v0=>10,F => -9.8, m => 1))))
+plot(fn, color=:red, 0, 2)</pre>
+    <div id="95b140cc-3b53-4b7b-a542-6ecf1a8bd666" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('95b140cc-3b53-4b7b-a542-6ecf1a8bd666');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.009765819019788131,0.019531638039576263,0.10983073618816097,0.20012983433674567,0.2543958284739967,0.30866182261124775,0.35454303002138965,0.4004242374315315,0.4502640887488172,0.5001039400661028,0.5460518745676796,0.5919998090692563,0.641260850941118,0.6905218928129796,0.7475956407450222,0.8046693886770646,0.8553898004495537,0.9061102122220429,0.9505874426512415,0.99506467308044,1.0435567931955396,1.092048913310639,1.1408292354081317,1.1896095575056242,1.2435424413772163,1.2974753252488085,1.3487911033692477,1.4001068814896869,1.453463384256194,1.506819887022701,1.5517346971781958,1.5966495073336904,1.6514853996532093,1.7063212919727282,1.7578686481150725,1.809416004257417,1.8919988661447684,1.9745817280321198,1.9872908640160598],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(255, 0, 0, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.09719087121435777,0.1934471044616684,1.039199687884606,1.8050437854683554,2.2268438207696084,2.6197848344977603,2.929496575543831,3.21857848169446,3.509225914365838,3.7755300413997914,3.9994727620542987,4.202725598396187,4.397652662557519,4.568798554305097,4.737350121351517,4.873979043908433,4.968608622001213,5.038027110424358,5.0781536444939,5.098893583102254,5.09941510689506,5.076892070697946,5.030984766707996,4.96175816844348,4.8580751765907655,4.725886376303528,4.573647575105117,4.395602344882466,4.183110376631943,3.9427186277841937,3.718732176691093,3.4749757919192135,3.150574272720263,2.7967043976738264,2.4371857794237535,2.051627287906072,1.3796560849315433,0.6408495769974678,0.5212162469722799],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.5,1.0,1.5,2.0],"visible":true,"ticks":"inside","range":[-0.04955993233010001,2.0466166153659477],"domain":[0.02137649460484106,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.0","0.5","1.0","1.5","2.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,1.0,2.0,3.0,4.0,5.0],"visible":true,"ticks":"inside","range":[-0.0528758558560633,5.249481833965482],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","1","2","3","4","5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
+<ul>
+<li><p>The Newton law of cooling</p>
+</li>
+</ul>$$dT/dt = -r(T - T_a)$$
+<p>.</p><pre class="sourceCode julia">T = SymFunction("T")
+@vars Ta T0 r
+eqn = dsolve(T'(t) + r * (T(t) - Ta), t, (T, t0, T0))</pre>
+<div class="well well-sm">
+\begin{equation*}T{\left (t \right )} = Ta + \left(T_{0} - Ta\right) e^{- r t} e^{r t_{0}}\end{equation*}</div>
+
+<pre class="sourceCode julia">fn = rhs(eqn(t0 => 0, T0=>10, r=>2, Ta=>5))
+plot(lambdify(fn), 0, 5)</pre>
+    <div id="fef67d7d-60cf-44ca-937d-7329fd1bd844" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('fef67d7d-60cf-44ca-937d-7329fd1bd844');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.012207273774735164,0.02441454754947033,0.036621821324205495,0.04882909509894066,0.10526603144180609,0.16170296778467153,0.21813990412753695,0.2745768404704024,0.3874507131561332,0.5003245858418641,0.568157078513428,0.6359895711849918,0.7038220638565555,0.7716545565281194,0.886357575053474,1.0010605935788286,1.250259850165257,1.4799995226731408,1.7263047320324492,2.0116734716926614,2.2652755305551073,2.4876616827011,2.7301222832765975,2.9740238937640604,3.2436883131220213,3.5002672037242175,3.7670497175567528,3.9916237683342257,4.26580322993182,4.523540010643543,4.9364543200802995],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[9.879405383924723,9.761719380134714,9.646871836033604,9.534794291030106,9.050765394465182,8.618400136353113,8.23218411134098,7.887191503406898,7.30374598253981,6.838203508775134,6.60499999811455,6.401381828317918,6.22359565797302,6.068364312963515,5.849355682377723,5.675242580114116,5.41021175053084,5.259094833209357,5.158314526347972,5.089464889124939,5.05387368448996,5.034531426623027,5.02126257797273,5.013054663208021,5.007612689798253,5.004556973896148,5.002672712184573,5.0017056489510106,5.000985690105458,5.000588671585948,5.000257762812385],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,1.0,2.0,3.0,4.0,5.0],"visible":true,"ticks":"inside","range":[-0.13552013761443177,5.084181731469466],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","1","2","3","4","5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[5.0,6.0,7.0,8.0,9.0,10.0],"visible":true,"ticks":"inside","range":[4.853883334179015,10.025779812558094],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["5","6","7","8","9","10"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
+<ul>
+<li><p>Hooke's law</p>
+</li>
+</ul><p>Hooke's law is a law of physics that states that the force (F) needed to extend or compress a spring by some distance x scales linearly with respect to that distance. That is: $F_{s}=-kx$.</p><p>Using $F=ma = m d^2x/dt^2$ we have $x''(t) = -kx(t)$.</p><p>It can be seen that $\cos(\sqrt{k}t)$ and $\sin(\sqrt{t}t)$ will be solutions.</p><h2>The tractrix</h2><p>The trajectory determined by the middle of the back axle of a car pulled by a rope at a constant speed and with a constant direction (initially perpendicular to the vehicle).</p>$$~
+dx/dt = - \sqrt{a^2 - x^2}/x.
+~$$
+<p>One solution is</p><pre class="sourceCode julia">a = 2
+y(t) = a*log((a + sqrt(a^2 + t^2))/t - sqrt(a^2 - t^2))
+plot(y, 0, 1.9)</pre>
+    <div id="af54c58f-b96c-4bdb-8665-52e0c466555f" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('af54c58f-b96c-4bdb-8665-52e0c466555f');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.00014496137607498006,0.0002899227521499601,0.0004348841282249402,0.0005798455042999202,0.0007248068803749003,0.0008697682564498804,0.0010147296325248604,0.0011596910085998405,0.0014496137607498006,0.0017395365128997607,0.002029459265049721,0.002319382017199681,0.002899227521499601,0.0034790730257995214,0.004058918530099442,0.004638764034399362,0.005798455042999202,0.006958146051599043,0.008117837060198883,0.009277528068798724,0.011596910085998405,0.013916292103198086,0.016235674120397767,0.018555056137597448,0.023916565090169664,0.02927807404274188,0.0346395829953141,0.040001091947886314,0.05072410985303075,0.06144712775817518,0.08289316356846405,0.10433919937875291,0.12578523518904178,0.14723127099933064,0.1686773068096195,0.19012334261990838,0.24167603705029686,0.29322873148068535,0.33681587852032013,0.3804030255599549,0.4750987430627977,0.5623998186157935,0.6559957981723308,0.7644359192432113,0.8608047016109407,0.9453114394264179,1.037446467645107,1.130129079630343,1.2326015589863681,1.3301015374152028,1.431478892671566,1.5168170319670058,1.6210052273740918,1.718945204044546,1.875852641630514],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[20.450530204084668,19.064090873710747,18.25301568299075,17.67750655833578,17.231074470710123,16.866286366881056,16.557840011743362,16.290632225771027,15.844055105983337,15.479121954298618,15.170530535625034,14.903177670449947,14.456310345309724,14.091086925765785,13.78220517683362,13.514561919108056,13.067113622421676,12.701308983456782,12.39184576809326,12.123620797792446,11.675008341000456,11.30803856780535,10.997409251095519,10.728017219375127,10.21497001898781,9.805038888252286,9.46332002289916,9.170091472436347,8.684264819283648,8.289850911369092,7.669303856956728,7.187229678560582,6.791405250733255,6.454507359511331,6.16043536740052,5.8989006804918285,5.365593049754673,4.925280844130779,4.602789800155059,4.314177194396257,3.7722281571092506,3.347079427954358,2.9486350381953743,2.5446094715643066,2.228711261078626,1.9815642817131447,1.7423067117624873,1.533089321559738,1.3392943517285156,1.1931156933199205,1.082989311136882,1.0254745879745255,1.0021532731775413,1.032022242588124,1.2132966231779811],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.5,1.0,1.5],"visible":true,"ticks":"inside","range":[-0.056126269031558186,1.932123872038147],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.0","0.5","1.0","1.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[5.0,10.0,15.0,20.0],"visible":true,"ticks":"inside","range":[0.41870196525032755,21.03398151201188],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["5","10","15","20"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
+
+  </div>
+</div>
+
+</body>
+</html>

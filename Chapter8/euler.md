@@ -21,7 +21,7 @@ for i in 1:n
   ti, xi = ts[end], xs[end]
 
   xi1 = xi + f(ti, xi) * h
-  
+
   push!(ts, ti + h)
   push!(xs, xi1)
 end
@@ -46,7 +46,7 @@ How does this compare to the actual answer?
 using SymPy
 u = SymFunction("u")
 @vars t
-eqn = dsolve(u'(t) - f(t, u(t)), t, (u, t0, x0))
+eqn = dsolve(u'(t) - f(t, u(t)), t, (u, t0, x0))[1]
 fn = lambdify(real(rhs(eqn)))
 plot!(fn, color=:red)
 ```
@@ -136,7 +136,7 @@ for i in 1:n
   xpppi = -2b*(xpi^2 + xi * xppi)
   xppppi = -2b*( 2xpi * xppi + xpi * xppi + xi * xpppi)
   xi1 = xi + xpi*h/1 + xppi*h^2/2 + xpppi*h^3/6 + xppppi * h^4 / 24
-  
+
   push!(ts, ti + h)
   push!(xs, xi1)
 end
@@ -176,13 +176,13 @@ An interesting application is [here](https://github.com/PerezHz/TaylorIntegratio
 
 We have this description of Euler's method (from [Wikipedia](https://en.wikipedia.org/wiki/Euler_method))
 
-> The Euler method is a first-order method, which means that the local error (error per step) is proportional to the square of the step size, and the global error (error at a given time) is proportional to the step size. 
+> The Euler method is a first-order method, which means that the local error (error per step) is proportional to the square of the step size, and the global error (error at a given time) is proportional to the step size.
 
 
 The *local error* is proportional to the step size -- Why? We have
 
 $$~
-x(t + h) = x(t) + x'(t) h + \mathcal(O)h^2.
+x(t + h) = x(t) + x'(t) h + \mathcal{O}(h^2).
 ~$$
 
 The global error is propogated through $c/h$ steps, so the errors accumulate to give basically $\mathcal{O}(h)$, or proportional to the step size.
@@ -192,7 +192,7 @@ More rigorously, we have with $x^*_i$ being the estimate and assuming Lipschitz:
 
 $$~
 GTE_{i+1} = |x^*_{i+1} - x_{i+1}| =
-|x^*_i- + h \cdot f(t_i, x^*_i) -  x_{i+1} + h \cdot f(t_i, x_i) +  x_{i+1} + h \cdot f(t_i, x_i) - x_{i+1}| \leq
+|x^*_i- + h \cdot f(t_i, x^*_i) -  (x_{i} + h \cdot f(t_i, x_i) + \mathcal{O}(h^2)| \leq
 \delta + (1 + Lh) \cdot |x^*_i - x_i|,
 ~$$
 
@@ -213,13 +213,3 @@ GTE \leq \delta \cdot \frac{1 - \gamma^{(t-t_0)/h}}{1 - \gamma} \leq \frac{M}{2L
 ~$$
 
 So we see $\mathcal{O}(h)$.
-
-
-
-
-
-
-
-
-
-

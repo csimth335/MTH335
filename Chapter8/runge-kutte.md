@@ -306,8 +306,8 @@ differential equations packages. (These must be installed to be used on JuliaBox
 For example,
 
 ```
-using DifferentialEquations
-f(t, u) = pi * exp(-t) * cos(pi*t) - u
+using OrdinaryDiffEq
+f(u, p, t) = pi * exp(-t) * cos(pi*t) - u
 u0 = 0.0
 tspan = (0.0, 1.0)
 prob = ODEProblem(f,u0,tspan)
@@ -329,7 +329,7 @@ The `DP5()` bit specifies the RK-4-5 method, the adaptive `Tsit5()`,
 the default, is more efficient:
 
 ```
-sol1 = solve(prob)
+sol1 = solve(prob,Tsit5())
 plot!(sol1)
 ```
 
@@ -377,4 +377,3 @@ The local truncation error, $Ch^5$ then looks like $(u-v)/(1 - 2^{-4})
 The book suggests that this difference can be monitored during the algorithm. If it gets too
 large the algorithm has more accumulated error than expected, and if
 so, can be repeated with a smaller $h$ in hopes of circumventing this.
-
