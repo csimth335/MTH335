@@ -207,7 +207,7 @@ This is from [Wikipedia](http://tinyurl.com/pzm7tww)
 The general form of an RK method becomes:
 
 $$~
-x_{n+1} = x_n + h \sum_{i=1}^s b_i k_i
+x_{n+1} = x_n + h \sum_{i=1}^s b_i k_i; \qua
 k_i = f(t_n + c_i h, x_n + h \sum_{j=1}^s a_{ij} k_j)
 ~$$
 
@@ -259,9 +259,9 @@ Becomes
 $$~
 \begin{array}{c|ccc}
 0 & &     &\\
-1/2 & 1/2   &\\
+1 & 1   &\\
 \hline
-& 1 & 1
+& 1/2 & 1/2
 \end{array}
 ~$$
 
@@ -271,11 +271,12 @@ The modified Euler method becomes
 $$~
 \begin{array}{c|ccc}
 0 & &     &\\
-1 & 1   &\\
+1/2 & 1/2   &\\
 \hline
-& 1/2 & 1/2
+& 1 & 1
 \end{array}
 ~$$
+
 
 
 
@@ -295,7 +296,7 @@ $$~
 
 
 
-To see some examples: [Runge-Kutta](https://github.com/JuliaLang/ODE.jl/blob/master/src/runge_kutta.jl) .
+To see some more examples: [Runge-Kutta](https://github.com/JuliaLang/ODE.jl/blob/master/src/runge_kutta.jl) .
 
 
 ### Examples
